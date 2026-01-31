@@ -376,10 +376,36 @@ npm run dev
 mvn test
 
 # Specific test class
-mvn test -Dtest=TestRunServiceTest
+mvn test -Dtest=TestRunRepositoryTest
 
 # With coverage
 mvn test jacoco:report
+```
+
+### Test Annotations
+
+```java
+// Repository tests - use @SpringBootTest with @Transactional
+@SpringBootTest
+@Transactional
+class RepositoryTest {
+    @Autowired
+    private EntityRepository repository;
+
+    @BeforeEach
+    void setUp() {
+        repository.deleteAll();
+    }
+}
+
+// Entity tests - pure unit tests, no Spring context needed
+class EntityTest {
+    @Test
+    void shouldCreateEntity() {
+        Entity entity = Entity.builder().name("test").build();
+        assertThat(entity.getName()).isEqualTo("test");
+    }
+}
 ```
 
 ---
