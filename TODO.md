@@ -3,11 +3,11 @@
 ## MVP Phase
 
 ### Backend - Database Layer
-- [ ] #1: Create TestRun entity and repository
-- [ ] #2: Create TestNode entity and repository
-- [ ] #3: Create TestStep entity and repository
-- [ ] #4: Create Attachment entity and repository
-- [ ] #5: Create EventLog entity and repository
+- [x] #1: Create TestRun entity and repository
+- [x] #2: Create TestNode entity and repository
+- [x] #3: Create TestStep entity and repository
+- [x] #4: Create Attachment entity and repository
+- [x] #5: Create EventLog entity and repository
 
 ### Backend - Services & Controllers
 - [ ] #6: Create Event Ingestion Controller
@@ -74,8 +74,8 @@
 
 | Phase | Total | Completed | Progress |
 |-------|-------|-----------|----------|
-| MVP | 25 | 0 | 0% |
+| MVP | 25 | 5 | 20% |
 | Phase 1 | 6 | 0 | 0% |
 | Phase 2 | 6 | 0 | 0% |
 | Phase 3 | 8 | 0 | 0% |
-| **Overall** | **45** | **0** | **0%** |
+| **Overall** | **45** | **5** | **11%** |
