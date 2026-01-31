@@ -38,3 +38,20 @@ utem.db
 
 ### Claude ###
 .claude/
+
+### Frontend ###
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
+
+### Logs ###
+*.log
+logs/
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### Attachments Storage ###
+attachments/
