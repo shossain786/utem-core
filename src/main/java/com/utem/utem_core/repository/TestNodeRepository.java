@@ -27,4 +27,8 @@ public interface TestNodeRepository extends JpaRepository<TestNode, String> {
     List<TestNode> findByFlakyTrue();
 
     List<TestNode> findByNameContainingIgnoreCase(String name);
+
+    long countByTestRunIdAndStatus(String runId, TestNode.NodeStatus status);
+
+    long countByTestRunIdAndNodeType(String runId, TestNode.NodeType nodeType);
 }
