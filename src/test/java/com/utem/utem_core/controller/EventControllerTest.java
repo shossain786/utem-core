@@ -4,6 +4,7 @@ import com.utem.utem_core.dto.EventRequest;
 import com.utem.utem_core.dto.EventResponse;
 import com.utem.utem_core.entity.EventLog;
 import com.utem.utem_core.repository.EventLogRepository;
+import com.utem.utem_core.service.EventProcessingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,9 @@ class EventControllerTest {
 
     @Mock
     private EventLogRepository eventLogRepository;
+
+    @Mock
+    private EventProcessingService eventProcessingService;
 
     @InjectMocks
     private EventController eventController;

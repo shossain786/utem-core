@@ -4,6 +4,7 @@ import com.utem.utem_core.dto.EventRequest;
 import com.utem.utem_core.dto.EventResponse;
 import com.utem.utem_core.entity.EventLog;
 import com.utem.utem_core.repository.EventLogRepository;
+import com.utem.utem_core.service.EventProcessingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 public class EventController {
 
     private final EventLogRepository eventLogRepository;
+    private final EventProcessingService eventProcessingService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -38,6 +40,7 @@ public class EventController {
             .build();
 
         EventLog saved = eventLogRepository.save(eventLog);
+        eventProcessingService.processEvent(saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(EventResponse.from(saved));
     }
 
@@ -59,6 +62,7 @@ public class EventController {
             .toList();
 
         List<EventLog> saved = eventLogRepository.saveAll(eventLogs);
+        saved.forEach(eventProcessingService::processEvent);
         List<EventResponse> responses = saved.stream()
             .map(EventResponse::from)
             .toList();
