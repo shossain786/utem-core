@@ -3,6 +3,8 @@ package com.utem.utem_core.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utem.utem_core.dto.EventPayload;
+import com.utem.utem_core.dto.websocket.RunSummaryMessage;
+import com.utem.utem_core.dto.websocket.WebSocketEventMessage;
 import com.utem.utem_core.entity.*;
 import com.utem.utem_core.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -23,6 +26,7 @@ public class EventProcessingService {
     private final TestStepRepository testStepRepository;
     private final AttachmentRepository attachmentRepository;
     private final ObjectMapper objectMapper;
+    private final Optional<WebSocketBroadcasterService> broadcasterService;
 
     private final Map<String, String> eventToTestRunMap = new ConcurrentHashMap<>();
     private final Map<String, String> eventToTestNodeMap = new ConcurrentHashMap<>();
@@ -71,6 +75,9 @@ public class EventProcessingService {
         eventToTestRunMap.put(eventLog.getEventId(), saved.getId());
         eventToTestRunMap.put(eventLog.getRunId(), saved.getId());
         log.debug("Created TestRun {} for event {}", saved.getId(), eventLog.getEventId());
+
+        broadcastEvent(eventLog, saved.getId(), "TEST_RUN", saved.getName(), saved.getStatus().name());
+        broadcastSummary(eventLog.getRunId(), saved);
     }
 
     private void handleTestRunFinished(EventLog eventLog, EventPayload payload) {
@@ -89,6 +96,9 @@ public class EventProcessingService {
             if (payload.skippedTests() != null) testRun.setSkippedTests(payload.skippedTests());
             testRunRepository.save(testRun);
             log.debug("Updated TestRun {} for event {}", testRunId, eventLog.getEventId());
+
+            broadcastEvent(eventLog, testRun.getId(), "TEST_RUN", testRun.getName(), testRun.getStatus().name());
+            broadcastSummary(eventLog.getRunId(), testRun);
         });
     }
 
@@ -126,6 +136,8 @@ public class EventProcessingService {
         TestNode saved = testNodeRepository.save(suite);
         eventToTestNodeMap.put(eventLog.getEventId(), saved.getId());
         log.debug("Created TestNode (SUITE) {} for event {}", saved.getId(), eventLog.getEventId());
+
+        broadcastEvent(eventLog, saved.getId(), "TEST_NODE", saved.getName(), saved.getStatus().name());
     }
 
     private void handleTestSuiteFinished(EventLog eventLog, EventPayload payload) {
@@ -141,6 +153,8 @@ public class EventProcessingService {
             if (payload.duration() != null) node.setDuration(payload.duration());
             testNodeRepository.save(node);
             log.debug("Updated TestNode (SUITE) {} for event {}", nodeId, eventLog.getEventId());
+
+            broadcastEvent(eventLog, node.getId(), "TEST_NODE", node.getName(), node.getStatus().name());
         });
     }
 
@@ -168,6 +182,8 @@ public class EventProcessingService {
         TestNode saved = testNodeRepository.save(testCase);
         eventToTestNodeMap.put(eventLog.getEventId(), saved.getId());
         log.debug("Created TestNode (SCENARIO) {} for event {}", saved.getId(), eventLog.getEventId());
+
+        broadcastEvent(eventLog, saved.getId(), "TEST_NODE", saved.getName(), saved.getStatus().name());
     }
 
     private void handleTestCaseFinished(EventLog eventLog, EventPayload payload) {
@@ -183,6 +199,8 @@ public class EventProcessingService {
             if (payload.duration() != null) node.setDuration(payload.duration());
             testNodeRepository.save(node);
             log.debug("Updated TestNode (SCENARIO) {} for event {}", nodeId, eventLog.getEventId());
+
+            broadcastEvent(eventLog, node.getId(), "TEST_NODE", node.getName(), node.getStatus().name());
         });
     }
 
@@ -208,6 +226,8 @@ public class EventProcessingService {
         TestStep saved = testStepRepository.save(step);
         eventToTestStepMap.put(eventLog.getEventId(), saved.getId());
         log.debug("Created TestStep {} for event {}", saved.getId(), eventLog.getEventId());
+
+        broadcastEvent(eventLog, saved.getId(), "TEST_STEP", saved.getName(), saved.getStatus().name());
     }
 
     private void handleTestPassed(EventLog eventLog, EventPayload payload) {
@@ -235,6 +255,8 @@ public class EventProcessingService {
             if (payload.duration() != null) node.setDuration(payload.duration());
             testNodeRepository.save(node);
             log.debug("Updated TestNode {} status to {} for event {}", nodeId, status, eventLog.getEventId());
+
+            broadcastEvent(eventLog, node.getId(), "TEST_NODE", node.getName(), node.getStatus().name());
         });
     }
 
@@ -261,6 +283,8 @@ public class EventProcessingService {
 
         Attachment saved = attachmentRepository.save(attachment);
         log.debug("Created Attachment {} for event {}", saved.getId(), eventLog.getEventId());
+
+        broadcastEvent(eventLog, saved.getId(), "ATTACHMENT", saved.getName(), saved.getType().name());
     }
 
     private String resolveTestRunId(EventLog eventLog) {
@@ -300,5 +324,22 @@ public class EventProcessingService {
             return testStepRepository.findById(stepId).orElse(null);
         }
         return null;
+    }
+
+    private void broadcastEvent(EventLog eventLog, String entityId, String entityType,
+                                String name, String status) {
+        broadcasterService.ifPresent(broadcaster -> {
+            WebSocketEventMessage message = WebSocketEventMessage.from(
+                    eventLog, entityId, entityType, name, status
+            );
+            broadcaster.broadcastEvent(eventLog.getRunId(), message);
+        });
+    }
+
+    private void broadcastSummary(String runId, TestRun testRun) {
+        broadcasterService.ifPresent(broadcaster -> {
+            RunSummaryMessage summary = RunSummaryMessage.from(runId, testRun);
+            broadcaster.broadcastSummary(runId, summary);
+        });
     }
 }
