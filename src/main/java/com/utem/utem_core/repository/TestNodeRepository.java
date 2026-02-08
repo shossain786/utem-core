@@ -3,8 +3,10 @@ package com.utem.utem_core.repository;
 import com.utem.utem_core.entity.TestNode;
 import com.utem.utem_core.entity.TestRun;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -31,4 +33,11 @@ public interface TestNodeRepository extends JpaRepository<TestNode, String> {
     long countByTestRunIdAndStatus(String runId, TestNode.NodeStatus status);
 
     long countByTestRunIdAndNodeType(String runId, TestNode.NodeType nodeType);
+
+    List<TestNode> findByNameAndNodeTypeOrderByTestRunStartTimeDesc(String name, TestNode.NodeType nodeType);
+
+    @Query("SELECT DISTINCT n.name FROM TestNode n WHERE n.flaky = true")
+    List<String> findDistinctFlakyTestNames();
+
+    List<TestNode> findByTestRunIdAndNodeTypeIn(String runId, Collection<TestNode.NodeType> nodeTypes);
 }

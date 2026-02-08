@@ -18,7 +18,7 @@
 - [x] #11: Create Attachment Controller
 - [x] #12: Create Run History Service
 - [x] #13: Create Run History Controller
-- [ ] #14: Create Flakiness Detection Service
+- [x] #14: Create Flakiness Detection Service
 - [ ] #15: Create Search and Filter Service
 - [ ] #16: Create Search Controller
 
@@ -74,8 +74,8 @@
 
 | Phase | Total | Completed | Progress |
 |-------|-------|-----------|----------|
-| MVP | 25 | 13 | 52% |
+| MVP | 25 | 14 | 56% |
 | Phase 1 | 6 | 0 | 0% |
 | Phase 2 | 6 | 0 | 0% |
 | Phase 3 | 8 | 0 | 0% |
-| **Overall** | **45** | **13** | **28%** |
+| **Overall** | **45** | **14** | **31%** |
