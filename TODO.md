@@ -16,7 +16,7 @@
 - [x] #9: Configure WebSocket for real-time updates
 - [x] #10: Create Attachment Storage Service
 - [x] #11: Create Attachment Controller
-- [ ] #12: Create Run History Service
+- [x] #12: Create Run History Service
 - [ ] #13: Create Run History Controller
 - [ ] #14: Create Flakiness Detection Service
 - [ ] #15: Create Search and Filter Service
@@ -74,8 +74,8 @@
 
 | Phase | Total | Completed | Progress |
 |-------|-------|-----------|----------|
-| MVP | 25 | 11 | 44% |
+| MVP | 25 | 12 | 48% |
 | Phase 1 | 6 | 0 | 0% |
 | Phase 2 | 6 | 0 | 0% |
 | Phase 3 | 8 | 0 | 0% |
-| **Overall** | **45** | **11** | **24%** |
+| **Overall** | **45** | **12** | **26%** |
