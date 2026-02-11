@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  /* Status colors */
+  --color-passed: #22c55e;
+  --color-failed: #ef4444;
+  --color-skipped: #eab308;
+  --color-running: #3b82f6;
+  --color-pending: #9ca3af;
+  --color-aborted: #f97316;
+
+  /* App colors */
+  --color-sidebar: #1e293b;
+  --color-sidebar-hover: #334155;
+  --color-sidebar-active: #0f172a;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
