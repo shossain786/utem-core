@@ -20,7 +20,7 @@
 - [x] #13: Create Run History Controller
 - [x] #14: Create Flakiness Detection Service
 - [x] #15: Create Search and Filter Service
-- [ ] #16: Create Search Controller
+- [x] #16: Create Search Controller
 
 ### Frontend
 - [ ] #17: Setup React frontend with Vite
@@ -74,8 +74,8 @@
 
 | Phase | Total | Completed | Progress |
 |-------|-------|-----------|----------|
-| MVP | 25 | 15 | 60% |
+| MVP | 25 | 16 | 64% |
 | Phase 1 | 6 | 0 | 0% |
 | Phase 2 | 6 | 0 | 0% |
 | Phase 3 | 8 | 0 | 0% |
-| **Overall** | **45** | **15** | **33%** |
+| **Overall** | **45** | **16** | **36%** |
