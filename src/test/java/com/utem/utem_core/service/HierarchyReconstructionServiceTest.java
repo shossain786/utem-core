@@ -1,6 +1,29 @@
 package com.utem.utem_core.service;
 
-import com.utem.utem_core.dto.*;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import org.mockito.Mock;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.utem.utem_core.dto.HierarchyNodeDTO;
+import com.utem.utem_core.dto.HierarchyOptions;
+import com.utem.utem_core.dto.NodePathDTO;
+import com.utem.utem_core.dto.NodeStatistics;
+import com.utem.utem_core.dto.TestRunHierarchyDTO;
 import com.utem.utem_core.entity.Attachment;
 import com.utem.utem_core.entity.TestNode;
 import com.utem.utem_core.entity.TestRun;
@@ -11,24 +34,9 @@ import com.utem.utem_core.repository.AttachmentRepository;
 import com.utem.utem_core.repository.TestNodeRepository;
 import com.utem.utem_core.repository.TestRunRepository;
 import com.utem.utem_core.repository.TestStepRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unused")
 class HierarchyReconstructionServiceTest {
 
     @Mock

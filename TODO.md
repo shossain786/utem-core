@@ -23,7 +23,7 @@
 - [x] #16: Create Search Controller
 
 ### Frontend
-- [ ] #17: Setup React frontend with Vite
+- [x] #17: Setup React frontend with Vite
 - [ ] #18: Create WebSocket client integration
 - [ ] #19: Create Dashboard component
 - [ ] #20: Create Test Run List component
@@ -74,8 +74,8 @@
 
 | Phase | Total | Completed | Progress |
 |-------|-------|-----------|----------|
-| MVP | 25 | 16 | 64% |
+| MVP | 25 | 17 | 68% |
 | Phase 1 | 6 | 0 | 0% |
 | Phase 2 | 6 | 0 | 0% |
 | Phase 3 | 8 | 0 | 0% |
-| **Overall** | **45** | **16** | **36%** |
+| **Overall** | **45** | **17** | **38%** |

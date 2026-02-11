@@ -1,6 +1,18 @@
 package com.utem.utem_core.service;
 
-import com.utem.utem_core.dto.*;
+import java.time.Instant;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.utem.utem_core.dto.AttachmentSummaryDTO;
+import com.utem.utem_core.dto.SearchResultDTO;
+import com.utem.utem_core.dto.TestNodeSummaryDTO;
+import com.utem.utem_core.dto.TestRunSummaryDTO;
+import com.utem.utem_core.dto.TestStepSummaryDTO;
 import com.utem.utem_core.entity.Attachment;
 import com.utem.utem_core.entity.TestNode;
 import com.utem.utem_core.entity.TestRun;
@@ -9,16 +21,9 @@ import com.utem.utem_core.repository.AttachmentRepository;
 import com.utem.utem_core.repository.TestNodeRepository;
 import com.utem.utem_core.repository.TestRunRepository;
 import com.utem.utem_core.repository.TestStepRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Unified search and filter service supporting combined filters across all entity types.

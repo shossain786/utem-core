@@ -1,23 +1,5 @@
 package com.utem.utem_core.controller;
 
-import com.utem.utem_core.dto.*;
-import com.utem.utem_core.entity.TestRun;
-import com.utem.utem_core.exception.TestRunNotFoundException;
-import com.utem.utem_core.service.RunHistoryService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -26,9 +8,34 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.utem.utem_core.dto.NodeStatistics;
+import com.utem.utem_core.dto.RunComparisonDTO;
+import com.utem.utem_core.dto.TestRunHierarchyDTO;
+import com.utem.utem_core.dto.TestRunSummaryDTO;
+import com.utem.utem_core.entity.TestRun;
+import com.utem.utem_core.exception.TestRunNotFoundException;
+import com.utem.utem_core.service.RunHistoryService;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unused")
 class RunHistoryControllerTest {
 
     @Mock
@@ -37,12 +44,7 @@ class RunHistoryControllerTest {
     @InjectMocks
     private RunHistoryController controller;
 
-    private Instant timestamp;
-
-    @BeforeEach
-    void setUp() {
-        timestamp = Instant.now();
-    }
+    private final Instant timestamp = Instant.now();
 
     private TestRunSummaryDTO createSummary(String id, String name, TestRun.RunStatus status) {
         return new TestRunSummaryDTO(
