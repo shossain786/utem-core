@@ -19,7 +19,7 @@
 - [x] #12: Create Run History Service
 - [x] #13: Create Run History Controller
 - [x] #14: Create Flakiness Detection Service
-- [ ] #15: Create Search and Filter Service
+- [x] #15: Create Search and Filter Service
 - [ ] #16: Create Search Controller
 
 ### Frontend
@@ -74,8 +74,8 @@
 
 | Phase | Total | Completed | Progress |
 |-------|-------|-----------|----------|
-| MVP | 25 | 14 | 56% |
+| MVP | 25 | 15 | 60% |
 | Phase 1 | 6 | 0 | 0% |
 | Phase 2 | 6 | 0 | 0% |
 | Phase 3 | 8 | 0 | 0% |
-| **Overall** | **45** | **14** | **31%** |
+| **Overall** | **45** | **15** | **33%** |

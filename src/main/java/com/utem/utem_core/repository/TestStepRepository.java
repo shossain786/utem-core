@@ -25,4 +25,10 @@ public interface TestStepRepository extends JpaRepository<TestStep, String> {
 
     @Query("SELECT s FROM TestStep s WHERE s.testNode.id IN :nodeIds ORDER BY s.testNode.id, s.stepOrder ASC")
     List<TestStep> findByTestNodeIdIn(@Param("nodeIds") Collection<String> nodeIds);
+
+    List<TestStep> findByNameContainingIgnoreCase(String name);
+
+    List<TestStep> findByErrorMessageContainingIgnoreCase(String errorMessage);
+
+    List<TestStep> findByStatusOrderByTimestampDesc(TestStep.StepStatus status);
 }

@@ -27,4 +27,8 @@ public interface AttachmentRepository extends JpaRepository<Attachment, String> 
 
     @Query("SELECT a FROM Attachment a WHERE a.testStep.id IN :stepIds")
     List<Attachment> findByTestStepIdIn(@Param("stepIds") Collection<String> stepIds);
+
+    List<Attachment> findByNameContainingIgnoreCase(String name);
+
+    List<Attachment> findByTypeAndNameContainingIgnoreCase(Attachment.AttachmentType type, String name);
 }
