@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, Page } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus } from '@/api/types';
 
 export function useRuns(page = 0, size = 20) {
   return useQuery({
@@ -11,6 +11,35 @@ export function useRuns(page = 0, size = 20) {
       });
       return data;
     },
+  });
+}
+
+export function useFilteredRuns(
+  page = 0,
+  size = 20,
+  status?: RunStatus | null,
+  name?: string | null,
+) {
+  return useQuery({
+    queryKey: ['runs', page, size, status, name],
+    queryFn: async () => {
+      const params: Record<string, string | number> = { page, size };
+      if (status) params.status = status;
+      if (name) params.name = name;
+      const { data } = await apiClient.get<Page<TestRunSummary>>('/runs', { params });
+      return data;
+    },
+  });
+}
+
+export function useRunDetail(runId: string | undefined) {
+  return useQuery({
+    queryKey: ['runs', runId, 'detail'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<TestRunHierarchy>(`/runs/${runId}/detail`);
+      return data;
+    },
+    enabled: !!runId,
   });
 }
 

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WebSocketProvider } from '@/contexts/WebSocketContext';
 import AppLayout from './components/layout/AppLayout';
 import DashboardPage from './pages/DashboardPage';
+import RunsPage from './pages/RunsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +22,8 @@ function App() {
           <Routes>
             <Route element={<AppLayout />}>
               <Route path="/" element={<DashboardPage />} />
-              <Route path="/runs" element={<PlaceholderPage title="Test Runs" />} />
+              <Route path="/runs" element={<RunsPage />} />
+              <Route path="/runs/:runId" element={<PlaceholderPage title="Run Detail" />} />
               <Route path="/search" element={<PlaceholderPage title="Search" />} />
             </Route>
           </Routes>
