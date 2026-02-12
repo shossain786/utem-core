@@ -24,7 +24,7 @@
 
 ### Frontend
 - [x] #17: Setup React frontend with Vite
-- [ ] #18: Create WebSocket client integration
+- [x] #18: Create WebSocket client integration
 - [ ] #19: Create Dashboard component
 - [ ] #20: Create Test Run List component
 - [ ] #21: Create Hierarchy Tree View component
@@ -74,8 +74,8 @@
 
 | Phase | Total | Completed | Progress |
 |-------|-------|-----------|----------|
-| MVP | 25 | 17 | 68% |
+| MVP | 25 | 18 | 72% |
 | Phase 1 | 6 | 0 | 0% |
 | Phase 2 | 6 | 0 | 0% |
 | Phase 3 | 8 | 0 | 0% |
-| **Overall** | **45** | **17** | **38%** |
+| **Overall** | **45** | **18** | **40%** |

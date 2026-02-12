@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WebSocketProvider } from '@/contexts/WebSocketContext';
 import AppLayout from './components/layout/AppLayout';
 import DashboardPage from './pages/DashboardPage';
 
@@ -15,15 +16,17 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/runs" element={<PlaceholderPage title="Test Runs" />} />
-            <Route path="/search" element={<PlaceholderPage title="Search" />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <WebSocketProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/runs" element={<PlaceholderPage title="Test Runs" />} />
+              <Route path="/search" element={<PlaceholderPage title="Search" />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </WebSocketProvider>
     </QueryClientProvider>
   );
 }

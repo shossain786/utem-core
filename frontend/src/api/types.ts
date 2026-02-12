@@ -149,6 +149,44 @@ export interface SearchResult {
   totalResults: number;
 }
 
+// ============ WebSocket Types ============
+
+export type EventType =
+  | 'TEST_RUN_STARTED'
+  | 'TEST_RUN_FINISHED'
+  | 'TEST_SUITE_STARTED'
+  | 'TEST_SUITE_FINISHED'
+  | 'TEST_CASE_STARTED'
+  | 'TEST_CASE_FINISHED'
+  | 'TEST_STEP'
+  | 'TEST_PASSED'
+  | 'TEST_FAILED'
+  | 'TEST_SKIPPED'
+  | 'ATTACHMENT';
+
+export interface WebSocketEventMessage {
+  eventId: string;
+  runId: string;
+  eventType: EventType;
+  parentId: string | null;
+  timestamp: string;
+  entityId: string;
+  entityType: string;
+  name: string;
+  status: string;
+}
+
+export interface RunSummaryMessage {
+  runId: string;
+  testRunId: string;
+  status: RunStatus;
+  totalTests: number;
+  passedTests: number;
+  failedTests: number;
+  skippedTests: number;
+  lastUpdated: string;
+}
+
 // ============ Spring Data Page ============
 
 export interface Page<T> {
