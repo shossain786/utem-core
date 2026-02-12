@@ -1,19 +1,125 @@
+import { Link } from 'react-router-dom';
+import { useRunSummaryStats, useRuns } from '@/hooks/useApi';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { formatDuration, formatRelativeTime, formatPassRate } from '@/utils/format';
+import type { RunStatus } from '@/api/types';
+
+const STATUS_COLORS: Record<RunStatus, string> = {
+  PASSED: 'bg-passed',
+  FAILED: 'bg-failed',
+  RUNNING: 'bg-running',
+  ABORTED: 'bg-aborted',
+};
+
+const STATUS_TEXT_COLORS: Record<RunStatus, string> = {
+  PASSED: 'text-passed',
+  FAILED: 'text-failed',
+  RUNNING: 'text-running',
+  ABORTED: 'text-aborted',
+};
+
 export default function DashboardPage() {
+  const { status: wsStatus } = useWebSocket();
+  const { data: stats, isLoading: statsLoading, isError: statsError } = useRunSummaryStats();
+  const { data: runsPage, isLoading: runsLoading } = useRuns(0, 5);
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total Runs" value="--" />
-        <StatCard label="Passed" value="--" color="text-passed" />
-        <StatCard label="Failed" value="--" color="text-failed" />
-        <StatCard label="Running" value="--" color="text-running" />
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <span
+            className={`inline-block w-2 h-2 rounded-full ${
+              wsStatus === 'connected'
+                ? 'bg-passed'
+                : wsStatus === 'connecting'
+                  ? 'bg-running animate-pulse'
+                  : 'bg-gray-400'
+            }`}
+          />
+          <span>{wsStatus === 'connected' ? 'Live' : wsStatus === 'connecting' ? 'Connecting...' : 'Offline'}</span>
+        </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <p className="text-gray-500 text-sm">
-          Dashboard will display real-time test run statistics, recent runs, and flakiness overview.
-        </p>
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <StatCard
+          label="Total Runs"
+          value={statsLoading ? '...' : statsError ? '--' : String(stats?.totalRuns ?? 0)}
+        />
+        <StatCard
+          label="Passed"
+          value={statsLoading ? '...' : String(stats?.passedRuns ?? 0)}
+          color="text-passed"
+        />
+        <StatCard
+          label="Failed"
+          value={statsLoading ? '...' : String(stats?.failedRuns ?? 0)}
+          color="text-failed"
+        />
+        <StatCard
+          label="Running"
+          value={statsLoading ? '...' : String(stats?.runningRuns ?? 0)}
+          color="text-running"
+        />
+        <StatCard
+          label="Aborted"
+          value={statsLoading ? '...' : String(stats?.abortedRuns ?? 0)}
+          color="text-aborted"
+        />
+      </div>
+
+      {/* Recent Runs */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-700">Recent Runs</h2>
+          <Link to="/runs" className="text-xs text-blue-600 hover:text-blue-800">
+            View all
+          </Link>
+        </div>
+
+        {runsLoading ? (
+          <div className="p-6 text-center text-sm text-gray-500">Loading...</div>
+        ) : !runsPage || runsPage.empty ? (
+          <div className="p-6 text-center">
+            <p className="text-sm text-gray-500 mb-1">No test runs yet</p>
+            <p className="text-xs text-gray-400">
+              Send events to the API to see test runs appear here.
+            </p>
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+                <th className="px-4 py-2 font-medium">Status</th>
+                <th className="px-4 py-2 font-medium">Name</th>
+                <th className="px-4 py-2 font-medium">Tests</th>
+                <th className="px-4 py-2 font-medium">Pass Rate</th>
+                <th className="px-4 py-2 font-medium">Duration</th>
+                <th className="px-4 py-2 font-medium">Started</th>
+              </tr>
+            </thead>
+            <tbody>
+              {runsPage.content.map((run) => (
+                <tr key={run.id} className="border-b border-gray-50 hover:bg-gray-50">
+                  <td className="px-4 py-2.5">
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-xs font-medium ${STATUS_TEXT_COLORS[run.status]}`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${STATUS_COLORS[run.status]}`} />
+                      {run.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 font-medium text-gray-900">{run.name}</td>
+                  <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>
+                  <td className="px-4 py-2.5 text-gray-600">{formatPassRate(run.passRate)}</td>
+                  <td className="px-4 py-2.5 text-gray-600">{formatDuration(run.duration)}</td>
+                  <td className="px-4 py-2.5 text-gray-500">{formatRelativeTime(run.startTime)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
