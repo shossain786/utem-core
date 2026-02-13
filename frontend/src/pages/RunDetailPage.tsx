@@ -1,0 +1,127 @@
+import { Link, useParams } from 'react-router-dom';
+import { useRunDetail } from '@/hooks/useApi';
+import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
+import { formatDuration } from '@/utils/format';
+import TreeNode from '@/components/tree/TreeNode';
+
+export default function RunDetailPage() {
+  const { runId } = useParams<{ runId: string }>();
+  const { data: hierarchy, isLoading, isError } = useRunDetail(runId);
+
+  if (isLoading) {
+    return (
+      <div className="p-6 text-center text-sm text-gray-500">Loading run details...</div>
+    );
+  }
+
+  if (isError || !hierarchy) {
+    return (
+      <div>
+        <BackLink />
+        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+          <p className="text-sm text-red-500 mb-1">Failed to load run details.</p>
+          <p className="text-xs text-gray-400">The run may not exist or the server may be unavailable.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = hierarchy.statistics;
+
+  return (
+    <div>
+      <BackLink />
+
+      {/* Run Header */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+        <div className="flex items-center gap-3 mb-3">
+          {/* Status badge */}
+          <span
+            className={`inline-flex items-center gap-1.5 text-xs font-medium ${RUN_STATUS_TEXT_COLORS[hierarchy.status]}`}
+          >
+            <span className={`w-2 h-2 rounded-full ${RUN_STATUS_COLORS[hierarchy.status]}`} />
+            {hierarchy.status}
+          </span>
+
+          {/* Run name */}
+          <h1 className="text-lg font-bold text-gray-900">{hierarchy.name}</h1>
+
+          {/* Duration */}
+          {stats.totalDuration > 0 && (
+            <span className="text-sm text-gray-400 ml-auto">
+              {formatDuration(stats.totalDuration)}
+            </span>
+          )}
+        </div>
+
+        {/* Stats summary bar */}
+        <div className="flex items-center gap-4 text-xs">
+          <span className="text-gray-500">
+            {stats.totalNodes} total
+          </span>
+          <span className="text-passed font-medium">{stats.passedNodes} passed</span>
+          <span className="text-failed font-medium">{stats.failedNodes} failed</span>
+          <span className="text-skipped font-medium">{stats.skippedNodes} skipped</span>
+          {stats.runningNodes > 0 && (
+            <span className="text-running font-medium">{stats.runningNodes} running</span>
+          )}
+          {stats.pendingNodes > 0 && (
+            <span className="text-pending font-medium">{stats.pendingNodes} pending</span>
+          )}
+        </div>
+
+        {/* Visual pass/fail bar */}
+        {stats.totalNodes > 0 && (
+          <div className="flex h-1.5 rounded-full overflow-hidden mt-3 bg-gray-100">
+            {stats.passedNodes > 0 && (
+              <div
+                className="bg-passed"
+                style={{ width: `${(stats.passedNodes / stats.totalNodes) * 100}%` }}
+              />
+            )}
+            {stats.failedNodes > 0 && (
+              <div
+                className="bg-failed"
+                style={{ width: `${(stats.failedNodes / stats.totalNodes) * 100}%` }}
+              />
+            )}
+            {stats.skippedNodes > 0 && (
+              <div
+                className="bg-skipped"
+                style={{ width: `${(stats.skippedNodes / stats.totalNodes) * 100}%` }}
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Tree View */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">Test Hierarchy</h2>
+        {hierarchy.rootNodes.length === 0 ? (
+          <p className="text-xs text-gray-400">No test nodes found for this run.</p>
+        ) : (
+          <div>
+            {hierarchy.rootNodes.map((node) => (
+              <TreeNode key={node.id} node={node} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BackLink() {
+  return (
+    <Link
+      to="/runs"
+      className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 mb-4"
+    >
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Runs
+    </Link>
+  );
+}

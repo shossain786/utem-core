@@ -2,21 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useFilteredRuns } from '@/hooks/useApi';
 import { formatDuration, formatRelativeTime, formatPassRate } from '@/utils/format';
+import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import type { RunStatus } from '@/api/types';
-
-const STATUS_COLORS: Record<RunStatus, string> = {
-  PASSED: 'bg-passed',
-  FAILED: 'bg-failed',
-  RUNNING: 'bg-running',
-  ABORTED: 'bg-aborted',
-};
-
-const STATUS_TEXT_COLORS: Record<RunStatus, string> = {
-  PASSED: 'text-passed',
-  FAILED: 'text-failed',
-  RUNNING: 'text-running',
-  ABORTED: 'text-aborted',
-};
 
 const STATUS_FILTERS: Array<{ label: string; value: RunStatus | null }> = [
   { label: 'All', value: null },
@@ -114,9 +101,9 @@ export default function RunsPage() {
                   <tr key={run.id} className="border-b border-gray-50 hover:bg-gray-50">
                     <td className="px-4 py-2.5">
                       <span
-                        className={`inline-flex items-center gap-1.5 text-xs font-medium ${STATUS_TEXT_COLORS[run.status]}`}
+                        className={`inline-flex items-center gap-1.5 text-xs font-medium ${RUN_STATUS_TEXT_COLORS[run.status]}`}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full ${STATUS_COLORS[run.status]}`} />
+                        <span className={`w-1.5 h-1.5 rounded-full ${RUN_STATUS_COLORS[run.status]}`} />
                         {run.status}
                       </span>
                     </td>
