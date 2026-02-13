@@ -31,49 +31,54 @@ function ChevronIcon({ expanded }: { expanded: boolean }) {
   );
 }
 
-function StepRow({ step }: { step: TestStep }) {
-  const [showError, setShowError] = useState(false);
+function StepRow({
+  step,
+  onStepClick,
+}: {
+  step: TestStep;
+  onStepClick?: (step: TestStep) => void;
+}) {
   const hasError = step.status === 'FAILED' && (step.errorMessage || step.stackTrace);
+  const attachmentCount = step.attachments.length;
 
   return (
-    <div>
-      <div className="flex items-center gap-2 py-1 px-2 text-xs text-gray-600 hover:bg-gray-50 rounded">
-        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${STEP_STATUS_COLORS[step.status]}`} />
-        <span className={`font-medium ${STEP_STATUS_TEXT_COLORS[step.status]}`}>
-          {step.name}
+    <div
+      className={`flex items-center gap-2 py-1 px-2 text-xs text-gray-600 hover:bg-gray-50 rounded ${
+        onStepClick ? 'cursor-pointer' : ''
+      }`}
+      onClick={() => onStepClick?.(step)}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${STEP_STATUS_COLORS[step.status]}`} />
+      <span className={`font-medium ${STEP_STATUS_TEXT_COLORS[step.status]}`}>
+        {step.name}
+      </span>
+      {hasError && (
+        <svg className="w-3.5 h-3.5 text-red-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )}
+      {attachmentCount > 0 && (
+        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 text-[10px] shrink-0">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+          </svg>
+          {attachmentCount}
         </span>
-        {step.duration != null && (
-          <span className="text-gray-400 ml-auto">{formatDuration(step.duration)}</span>
-        )}
-        {hasError && (
-          <button
-            onClick={() => setShowError(!showError)}
-            className="text-red-500 hover:text-red-700 ml-1 shrink-0"
-            title="Show error details"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </button>
-        )}
-      </div>
-      {hasError && showError && (
-        <div className="ml-5 mt-1 mb-2 p-2 rounded bg-red-50 border border-red-200 text-xs">
-          {step.errorMessage && (
-            <p className="text-red-700 font-medium mb-1">{step.errorMessage}</p>
-          )}
-          {step.stackTrace && (
-            <pre className="text-red-600 whitespace-pre-wrap overflow-x-auto max-h-48 text-[11px] leading-4">
-              {step.stackTrace}
-            </pre>
-          )}
-        </div>
+      )}
+      {step.duration != null && (
+        <span className="text-gray-400 ml-auto">{formatDuration(step.duration)}</span>
       )}
     </div>
   );
 }
 
-export default function TreeNode({ node, depth = 0 }: { node: HierarchyNode; depth?: number }) {
+interface TreeNodeProps {
+  node: HierarchyNode;
+  depth?: number;
+  onStepClick?: (step: TestStep) => void;
+}
+
+export default function TreeNode({ node, depth = 0, onStepClick }: TreeNodeProps) {
   const hasChildren = node.children.length > 0;
   const hasSteps = node.steps.length > 0;
   const isExpandable = hasChildren || hasSteps;
@@ -137,7 +142,7 @@ export default function TreeNode({ node, depth = 0 }: { node: HierarchyNode; dep
         <div className="pl-2">
           {/* Child nodes */}
           {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} depth={depth + 1} />
+            <TreeNode key={child.id} node={child} depth={depth + 1} onStepClick={onStepClick} />
           ))}
 
           {/* Steps (inline under scenario/step nodes) */}
@@ -146,7 +151,7 @@ export default function TreeNode({ node, depth = 0 }: { node: HierarchyNode; dep
               {node.steps
                 .sort((a, b) => (a.stepOrder ?? 0) - (b.stepOrder ?? 0))
                 .map((step) => (
-                  <StepRow key={step.id} step={step} />
+                  <StepRow key={step.id} step={step} onStepClick={onStepClick} />
                 ))}
             </div>
           )}

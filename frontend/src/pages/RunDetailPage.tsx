@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useRunDetail } from '@/hooks/useApi';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import { formatDuration } from '@/utils/format';
 import TreeNode from '@/components/tree/TreeNode';
+import StepDetailPanel from '@/components/step/StepDetailPanel';
+import type { TestStep } from '@/api/types';
 
 export default function RunDetailPage() {
   const { runId } = useParams<{ runId: string }>();
   const { data: hierarchy, isLoading, isError } = useRunDetail(runId);
+  const [selectedStep, setSelectedStep] = useState<TestStep | null>(null);
 
   if (isLoading) {
     return (
@@ -103,11 +107,13 @@ export default function RunDetailPage() {
         ) : (
           <div>
             {hierarchy.rootNodes.map((node) => (
-              <TreeNode key={node.id} node={node} />
+              <TreeNode key={node.id} node={node} onStepClick={setSelectedStep} />
             ))}
           </div>
         )}
       </div>
+
+      <StepDetailPanel step={selectedStep} onClose={() => setSelectedStep(null)} />
     </div>
   );
 }

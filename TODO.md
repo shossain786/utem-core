@@ -28,7 +28,7 @@
 - [x] #19: Create Dashboard component
 - [x] #20: Create Test Run List component
 - [x] #21: Create Hierarchy Tree View component
-- [ ] #22: Create Step Details component
+- [x] #22: Create Step Details component
 - [ ] #23: Create Attachment Viewer component
 - [ ] #24: Create Search and Filter UI component
 - [ ] #25: Create Flakiness Indicator component
@@ -74,8 +74,8 @@
 
 | Phase | Total | Completed | Progress |
 |-------|-------|-----------|----------|
-| MVP | 25 | 21 | 84% |
+| MVP | 25 | 22 | 88% |
 | Phase 1 | 6 | 0 | 0% |
 | Phase 2 | 6 | 0 | 0% |
 | Phase 3 | 8 | 0 | 0% |
-| **Overall** | **45** | **21** | **47%** |
+| **Overall** | **45** | **22** | **49%** |

@@ -42,3 +42,20 @@ export function formatPassRate(rate: number | null | undefined): string {
   if (rate == null) return '--';
   return `${rate.toFixed(1)}%`;
 }
+
+export function formatFileSize(bytes: number | null | undefined): string {
+  if (bytes == null) return '--';
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  const mb = kb / 1024;
+  if (mb < 1024) return `${mb.toFixed(1)} MB`;
+  const gb = mb / 1024;
+  return `${gb.toFixed(1)} GB`;
+}
+
+export function formatTimestamp(isoString: string | null | undefined): string {
+  if (!isoString) return '--';
+  const date = new Date(isoString);
+  return date.toLocaleString();
+}
