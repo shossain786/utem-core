@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NODE_STATUS_COLORS, NODE_STATUS_TEXT_COLORS, STEP_STATUS_COLORS, STEP_STATUS_TEXT_COLORS } from '@/utils/status';
 import { formatDuration } from '@/utils/format';
-import type { HierarchyNode, TestStep, NodeType } from '@/api/types';
+import type { HierarchyNode, TestStep, NodeType, AttachmentSummary } from '@/api/types';
 
 const NODE_TYPE_LABELS: Record<NodeType, string> = {
   SUITE: 'Suite',
@@ -31,12 +31,34 @@ function ChevronIcon({ expanded }: { expanded: boolean }) {
   );
 }
 
+function PaperclipBadge({
+  count,
+  onClick,
+}: {
+  count: number;
+  onClick?: (e: React.MouseEvent) => void;
+}) {
+  return (
+    <button
+      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 text-[10px] shrink-0 hover:bg-gray-200"
+      onClick={onClick}
+    >
+      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+      </svg>
+      {count}
+    </button>
+  );
+}
+
 function StepRow({
   step,
   onStepClick,
+  onAttachmentClick,
 }: {
   step: TestStep;
   onStepClick?: (step: TestStep) => void;
+  onAttachmentClick?: (attachments: AttachmentSummary[], index: number) => void;
 }) {
   const hasError = step.status === 'FAILED' && (step.errorMessage || step.stackTrace);
   const attachmentCount = step.attachments.length;
@@ -58,12 +80,13 @@ function StepRow({
         </svg>
       )}
       {attachmentCount > 0 && (
-        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 text-[10px] shrink-0">
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-          </svg>
-          {attachmentCount}
-        </span>
+        <PaperclipBadge
+          count={attachmentCount}
+          onClick={onAttachmentClick ? (e) => {
+            e.stopPropagation();
+            onAttachmentClick(step.attachments, 0);
+          } : undefined}
+        />
       )}
       {step.duration != null && (
         <span className="text-gray-400 ml-auto">{formatDuration(step.duration)}</span>
@@ -76,12 +99,14 @@ interface TreeNodeProps {
   node: HierarchyNode;
   depth?: number;
   onStepClick?: (step: TestStep) => void;
+  onAttachmentClick?: (attachments: AttachmentSummary[], index: number) => void;
 }
 
-export default function TreeNode({ node, depth = 0, onStepClick }: TreeNodeProps) {
+export default function TreeNode({ node, depth = 0, onStepClick, onAttachmentClick }: TreeNodeProps) {
   const hasChildren = node.children.length > 0;
   const hasSteps = node.steps.length > 0;
   const isExpandable = hasChildren || hasSteps;
+  const nodeAttachmentCount = node.attachments.length;
 
   // Suites and features default to expanded, scenarios and steps default to collapsed
   const [expanded, setExpanded] = useState(
@@ -129,6 +154,17 @@ export default function TreeNode({ node, depth = 0, onStepClick }: TreeNodeProps
           </span>
         )}
 
+        {/* Node-level attachment badge */}
+        {nodeAttachmentCount > 0 && (
+          <PaperclipBadge
+            count={nodeAttachmentCount}
+            onClick={onAttachmentClick ? (e) => {
+              e.stopPropagation();
+              onAttachmentClick(node.attachments, 0);
+            } : undefined}
+          />
+        )}
+
         {/* Duration */}
         {node.duration != null && (
           <span className="text-xs text-gray-400 ml-auto shrink-0">
@@ -142,7 +178,13 @@ export default function TreeNode({ node, depth = 0, onStepClick }: TreeNodeProps
         <div className="pl-2">
           {/* Child nodes */}
           {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} depth={depth + 1} onStepClick={onStepClick} />
+            <TreeNode
+              key={child.id}
+              node={child}
+              depth={depth + 1}
+              onStepClick={onStepClick}
+              onAttachmentClick={onAttachmentClick}
+            />
           ))}
 
           {/* Steps (inline under scenario/step nodes) */}
@@ -151,7 +193,12 @@ export default function TreeNode({ node, depth = 0, onStepClick }: TreeNodeProps
               {node.steps
                 .sort((a, b) => (a.stepOrder ?? 0) - (b.stepOrder ?? 0))
                 .map((step) => (
-                  <StepRow key={step.id} step={step} onStepClick={onStepClick} />
+                  <StepRow
+                    key={step.id}
+                    step={step}
+                    onStepClick={onStepClick}
+                    onAttachmentClick={onAttachmentClick}
+                  />
                 ))}
             </div>
           )}

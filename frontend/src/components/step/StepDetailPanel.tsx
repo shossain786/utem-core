@@ -1,12 +1,7 @@
 import { STEP_STATUS_COLORS, STEP_STATUS_TEXT_COLORS } from '@/utils/status';
 import { formatDuration, formatTimestamp, formatFileSize } from '@/utils/format';
+import { attachmentDownloadUrl, isImageAttachment, isVideoAttachment } from '@/utils/attachmentUtils';
 import type { TestStep, AttachmentSummary, AttachmentType } from '@/api/types';
-
-const ATTACHMENT_BASE_URL = '/utem/attachments';
-
-function attachmentDownloadUrl(id: string): string {
-  return `${ATTACHMENT_BASE_URL}/${id}/download`;
-}
 
 const ATTACHMENT_TYPE_ICONS: Record<AttachmentType, string> = {
   SCREENSHOT: 'Screenshot',
@@ -15,10 +10,16 @@ const ATTACHMENT_TYPE_ICONS: Record<AttachmentType, string> = {
   FILE: 'File',
 };
 
-function AttachmentItem({ attachment }: { attachment: AttachmentSummary }) {
+function AttachmentItem({
+  attachment,
+  onClick,
+}: {
+  attachment: AttachmentSummary;
+  onClick?: () => void;
+}) {
   const url = attachmentDownloadUrl(attachment.id);
-  const isImage = attachment.type === 'SCREENSHOT' || attachment.mimeType?.startsWith('image/');
-  const isVideo = attachment.type === 'VIDEO' || attachment.mimeType?.startsWith('video/');
+  const isImage = isImageAttachment(attachment);
+  const isVideo = isVideoAttachment(attachment);
 
   return (
     <div className="border border-gray-100 rounded-md p-2">
@@ -27,7 +28,12 @@ function AttachmentItem({ attachment }: { attachment: AttachmentSummary }) {
         <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 font-medium text-[10px]">
           {ATTACHMENT_TYPE_ICONS[attachment.type]}
         </span>
-        <span className="font-medium text-gray-700 truncate">{attachment.name}</span>
+        <span
+          className={`font-medium text-gray-700 truncate ${onClick ? 'cursor-pointer hover:text-blue-600' : ''}`}
+          onClick={onClick}
+        >
+          {attachment.name}
+        </span>
         {attachment.fileSize != null && (
           <span className="text-gray-400 ml-auto shrink-0">{formatFileSize(attachment.fileSize)}</span>
         )}
@@ -40,23 +46,31 @@ function AttachmentItem({ attachment }: { attachment: AttachmentSummary }) {
 
       {/* Preview */}
       {isImage && (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="block mt-1">
+        <div
+          className={`block mt-1 ${onClick ? 'cursor-pointer' : ''}`}
+          onClick={onClick}
+        >
           <img
             src={url}
             alt={attachment.name}
             className="max-h-40 rounded border border-gray-200 object-contain bg-gray-50"
             loading="lazy"
           />
-        </a>
+        </div>
       )}
 
       {isVideo && (
-        <video
-          src={url}
-          controls
-          preload="metadata"
-          className="max-h-40 rounded border border-gray-200 mt-1 w-full"
-        />
+        <div
+          className={`mt-1 ${onClick ? 'cursor-pointer' : ''}`}
+          onClick={onClick}
+        >
+          <video
+            src={url}
+            controls
+            preload="metadata"
+            className="max-h-40 rounded border border-gray-200 w-full"
+          />
+        </div>
       )}
 
       {/* Download link */}
@@ -77,9 +91,11 @@ function AttachmentItem({ attachment }: { attachment: AttachmentSummary }) {
 export default function StepDetailPanel({
   step,
   onClose,
+  onAttachmentClick,
 }: {
   step: TestStep | null;
   onClose: () => void;
+  onAttachmentClick?: (attachments: AttachmentSummary[], index: number) => void;
 }) {
   if (!step) return null;
 
@@ -148,8 +164,12 @@ export default function StepDetailPanel({
                 Attachments ({step.attachments.length})
               </h3>
               <div className="space-y-2">
-                {step.attachments.map((att) => (
-                  <AttachmentItem key={att.id} attachment={att} />
+                {step.attachments.map((att, index) => (
+                  <AttachmentItem
+                    key={att.id}
+                    attachment={att}
+                    onClick={onAttachmentClick ? () => onAttachmentClick(step.attachments, index) : undefined}
+                  />
                 ))}
               </div>
             </div>

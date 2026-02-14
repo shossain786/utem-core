@@ -29,7 +29,7 @@
 - [x] #20: Create Test Run List component
 - [x] #21: Create Hierarchy Tree View component
 - [x] #22: Create Step Details component
-- [ ] #23: Create Attachment Viewer component
+- [x] #23: Create Attachment Viewer component
 - [ ] #24: Create Search and Filter UI component
 - [ ] #25: Create Flakiness Indicator component
 

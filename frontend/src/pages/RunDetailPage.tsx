@@ -5,12 +5,15 @@ import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import { formatDuration } from '@/utils/format';
 import TreeNode from '@/components/tree/TreeNode';
 import StepDetailPanel from '@/components/step/StepDetailPanel';
+import AttachmentViewer from '@/components/attachment/AttachmentViewer';
+import { useAttachmentViewer } from '@/hooks/useAttachmentViewer';
 import type { TestStep } from '@/api/types';
 
 export default function RunDetailPage() {
   const { runId } = useParams<{ runId: string }>();
   const { data: hierarchy, isLoading, isError } = useRunDetail(runId);
   const [selectedStep, setSelectedStep] = useState<TestStep | null>(null);
+  const viewer = useAttachmentViewer();
 
   if (isLoading) {
     return (
@@ -107,13 +110,14 @@ export default function RunDetailPage() {
         ) : (
           <div>
             {hierarchy.rootNodes.map((node) => (
-              <TreeNode key={node.id} node={node} onStepClick={setSelectedStep} />
+              <TreeNode key={node.id} node={node} onStepClick={setSelectedStep} onAttachmentClick={viewer.open} />
             ))}
           </div>
         )}
       </div>
 
-      <StepDetailPanel step={selectedStep} onClose={() => setSelectedStep(null)} />
+      <StepDetailPanel step={selectedStep} onClose={() => setSelectedStep(null)} onAttachmentClick={viewer.open} />
+      <AttachmentViewer {...viewer} />
     </div>
   );
 }
