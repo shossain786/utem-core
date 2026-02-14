@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, SearchResult } from '@/api/types';
 
 export function useRuns(page = 0, size = 20) {
   return useQuery({
@@ -50,5 +50,18 @@ export function useRunSummaryStats() {
       const { data } = await apiClient.get<Record<string, number>>('/runs/summary');
       return data;
     },
+  });
+}
+
+export function useGlobalSearch(query: string, limit = 10) {
+  return useQuery({
+    queryKey: ['search', query, limit],
+    queryFn: async () => {
+      const { data } = await apiClient.get<SearchResult>('/search', {
+        params: { q: query, limit },
+      });
+      return data;
+    },
+    enabled: query.length >= 2,
   });
 }

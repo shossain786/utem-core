@@ -5,6 +5,7 @@ import AppLayout from './components/layout/AppLayout';
 import DashboardPage from './pages/DashboardPage';
 import RunsPage from './pages/RunsPage';
 import RunDetailPage from './pages/RunDetailPage';
+import SearchPage from './pages/SearchPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,23 +26,12 @@ function App() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/runs" element={<RunsPage />} />
               <Route path="/runs/:runId" element={<RunDetailPage />} />
-              <Route path="/search" element={<PlaceholderPage title="Search" />} />
+              <Route path="/search" element={<SearchPage />} />
             </Route>
           </Routes>
         </BrowserRouter>
       </WebSocketProvider>
     </QueryClientProvider>
-  );
-}
-
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">{title}</h1>
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <p className="text-gray-500 text-sm">This page will be implemented in upcoming tasks.</p>
-      </div>
-    </div>
   );
 }
 
