@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useRunSummaryStats, useRuns } from '@/hooks/useApi';
+import { useRunSummaryStats, useRuns, useOverallFlakiness } from '@/hooks/useApi';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { formatDuration, formatRelativeTime, formatPassRate } from '@/utils/format';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
@@ -8,6 +8,7 @@ export default function DashboardPage() {
   const { status: wsStatus } = useWebSocket();
   const { data: stats, isLoading: statsLoading, isError: statsError } = useRunSummaryStats();
   const { data: runsPage, isLoading: runsLoading } = useRuns(0, 5);
+  const { data: flakiness, isLoading: flakinessLoading } = useOverallFlakiness();
 
   return (
     <div>
@@ -28,7 +29,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
         <StatCard
           label="Total Runs"
           value={statsLoading ? '...' : statsError ? '--' : String(stats?.totalRuns ?? 0)}
@@ -53,6 +54,13 @@ export default function DashboardPage() {
           value={statsLoading ? '...' : String(stats?.abortedRuns ?? 0)}
           color="text-aborted"
         />
+        <Link to="/flakiness">
+          <StatCard
+            label="Flakiness"
+            value={flakinessLoading ? '...' : `${(flakiness?.flakinessPercentage ?? 0).toFixed(1)}%`}
+            color={flakiness && flakiness.flakinessPercentage > 0 ? 'text-yellow-600' : 'text-gray-900'}
+          />
+        </Link>
       </div>
 
       {/* Recent Runs */}

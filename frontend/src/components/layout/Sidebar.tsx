@@ -4,6 +4,7 @@ const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
   { to: '/runs', label: 'Test Runs', icon: '🧪' },
   { to: '/search', label: 'Search', icon: '🔍' },
+  { to: '/flakiness', label: 'Flakiness', icon: '⚡' },
 ];
 
 export default function Sidebar() {

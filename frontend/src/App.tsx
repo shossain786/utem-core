@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 import RunsPage from './pages/RunsPage';
 import RunDetailPage from './pages/RunDetailPage';
 import SearchPage from './pages/SearchPage';
+import FlakinessPage from './pages/FlakinessPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +28,7 @@ function App() {
               <Route path="/runs" element={<RunsPage />} />
               <Route path="/runs/:runId" element={<RunDetailPage />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/flakiness" element={<FlakinessPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

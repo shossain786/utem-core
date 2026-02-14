@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, SearchResult } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, SearchResult, FlakinessReport, FlakyTest } from '@/api/types';
 
 export function useRuns(page = 0, size = 20) {
   return useQuery({
@@ -63,5 +63,27 @@ export function useGlobalSearch(query: string, limit = 10) {
       return data;
     },
     enabled: query.length >= 2,
+  });
+}
+
+export function useOverallFlakiness() {
+  return useQuery({
+    queryKey: ['flakiness', 'report'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<FlakinessReport>('/flakiness/report');
+      return data;
+    },
+  });
+}
+
+export function useTopFlakyTests(limit = 10) {
+  return useQuery({
+    queryKey: ['flakiness', 'top', limit],
+    queryFn: async () => {
+      const { data } = await apiClient.get<FlakyTest[]>('/flakiness/top', {
+        params: { limit },
+      });
+      return data;
+    },
   });
 }
