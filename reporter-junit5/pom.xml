@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.utem</groupId>
+    <artifactId>utem-reporter-junit5</artifactId>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
+
+    <name>UTEM Reporter - JUnit 5</name>
+    <description>JUnit 5 TestExecutionListener that reports test results to UTEM Core</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit-platform.version>1.10.2</junit-platform.version>
+        <selenium.version>4.18.1</selenium.version>
+    </properties>
+
+    <dependencies>
+        <!-- JUnit 5 Platform Launcher API (provided - user's test runtime supplies it) -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit-platform.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Selenium WebDriver API (optional, provided - only needed for screenshot capture) -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-api</artifactId>
+            <version>${selenium.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
