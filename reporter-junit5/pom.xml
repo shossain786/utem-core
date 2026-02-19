@@ -30,6 +30,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Cucumber Plugin API (provided - only needed for Cucumber integration) -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-plugin</artifactId>
+            <version>7.34.2</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Selenium WebDriver API (optional, provided - only needed for screenshot capture) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
