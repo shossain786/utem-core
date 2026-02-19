@@ -44,10 +44,15 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).body(EventResponse.from(saved));
     }
 
+    private static final int MAX_BATCH_SIZE = 500;
+
     @PostMapping("/batch")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<List<EventResponse>> ingestEvents(
             @Valid @RequestBody List<EventRequest> requests) {
+        if (requests.size() > MAX_BATCH_SIZE) {
+            return ResponseEntity.badRequest().build();
+        }
         List<EventLog> eventLogs = requests.stream()
             .filter(request -> !eventLogRepository.existsByEventId(request.eventId()))
             .map(request -> EventLog.builder()

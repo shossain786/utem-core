@@ -36,6 +36,7 @@ public class EventProcessingService {
     public void processEvent(EventLog eventLog) {
         try {
             EventPayload payload = parsePayload(eventLog.getPayload());
+            validatePayload(eventLog.getEventType(), payload, eventLog.getEventId());
 
             switch (eventLog.getEventType()) {
                 case TEST_RUN_STARTED -> handleTestRunStarted(eventLog, payload);
@@ -52,11 +53,35 @@ public class EventProcessingService {
             }
         } catch (JsonProcessingException e) {
             log.error("Failed to parse payload for event {}: {}", eventLog.getEventId(), e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("Unexpected error processing event {} (type={}): {}",
+                    eventLog.getEventId(), eventLog.getEventType(), e.getMessage(), e);
         }
     }
 
     private EventPayload parsePayload(String payloadJson) throws JsonProcessingException {
         return objectMapper.readValue(payloadJson, EventPayload.class);
+    }
+
+    private void validatePayload(EventLog.EventType eventType, EventPayload payload, String eventId) {
+        switch (eventType) {
+            case TEST_RUN_STARTED -> {
+                if (payload.name() == null || payload.name().isBlank()) {
+                    log.warn("Event {} (TEST_RUN_STARTED): missing 'name', will default to 'Unnamed Test Run'", eventId);
+                }
+            }
+            case TEST_FAILED -> {
+                if (payload.errorMessage() == null || payload.errorMessage().isBlank()) {
+                    log.warn("Event {} (TEST_FAILED): missing 'errorMessage'", eventId);
+                }
+            }
+            case ATTACHMENT -> {
+                if (payload.attachmentType() == null) {
+                    log.warn("Event {} (ATTACHMENT): missing 'attachmentType', will default to FILE", eventId);
+                }
+            }
+            default -> { /* no additional validation required */ }
+        }
     }
 
     private void handleTestRunStarted(EventLog eventLog, EventPayload payload) {
