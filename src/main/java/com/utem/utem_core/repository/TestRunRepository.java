@@ -9,7 +9,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TestRunRepository extends JpaRepository<TestRun, String> {
@@ -29,6 +31,12 @@ public interface TestRunRepository extends JpaRepository<TestRun, String> {
     Page<TestRun> findByNameContainingIgnoreCaseOrderByStartTimeDesc(String name, Pageable pageable);
 
     List<TestRun> findByStartTimeBefore(Instant cutoff);
+
+    List<TestRun> findByStatusAndStartTimeBefore(TestRun.RunStatus status, Instant threshold);
+
+    Optional<TestRun> findBySourceRunId(String sourceRunId);
+
+    List<TestRun> findByStatusInOrderByStartTimeDesc(Collection<TestRun.RunStatus> statuses, Pageable pageable);
 
     long countByStatus(TestRun.RunStatus status);
 

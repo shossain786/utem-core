@@ -87,6 +87,7 @@ public class EventProcessingService {
     private void handleTestRunStarted(EventLog eventLog, EventPayload payload) {
         TestRun testRun = TestRun.builder()
                 .name(payload.name() != null ? payload.name() : "Unnamed Test Run")
+                .sourceRunId(eventLog.getRunId())
                 .startTime(eventLog.getTimestamp())
                 .status(TestRun.RunStatus.RUNNING)
                 .metadata(payload.metadata())
@@ -319,6 +320,16 @@ public class EventProcessingService {
         }
         if (testRunId == null && eventLog.getRunId() != null) {
             testRunId = eventToTestRunMap.get(eventLog.getRunId());
+        }
+        // DB fallback: handles the case where the server restarted and the in-memory map was lost
+        if (testRunId == null && eventLog.getRunId() != null) {
+            testRunId = testRunRepository.findBySourceRunId(eventLog.getRunId())
+                    .map(TestRun::getId)
+                    .orElse(null);
+            if (testRunId != null) {
+                eventToTestRunMap.put(eventLog.getRunId(), testRunId);
+                log.debug("Rebuilt map entry after restart: runId {} → testRunId {}", eventLog.getRunId(), testRunId);
+            }
         }
         return testRunId;
     }

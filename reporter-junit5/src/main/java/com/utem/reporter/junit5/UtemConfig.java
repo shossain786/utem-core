@@ -26,6 +26,10 @@ public final class UtemConfig {
         return serverUrl + "/events";
     }
 
+    public String getBatchEventsUrl() {
+        return serverUrl + "/events/batch";
+    }
+
     public String getAttachmentUploadUrl(String attachmentId) {
         return serverUrl + "/attachments/" + attachmentId + "/upload";
     }

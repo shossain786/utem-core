@@ -5,8 +5,10 @@ import AppLayout from './components/layout/AppLayout';
 import DashboardPage from './pages/DashboardPage';
 import RunsPage from './pages/RunsPage';
 import RunDetailPage from './pages/RunDetailPage';
+import ComparisonPage from './pages/ComparisonPage';
 import SearchPage from './pages/SearchPage';
 import FlakinessPage from './pages/FlakinessPage';
+import TrendsPage from './pages/TrendsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,8 +29,10 @@ function App() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/runs" element={<RunsPage />} />
               <Route path="/runs/:runId" element={<RunDetailPage />} />
+              <Route path="/runs/:runId/compare/:compareRunId" element={<ComparisonPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/flakiness" element={<FlakinessPage />} />
+              <Route path="/trends" element={<TrendsPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

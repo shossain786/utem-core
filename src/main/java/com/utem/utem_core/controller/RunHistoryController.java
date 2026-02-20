@@ -91,6 +91,16 @@ public class RunHistoryController {
     }
 
     /**
+     * Manually abort a run stuck in RUNNING status (e.g. after CI pipeline crash).
+     * Returns 409 if the run is not currently RUNNING.
+     */
+    @PostMapping("/{runId}/abort")
+    public ResponseEntity<TestRunSummaryDTO> abortRun(@PathVariable String runId) {
+        log.info("Manual abort requested for run {}", runId);
+        return ResponseEntity.ok(runHistoryService.abortRun(runId));
+    }
+
+    /**
      * Delete a run and all associated data.
      */
     @DeleteMapping("/{runId}")

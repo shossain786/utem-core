@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, SearchResult, FlakinessReport, FlakyTest } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData } from '@/api/types';
 
-export function useRuns(page = 0, size = 20) {
+export function useRuns(page = 0, size = 20, refetchInterval?: number | false) {
   return useQuery({
     queryKey: ['runs', page, size],
     queryFn: async () => {
@@ -11,6 +11,7 @@ export function useRuns(page = 0, size = 20) {
       });
       return data;
     },
+    refetchInterval,
   });
 }
 
@@ -32,7 +33,7 @@ export function useFilteredRuns(
   });
 }
 
-export function useRunDetail(runId: string | undefined) {
+export function useRunDetail(runId: string | undefined, refetchInterval?: number | false) {
   return useQuery({
     queryKey: ['runs', runId, 'detail'],
     queryFn: async () => {
@@ -40,16 +41,31 @@ export function useRunDetail(runId: string | undefined) {
       return data;
     },
     enabled: !!runId,
+    refetchInterval,
   });
 }
 
-export function useRunSummaryStats() {
+export function useRunSummaryStats(refetchInterval?: number | false) {
   return useQuery({
     queryKey: ['runs', 'summary'],
     queryFn: async () => {
       const { data } = await apiClient.get<Record<string, number>>('/runs/summary');
       return data;
     },
+    refetchInterval,
+  });
+}
+
+export function useRunComparison(baseRunId: string | undefined, compareRunId: string | undefined) {
+  return useQuery({
+    queryKey: ['runs', baseRunId, 'compare', compareRunId],
+    queryFn: async () => {
+      const { data } = await apiClient.get<RunComparison>(`/runs/${baseRunId}/compare`, {
+        params: { with: compareRunId },
+      });
+      return data;
+    },
+    enabled: !!baseRunId && !!compareRunId,
   });
 }
 
@@ -83,6 +99,46 @@ export function useTopFlakyTests(limit = 10) {
       const { data } = await apiClient.get<FlakyTest[]>('/flakiness/top', {
         params: { limit },
       });
+      return data;
+    },
+  });
+}
+
+export function usePassRateTrend(limit: number) {
+  return useQuery({
+    queryKey: ['trends', 'pass-rate', limit],
+    queryFn: async () => {
+      const { data } = await apiClient.get<TrendData>('/trends/pass-rate', { params: { limit } });
+      return data;
+    },
+  });
+}
+
+export function useDurationTrend(limit: number) {
+  return useQuery({
+    queryKey: ['trends', 'duration', limit],
+    queryFn: async () => {
+      const { data } = await apiClient.get<TrendData>('/trends/duration', { params: { limit } });
+      return data;
+    },
+  });
+}
+
+export function useTestCountTrend(limit: number) {
+  return useQuery({
+    queryKey: ['trends', 'test-count', limit],
+    queryFn: async () => {
+      const { data } = await apiClient.get<TrendData>('/trends/test-count', { params: { limit } });
+      return data;
+    },
+  });
+}
+
+export function useFlakinessTrend(limit: number) {
+  return useQuery({
+    queryKey: ['trends', 'flakiness', limit],
+    queryFn: async () => {
+      const { data } = await apiClient.get<TrendData>('/trends/flakiness', { params: { limit } });
       return data;
     },
   });

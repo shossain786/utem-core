@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFilteredRuns } from '@/hooks/useApi';
 import { formatDuration, formatRelativeTime, formatPassRate } from '@/utils/format';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
@@ -14,10 +14,12 @@ const STATUS_FILTERS: Array<{ label: string; value: RunStatus | null }> = [
 ];
 
 export default function RunsPage() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useState<RunStatus | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Debounce search input
   useEffect(() => {
@@ -39,7 +41,21 @@ export default function RunsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Test Runs</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Test Runs</h1>
+        {selectedIds.length === 2 && (
+          <button
+            type="button"
+            onClick={() => navigate(`/runs/${selectedIds[0]}/compare/${selectedIds[1]}`)}
+            className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Compare Selected
+          </button>
+        )}
+        {selectedIds.length === 1 && (
+          <span className="text-xs text-gray-500">Select one more run to compare</span>
+        )}
+      </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
@@ -47,6 +63,7 @@ export default function RunsPage() {
           {STATUS_FILTERS.map((filter) => (
             <button
               key={filter.label}
+              type="button"
               onClick={() => setStatusFilter(filter.value)}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 statusFilter === filter.value
@@ -88,6 +105,7 @@ export default function RunsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+                  <th className="px-3 py-2 w-8" scope="col" aria-label="Select for comparison" />
                   <th className="px-4 py-2 font-medium">Status</th>
                   <th className="px-4 py-2 font-medium">Name</th>
                   <th className="px-4 py-2 font-medium">Tests</th>
@@ -97,8 +115,27 @@ export default function RunsPage() {
                 </tr>
               </thead>
               <tbody>
-                {runsPage.content.map((run) => (
-                  <tr key={run.id} className="border-b border-gray-50 hover:bg-gray-50">
+                {runsPage.content.map((run) => {
+                  const isSelected = selectedIds.includes(run.id);
+                  const isDisabled = !isSelected && selectedIds.length === 2;
+                  return (
+                  <tr key={run.id} className={`border-b border-gray-50 hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}`}>
+                    <td className="px-3 py-2.5">
+                      <input
+                        type="checkbox"
+                        aria-label={`Select run ${run.name} for comparison`}
+                        checked={isSelected}
+                        disabled={isDisabled}
+                        onChange={() =>
+                          setSelectedIds((prev) =>
+                            prev.includes(run.id)
+                              ? prev.filter((id) => id !== run.id)
+                              : [...prev, run.id],
+                          )
+                        }
+                        className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 disabled:opacity-30 cursor-pointer"
+                      />
+                    </td>
                     <td className="px-4 py-2.5">
                       <span
                         className={`inline-flex items-center gap-1.5 text-xs font-medium ${RUN_STATUS_TEXT_COLORS[run.status]}`}
@@ -120,7 +157,8 @@ export default function RunsPage() {
                     <td className="px-4 py-2.5 text-gray-600">{formatDuration(run.duration)}</td>
                     <td className="px-4 py-2.5 text-gray-500">{formatRelativeTime(run.startTime)}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
 
@@ -131,6 +169,7 @@ export default function RunsPage() {
               </p>
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={runsPage.first}
                   className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -141,6 +180,7 @@ export default function RunsPage() {
                   Page {runsPage.number + 1} of {runsPage.totalPages}
                 </span>
                 <button
+                  type="button"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={runsPage.last}
                   className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"

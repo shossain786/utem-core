@@ -3,28 +3,33 @@ import websocketService, { type ConnectionStatus } from '@/services/websocket';
 
 interface WebSocketContextValue {
   status: ConnectionStatus;
+  reconnectCount: number;
 }
 
 const WebSocketContext = createContext<WebSocketContextValue>({
   status: 'disconnected',
+  reconnectCount: 0,
 });
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<ConnectionStatus>(websocketService.status);
+  const [reconnectCount, setReconnectCount] = useState(websocketService.reconnectCount);
 
   useEffect(() => {
     websocketService.connect();
 
-    const removeListener = websocketService.onStatusChange(setStatus);
+    const removeStatusListener = websocketService.onStatusChange(setStatus);
+    const removeCountListener = websocketService.onReconnectCountChange(setReconnectCount);
 
     return () => {
-      removeListener();
+      removeStatusListener();
+      removeCountListener();
       websocketService.disconnect();
     };
   }, []);
 
   return (
-    <WebSocketContext.Provider value={{ status }}>
+    <WebSocketContext.Provider value={{ status, reconnectCount }}>
       {children}
     </WebSocketContext.Provider>
   );

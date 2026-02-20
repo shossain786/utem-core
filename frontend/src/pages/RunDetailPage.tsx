@@ -1,19 +1,33 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useRunDetail } from '@/hooks/useApi';
+import { useRunEvents, useRunSummary, useWebSocket } from '@/hooks/useWebSocket';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
-import { formatDuration } from '@/utils/format';
+import { formatDuration, formatRelativeTime } from '@/utils/format';
 import TreeNode from '@/components/tree/TreeNode';
 import StepDetailPanel from '@/components/step/StepDetailPanel';
 import AttachmentViewer from '@/components/attachment/AttachmentViewer';
 import { useAttachmentViewer } from '@/hooks/useAttachmentViewer';
+import ExportDropdown from '@/components/export/ExportDropdown';
 import type { TestStep } from '@/api/types';
 
 export default function RunDetailPage() {
   const { runId } = useParams<{ runId: string }>();
-  const { data: hierarchy, isLoading, isError } = useRunDetail(runId);
+  const { status: wsStatus } = useWebSocket();
   const [selectedStep, setSelectedStep] = useState<TestStep | null>(null);
   const viewer = useAttachmentViewer();
+
+  // Fall back to polling every 10s when WebSocket is disconnected
+  const { data: hierarchy, isLoading, isError, dataUpdatedAt } = useRunDetail(
+    runId,
+    wsStatus !== 'connected' ? 10_000 : false,
+  );
+
+  const runIsActive = hierarchy?.status === 'RUNNING';
+
+  // Subscribe to real-time events — auto-invalidate query cache on each WS event
+  useRunEvents(runIsActive ? runId : null);
+  useRunSummary(runIsActive ? runId : null);
 
   if (isLoading) {
     return (
@@ -42,23 +56,35 @@ export default function RunDetailPage() {
       {/* Run Header */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
         <div className="flex items-center gap-3 mb-3">
-          {/* Status badge */}
+          {/* Status badge — pulsing dot when RUNNING */}
           <span
             className={`inline-flex items-center gap-1.5 text-xs font-medium ${RUN_STATUS_TEXT_COLORS[hierarchy.status]}`}
           >
-            <span className={`w-2 h-2 rounded-full ${RUN_STATUS_COLORS[hierarchy.status]}`} />
+            <span
+              className={`w-2 h-2 rounded-full ${RUN_STATUS_COLORS[hierarchy.status]}${runIsActive ? ' animate-pulse' : ''}`}
+            />
             {hierarchy.status}
           </span>
 
           {/* Run name */}
           <h1 className="text-lg font-bold text-gray-900">{hierarchy.name}</h1>
 
-          {/* Duration */}
-          {stats.totalDuration > 0 && (
-            <span className="text-sm text-gray-400 ml-auto">
-              {formatDuration(stats.totalDuration)}
-            </span>
-          )}
+          <div className="ml-auto flex items-center gap-3">
+            {/* Last updated timestamp */}
+            {dataUpdatedAt > 0 && (
+              <span className="text-xs text-gray-400">
+                Updated {formatRelativeTime(new Date(dataUpdatedAt).toISOString())}
+              </span>
+            )}
+            {/* Duration */}
+            {stats.totalDuration > 0 && (
+              <span className="text-sm text-gray-400">
+                {formatDuration(stats.totalDuration)}
+              </span>
+            )}
+            {/* Export */}
+            {runId && <ExportDropdown runId={runId} />}
+          </div>
         </div>
 
         {/* Stats summary bar */}

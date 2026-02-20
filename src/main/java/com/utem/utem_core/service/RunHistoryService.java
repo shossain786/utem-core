@@ -17,8 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Service for querying, listing, comparing, and managing test run history.
@@ -91,13 +95,76 @@ public class RunHistoryService {
     }
 
     /**
-     * Compare two runs side by side.
+     * Compare two runs side by side, including node-level diff matched by name.
      */
     @Transactional(readOnly = true)
     public RunComparisonDTO compareRuns(String baseRunId, String compareRunId) {
         TestRunSummaryDTO baseRun = getRunById(baseRunId);
         TestRunSummaryDTO compareRun = getRunById(compareRunId);
-        return RunComparisonDTO.from(baseRun, compareRun);
+
+        // Build node-level diff (SCENARIO and SUITE types, matched by name)
+        List<TestNode> baseNodes = testNodeRepository.findByTestRunId(baseRunId);
+        List<TestNode> compareNodes = testNodeRepository.findByTestRunId(compareRunId);
+
+        Map<String, TestNode> baseByName = baseNodes.stream()
+                .collect(Collectors.toMap(TestNode::getName, n -> n, (a, b) -> a));
+        Map<String, TestNode> compareByName = compareNodes.stream()
+                .collect(Collectors.toMap(TestNode::getName, n -> n, (a, b) -> a));
+
+        Set<String> allNames = new LinkedHashSet<>();
+        allNames.addAll(baseByName.keySet());
+        allNames.addAll(compareByName.keySet());
+
+        List<RunComparisonDTO.NodeDiffEntry> diffs = new ArrayList<>();
+        for (String name : allNames) {
+            TestNode base = baseByName.get(name);
+            TestNode compare = compareByName.get(name);
+
+            RunComparisonDTO.DiffType diffType;
+            if (base == null) {
+                diffType = RunComparisonDTO.DiffType.NEW;
+            } else if (compare == null) {
+                diffType = RunComparisonDTO.DiffType.REMOVED;
+            } else if (base.getStatus() == TestNode.NodeStatus.PASSED
+                    && compare.getStatus() == TestNode.NodeStatus.FAILED) {
+                diffType = RunComparisonDTO.DiffType.REGRESSION;
+            } else if (base.getStatus() == TestNode.NodeStatus.FAILED
+                    && compare.getStatus() == TestNode.NodeStatus.PASSED) {
+                diffType = RunComparisonDTO.DiffType.FIX;
+            } else {
+                diffType = RunComparisonDTO.DiffType.UNCHANGED;
+            }
+
+            diffs.add(new RunComparisonDTO.NodeDiffEntry(
+                    name,
+                    compare != null ? compare.getNodeType().name() : base.getNodeType().name(),
+                    diffType,
+                    base != null ? base.getStatus().name() : null,
+                    compare != null ? compare.getStatus().name() : null,
+                    base != null ? base.getDuration() : null,
+                    compare != null ? compare.getDuration() : null
+            ));
+        }
+
+        return RunComparisonDTO.from(baseRun, compareRun, diffs);
+    }
+
+    /**
+     * Manually abort a RUNNING run. Throws {@link IllegalStateException} if run is not RUNNING.
+     */
+    @Transactional
+    public TestRunSummaryDTO abortRun(String runId) {
+        TestRun run = testRunRepository.findById(runId)
+                .orElseThrow(() -> new TestRunNotFoundException(runId));
+        if (run.getStatus() != TestRun.RunStatus.RUNNING) {
+            throw new IllegalStateException(
+                    "Run " + runId + " cannot be aborted — current status: " + run.getStatus());
+        }
+        run.setStatus(TestRun.RunStatus.ABORTED);
+        run.setEndTime(Instant.now());
+        TestRun saved = testRunRepository.save(run);
+        log.info("Manually aborted run {} ('{}')", runId, run.getName());
+        return TestRunSummaryDTO.from(saved);
     }
 
     /**

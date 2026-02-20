@@ -15,11 +15,11 @@ const TERMINAL_EVENTS: Set<EventType> = new Set([
 ]);
 
 /**
- * Returns the current WebSocket connection status.
+ * Returns the current WebSocket connection status and reconnect count.
  */
-export function useWebSocket(): { status: ConnectionStatus } {
-  const { status } = useWebSocketContext();
-  return { status };
+export function useWebSocket(): { status: ConnectionStatus; reconnectCount: number } {
+  const { status, reconnectCount } = useWebSocketContext();
+  return { status, reconnectCount };
 }
 
 /**

@@ -191,7 +191,7 @@ class RunHistoryControllerTest {
             TestRunSummaryDTO base = createSummary("run-1", "Base", TestRun.RunStatus.PASSED);
             TestRunSummaryDTO compare = createSummary("run-2", "Compare", TestRun.RunStatus.FAILED);
             RunComparisonDTO comparison = new RunComparisonDTO(
-                    base, compare, 0, -2, 2, 0, -20.0, 0L);
+                    base, compare, 0, -2, 2, 0, -20.0, 0L, java.util.List.of());
 
             when(runHistoryService.compareRuns("run-1", "run-2")).thenReturn(comparison);
 

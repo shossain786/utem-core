@@ -28,6 +28,7 @@ public class UtemReporter implements TestExecutionListener {
     private final String runId = UUID.randomUUID().toString();
     private final UtemConfig config = new UtemConfig();
     private final UtemHttpClient httpClient = new UtemHttpClient(config);
+    private final EventQueue eventQueue = new EventQueue(httpClient);
     private final EventBuilder builder = new EventBuilder();
 
     // Maps TestIdentifier.uniqueId -> generated eventId for the START event
@@ -48,7 +49,7 @@ public class UtemReporter implements TestExecutionListener {
         totalTests.set((int) count);
 
         String json = builder.buildRunStarted(runEventId, runId, "JUnit 5 Test Run");
-        httpClient.sendEvent(json);
+        eventQueue.enqueue(json);
 
         System.out.println("[UTEM] Test run started: " + runId);
     }
@@ -58,8 +59,9 @@ public class UtemReporter implements TestExecutionListener {
         String eventId = UUID.randomUUID().toString();
         String json = builder.buildRunFinished(eventId, runId, runEventId,
                 totalTests.get(), passedTests.get(), failedTests.get(), skippedTests.get());
-        httpClient.sendEvent(json);
+        eventQueue.enqueue(json);
 
+        eventQueue.flush();
         System.out.println("[UTEM] Test run finished: " + passedTests.get() + " passed, "
                 + failedTests.get() + " failed, " + skippedTests.get() + " skipped");
     }
@@ -75,11 +77,11 @@ public class UtemReporter implements TestExecutionListener {
         if (testIdentifier.isTest()) {
             String json = builder.buildCaseStarted(eventId, runId, parentEventId,
                     testIdentifier.getDisplayName());
-            httpClient.sendEvent(json);
+            eventQueue.enqueue(json);
         } else if (isReportableContainer(testIdentifier)) {
             String json = builder.buildSuiteStarted(eventId, runId, parentEventId,
                     testIdentifier.getDisplayName());
-            httpClient.sendEvent(json);
+            eventQueue.enqueue(json);
         }
     }
 
@@ -97,7 +99,7 @@ public class UtemReporter implements TestExecutionListener {
             String nodeStatus = deriveContainerStatus(result);
             String json = builder.buildSuiteFinished(
                     UUID.randomUUID().toString(), runId, startEventId, nodeStatus, duration);
-            httpClient.sendEvent(json);
+            eventQueue.enqueue(json);
         }
     }
 
@@ -113,15 +115,15 @@ public class UtemReporter implements TestExecutionListener {
 
             String startJson = builder.buildCaseStarted(eventId, runId, parentEventId,
                     testIdentifier.getDisplayName());
-            httpClient.sendEvent(startJson);
+            eventQueue.enqueue(startJson);
 
             String skipJson = builder.buildTestSkipped(
                     UUID.randomUUID().toString(), runId, eventId, reason);
-            httpClient.sendEvent(skipJson);
+            eventQueue.enqueue(skipJson);
 
             String finishJson = builder.buildCaseFinished(
                     UUID.randomUUID().toString(), runId, eventId, "SKIPPED", 0L);
-            httpClient.sendEvent(finishJson);
+            eventQueue.enqueue(finishJson);
         }
     }
 
@@ -133,10 +135,10 @@ public class UtemReporter implements TestExecutionListener {
                 passedTests.incrementAndGet();
                 String passJson = builder.buildTestPassed(
                         UUID.randomUUID().toString(), runId, startEventId, duration);
-                httpClient.sendEvent(passJson);
+                eventQueue.enqueue(passJson);
                 String finishJson = builder.buildCaseFinished(
                         UUID.randomUUID().toString(), runId, startEventId, "PASSED", duration);
-                httpClient.sendEvent(finishJson);
+                eventQueue.enqueue(finishJson);
             }
             case FAILED -> {
                 failedTests.incrementAndGet();
@@ -147,22 +149,22 @@ public class UtemReporter implements TestExecutionListener {
                 String failJson = builder.buildTestFailed(
                         UUID.randomUUID().toString(), runId, startEventId,
                         duration, errorMessage, stackTrace);
-                httpClient.sendEvent(failJson);
+                eventQueue.enqueue(failJson);
 
                 captureScreenshotIfAvailable(startEventId);
 
                 String finishJson = builder.buildCaseFinished(
                         UUID.randomUUID().toString(), runId, startEventId, "FAILED", duration);
-                httpClient.sendEvent(finishJson);
+                eventQueue.enqueue(finishJson);
             }
             case ABORTED -> {
                 skippedTests.incrementAndGet();
                 String skipJson = builder.buildTestSkipped(
                         UUID.randomUUID().toString(), runId, startEventId, "Aborted");
-                httpClient.sendEvent(skipJson);
+                eventQueue.enqueue(skipJson);
                 String finishJson = builder.buildCaseFinished(
                         UUID.randomUUID().toString(), runId, startEventId, "SKIPPED", duration);
-                httpClient.sendEvent(finishJson);
+                eventQueue.enqueue(finishJson);
             }
         }
     }
@@ -206,7 +208,7 @@ public class UtemReporter implements TestExecutionListener {
             String attachmentEventId = UUID.randomUUID().toString();
             String json = builder.buildAttachment(attachmentEventId, runId, testCaseEventId,
                     "failure-screenshot.png", "image/png", screenshot.length(), true);
-            httpClient.sendEvent(json);
+            eventQueue.enqueue(json);
             httpClient.uploadFile(attachmentEventId, screenshot.toPath(), "failure-screenshot.png");
         } catch (Exception e) {
             System.err.println("[UTEM] Screenshot capture failed: " + e.getMessage());

@@ -6,25 +6,36 @@ import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 
 export default function DashboardPage() {
   const { status: wsStatus } = useWebSocket();
-  const { data: stats, isLoading: statsLoading, isError: statsError } = useRunSummaryStats();
-  const { data: runsPage, isLoading: runsLoading } = useRuns(0, 5);
+  // Poll every 10s when WS is disconnected so the UI stays current without WebSocket
+  const pollingInterval = wsStatus !== 'connected' ? 10_000 : false;
+  const { data: stats, isLoading: statsLoading, isError: statsError, dataUpdatedAt: statsUpdatedAt } =
+    useRunSummaryStats(pollingInterval);
+  const hasActiveRuns = (stats?.runningRuns ?? 0) > 0;
+  // Keep runs list refreshed whenever tests are actively running
+  const runsRefetchInterval = hasActiveRuns || wsStatus !== 'connected' ? 10_000 : false;
+  const { data: runsPage, isLoading: runsLoading } = useRuns(0, 5, runsRefetchInterval);
   const { data: flakiness, isLoading: flakinessLoading } = useOverallFlakiness();
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <span
-            className={`inline-block w-2 h-2 rounded-full ${
-              wsStatus === 'connected'
-                ? 'bg-passed'
-                : wsStatus === 'connecting'
-                  ? 'bg-running animate-pulse'
-                  : 'bg-gray-400'
-            }`}
-          />
-          <span>{wsStatus === 'connected' ? 'Live' : wsStatus === 'connecting' ? 'Connecting...' : 'Offline'}</span>
+        <div className="flex items-center gap-3 text-xs text-gray-500">
+          {statsUpdatedAt > 0 && (
+            <span>Refreshed {formatRelativeTime(new Date(statsUpdatedAt).toISOString())}</span>
+          )}
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`inline-block w-2 h-2 rounded-full ${
+                wsStatus === 'connected'
+                  ? 'bg-passed'
+                  : wsStatus === 'connecting'
+                    ? 'bg-running animate-pulse'
+                    : 'bg-gray-400'
+              }`}
+            />
+            <span>{wsStatus === 'connected' ? 'Live' : wsStatus === 'connecting' ? 'Connecting...' : 'Offline'}</span>
+          </div>
         </div>
       </div>
 

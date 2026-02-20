@@ -23,6 +23,10 @@ public class TestRun {
     @Column(nullable = false)
     private String name;
 
+    /** The reporter-generated UUID (runId) used to correlate in-memory maps after server restart. */
+    @Column(unique = true)
+    private String sourceRunId;
+
     @Column(nullable = false)
     private Instant startTime;
 

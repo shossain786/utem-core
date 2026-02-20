@@ -32,6 +32,7 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
     private final String runId = UUID.randomUUID().toString();
     private final UtemConfig config = new UtemConfig();
     private final UtemHttpClient httpClient = new UtemHttpClient(config);
+    private final EventQueue eventQueue = new EventQueue(httpClient);
     private final EventBuilder builder = new EventBuilder();
 
     private String runEventId;
@@ -59,7 +60,7 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
     private void onRunStarted(TestRunStarted event) {
         runEventId = UUID.randomUUID().toString();
         String json = builder.buildRunStarted(runEventId, runId, "Cucumber Test Run");
-        httpClient.sendEvent(json);
+        eventQueue.enqueue(json);
         System.out.println("[UTEM] Cucumber test run started: " + runId);
     }
 
@@ -73,7 +74,7 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
             String fEventId = UUID.randomUUID().toString();
             String featureName = extractFeatureName(uri);
             String json = builder.buildSuiteStarted(fEventId, runId, runEventId, featureName);
-            httpClient.sendEvent(json);
+            eventQueue.enqueue(json);
             return fEventId;
         });
 
@@ -84,7 +85,7 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
 
         String json = builder.buildCaseStarted(caseEventId, runId, featureEventId,
                 testCase.getName());
-        httpClient.sendEvent(json);
+        eventQueue.enqueue(json);
     }
 
     private void onCaseFinished(TestCaseFinished event) {
@@ -104,10 +105,10 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
                 passedTests.incrementAndGet();
                 String passJson = builder.buildTestPassed(
                         UUID.randomUUID().toString(), runId, caseEventId, duration);
-                httpClient.sendEvent(passJson);
+                eventQueue.enqueue(passJson);
                 String finishJson = builder.buildCaseFinished(
                         UUID.randomUUID().toString(), runId, caseEventId, "PASSED", duration);
-                httpClient.sendEvent(finishJson);
+                eventQueue.enqueue(finishJson);
             }
             case FAILED -> {
                 failedTests.incrementAndGet();
@@ -118,13 +119,13 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
                 String failJson = builder.buildTestFailed(
                         UUID.randomUUID().toString(), runId, caseEventId,
                         duration, errorMessage, stackTrace);
-                httpClient.sendEvent(failJson);
+                eventQueue.enqueue(failJson);
 
                 captureScreenshotIfAvailable(caseEventId);
 
                 String finishJson = builder.buildCaseFinished(
                         UUID.randomUUID().toString(), runId, caseEventId, "FAILED", duration);
-                httpClient.sendEvent(finishJson);
+                eventQueue.enqueue(finishJson);
             }
             case SKIPPED, PENDING, UNDEFINED, AMBIGUOUS -> {
                 skippedTests.incrementAndGet();
@@ -134,10 +135,10 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
                 }
                 String skipJson = builder.buildTestSkipped(
                         UUID.randomUUID().toString(), runId, caseEventId, reason);
-                httpClient.sendEvent(skipJson);
+                eventQueue.enqueue(skipJson);
                 String finishJson = builder.buildCaseFinished(
                         UUID.randomUUID().toString(), runId, caseEventId, "SKIPPED", duration);
-                httpClient.sendEvent(finishJson);
+                eventQueue.enqueue(finishJson);
             }
         }
     }
@@ -148,15 +149,16 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
             String nodeStatus = failedTests.get() > 0 ? "FAILED" : "PASSED";
             String json = builder.buildSuiteFinished(
                     UUID.randomUUID().toString(), runId, entry.getValue(), nodeStatus, null);
-            httpClient.sendEvent(json);
+            eventQueue.enqueue(json);
         }
 
         // Finish the run
         String eventId = UUID.randomUUID().toString();
         String json = builder.buildRunFinished(eventId, runId, runEventId,
                 totalTests.get(), passedTests.get(), failedTests.get(), skippedTests.get());
-        httpClient.sendEvent(json);
+        eventQueue.enqueue(json);
 
+        eventQueue.flush();
         System.out.println("[UTEM] Cucumber test run finished: " + passedTests.get() + " passed, "
                 + failedTests.get() + " failed, " + skippedTests.get() + " skipped");
     }
@@ -191,7 +193,7 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
             String attachmentEventId = UUID.randomUUID().toString();
             String json = builder.buildAttachment(attachmentEventId, runId, testCaseEventId,
                     "failure-screenshot.png", "image/png", screenshot.length(), true);
-            httpClient.sendEvent(json);
+            eventQueue.enqueue(json);
             httpClient.uploadFile(attachmentEventId, screenshot.toPath(), "failure-screenshot.png");
         } catch (Exception e) {
             System.err.println("[UTEM] Screenshot capture failed: " + e.getMessage());

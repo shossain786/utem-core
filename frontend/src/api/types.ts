@@ -108,6 +108,18 @@ export interface TestRunHierarchy {
   rootNodes: HierarchyNode[];
 }
 
+export type DiffType = 'REGRESSION' | 'FIX' | 'NEW' | 'REMOVED' | 'UNCHANGED';
+
+export interface NodeDiffEntry {
+  name: string;
+  nodeType: string;
+  diffType: DiffType;
+  baseStatus: string | null;
+  compareStatus: string | null;
+  baseDuration: number | null;
+  compareDuration: number | null;
+}
+
 export interface RunComparison {
   baseRun: TestRunSummary;
   compareRun: TestRunSummary;
@@ -117,6 +129,7 @@ export interface RunComparison {
   skippedTestsDiff: number;
   passRateDiff: number | null;
   durationDiff: number | null;
+  nodeDiffs: NodeDiffEntry[];
 }
 
 export interface FlakyTest {
@@ -147,6 +160,21 @@ export interface SearchResult {
   steps: TestStepSummary[];
   attachments: AttachmentSummary[];
   totalResults: number;
+}
+
+// ============ Trend Types ============
+
+export interface TrendPoint {
+  runId: string;
+  runName: string;
+  startTime: string;
+  value: number | null;
+}
+
+export interface TrendData {
+  metric: string;
+  limit: number;
+  points: TrendPoint[];
 }
 
 // ============ WebSocket Types ============

@@ -27,29 +27,69 @@ public final class UtemHttpClient {
                 .build();
     }
 
+    private static final int MAX_RETRIES = 3;
+    private static final long[] RETRY_DELAYS_MS = {100, 500, 2000};
+
     /**
-     * POST a JSON event to /utem/events.
+     * POST a JSON event to /utem/events with retry on failure.
      */
     public void sendEvent(String json) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(config.getEventsUrl()))
-                    .header("Content-Type", "application/json")
-                    .timeout(Duration.ofSeconds(10))
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
+        sendWithRetry(config.getEventsUrl(), json);
+    }
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    /**
+     * POST a JSON array of events to /utem/events/batch.
+     * Returns true if all events were accepted.
+     */
+    public boolean sendBatch(java.util.List<String> jsonEvents) {
+        if (jsonEvents.isEmpty()) return true;
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < jsonEvents.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append(jsonEvents.get(i));
+        }
+        sb.append("]");
+        return sendWithRetry(config.getBatchEventsUrl(), sb.toString());
+    }
 
-            if (response.statusCode() >= 400 && response.statusCode() != 409) {
-                System.err.println("[UTEM] Event rejected (HTTP " + response.statusCode() + "): " + response.body());
-            }
-        } catch (IOException | InterruptedException e) {
-            System.err.println("[UTEM] Failed to send event: " + e.getMessage());
-            if (e instanceof InterruptedException) {
+    /**
+     * POST JSON to a URL with exponential backoff retry. Returns true on success.
+     */
+    private boolean sendWithRetry(String url, String json) {
+        for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .header("Content-Type", "application/json")
+                        .timeout(Duration.ofSeconds(10))
+                        .POST(HttpRequest.BodyPublishers.ofString(json))
+                        .build();
+
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 409) return true; // duplicate, ignore
+                if (response.statusCode() < 400) return true;  // success
+
+                System.err.println("[UTEM] Event rejected (HTTP " + response.statusCode()
+                        + "), attempt " + (attempt + 1) + ": " + response.body());
+            } catch (IOException e) {
+                System.err.println("[UTEM] Send failed (attempt " + (attempt + 1) + "): " + e.getMessage());
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return false;
+            }
+
+            if (attempt < MAX_RETRIES) {
+                try {
+                    Thread.sleep(RETRY_DELAYS_MS[attempt]);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
             }
         }
+        System.err.println("[UTEM] Gave up after " + (MAX_RETRIES + 1) + " attempts.");
+        return false;
     }
 
     /**
