@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "utem-reporter"
+version = "0.1.0"
+description = "pytest plugin that streams test results to UTEM Core in real time"
+readme = "README.md"
+requires-python = ">=3.8"
+# Zero runtime dependencies — uses only the Python standard library
+dependencies = []
+
+[project.entry-points."pytest11"]
+utem-reporter = "utem_reporter.plugin"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["utem_reporter*"]

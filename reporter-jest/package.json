@@ -1,0 +1,14 @@
+{
+  "name": "utem-jest-reporter",
+  "version": "0.1.0",
+  "description": "Jest custom reporter that streams test results to UTEM Core in real time",
+  "main": "UtemReporter.js",
+  "license": "MIT",
+  "keywords": ["jest", "reporter", "utem", "test-reporting"],
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "jest": ">=27"
+  }
+}
