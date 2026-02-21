@@ -9,6 +9,9 @@ import ComparisonPage from './pages/ComparisonPage';
 import SearchPage from './pages/SearchPage';
 import FlakinessPage from './pages/FlakinessPage';
 import TrendsPage from './pages/TrendsPage';
+import InsightsPage from './pages/InsightsPage';
+import FailureClustersPage from './pages/FailureClustersPage';
+import PerformancePage from './pages/PerformancePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +36,9 @@ function App() {
               <Route path="/search" element={<SearchPage />} />
               <Route path="/flakiness" element={<FlakinessPage />} />
               <Route path="/trends" element={<TrendsPage />} />
+              <Route path="/insights" element={<InsightsPage />} />
+              <Route path="/failures" element={<FailureClustersPage />} />
+              <Route path="/performance" element={<PerformancePage />} />
             </Route>
           </Routes>
         </BrowserRouter>

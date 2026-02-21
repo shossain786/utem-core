@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary } from '@/api/types';
 
 export function useRuns(page = 0, size = 20, refetchInterval?: number | false) {
   return useQuery({
@@ -139,6 +139,56 @@ export function useFlakinessTrend(limit: number) {
     queryKey: ['trends', 'flakiness', limit],
     queryFn: async () => {
       const { data } = await apiClient.get<TrendData>('/trends/flakiness', { params: { limit } });
+      return data;
+    },
+  });
+}
+
+export function useFailureHotspots(limit: number, recentRuns: number) {
+  return useQuery({
+    queryKey: ['failure-insights', 'hotspots', limit, recentRuns],
+    queryFn: async () => {
+      const { data } = await apiClient.get<FailureHotspot[]>('/failure-insights/hotspots', { params: { limit, recentRuns } });
+      return data;
+    },
+  });
+}
+
+export function useFailureClusters(limit: number, recentRuns: number) {
+  return useQuery({
+    queryKey: ['failure-insights', 'clusters', limit, recentRuns],
+    queryFn: async () => {
+      const { data } = await apiClient.get<FailureCluster[]>('/failure-insights/clusters', { params: { limit, recentRuns } });
+      return data;
+    },
+  });
+}
+
+export function useFailureInsights(recentRuns: number) {
+  return useQuery({
+    queryKey: ['failure-insights', 'summary', recentRuns],
+    queryFn: async () => {
+      const { data } = await apiClient.get<FailureInsights>('/failure-insights/summary', { params: { recentRuns } });
+      return data;
+    },
+  });
+}
+
+export function usePerformanceReport(limit: number, recentRuns: number) {
+  return useQuery({
+    queryKey: ['performance', 'report', limit, recentRuns],
+    queryFn: async () => {
+      const { data } = await apiClient.get<PerformanceReport>('/performance/report', { params: { limit, recentRuns } });
+      return data;
+    },
+  });
+}
+
+export function useInsightsSummary(recentRuns: number) {
+  return useQuery({
+    queryKey: ['insights', 'summary', recentRuns],
+    queryFn: async () => {
+      const { data } = await apiClient.get<InsightsSummary>('/insights/summary', { params: { recentRuns } });
       return data;
     },
   });

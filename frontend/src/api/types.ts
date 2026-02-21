@@ -162,6 +162,66 @@ export interface SearchResult {
   totalResults: number;
 }
 
+// ============ Phase 2 Analytics Types ============
+
+export interface FailureHotspot {
+  testName: string;
+  nodeType: NodeType;
+  failCount: number;
+  totalRuns: number;
+  failRate: number;           // 0–100 percentage
+  lastRunId: string | null;
+  lastErrorMessage: string | null;
+}
+
+export interface FailureCluster {
+  clusterId: number;
+  representativeError: string;
+  occurrences: number;
+  affectedTests: string[];
+  runIds: string[];
+}
+
+export interface FailureInsights {
+  recentRunsAnalyzed: number;
+  hotspots: FailureHotspot[];
+  clusters: FailureCluster[];
+}
+
+export interface SlowTest {
+  testName: string;
+  nodeType: NodeType;
+  avgDurationMs: number;
+  maxDurationMs: number;
+  minDurationMs: number;
+  runCount: number;
+  slowestRunId: string | null;
+}
+
+export interface DurationStats {
+  avgMs: number;
+  maxMs: number;
+  minMs: number;
+  totalMs: number;
+  count: number;
+}
+
+export interface PerformanceReport {
+  recentRunsAnalyzed: number;
+  slowestTests: SlowTest[];
+  durationByNodeType: Record<string, DurationStats>;
+}
+
+export interface InsightsSummary {
+  recentRunsAnalyzed: number;
+  overallHealthScore: number;   // 0–100
+  topFailures: FailureHotspot[];
+  topClusters: FailureCluster[];
+  topSlowTests: SlowTest[];
+  totalFailureClusters: number;
+  totalHotspots: number;
+}
+
 // ============ Trend Types ============
 
 export interface TrendPoint {

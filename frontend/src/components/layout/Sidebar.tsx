@@ -6,6 +6,9 @@ const navItems = [
   { to: '/search', label: 'Search', icon: '🔍' },
   { to: '/flakiness', label: 'Flakiness', icon: '⚡' },
   { to: '/trends', label: 'Trends', icon: '📈' },
+  { to: '/insights', label: 'Insights', icon: '💡' },
+  { to: '/failures', label: 'Failures', icon: '🔥' },
+  { to: '/performance', label: 'Performance', icon: '⏱️' },
 ];
 
 export default function Sidebar() {
