@@ -1,0 +1,59 @@
+// UTEM - Jenkins Pipeline Example
+// This Declarative Pipeline shows how to run tests with the UTEM reporter.
+// The reporter sends results to UTEM Core automatically during the test run.
+// Optionally, enable the Jenkins webhook notification in UTEM's application.properties
+// so UTEM pushes a result summary back to Jenkins when the run completes.
+
+pipeline {
+    agent any
+
+    environment {
+        // UTEM server URL — override with your actual host/port
+        UTEM_SERVER_URL = 'http://utem-server:8080/utem'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Pass the UTEM server URL as a system property.
+                // The UTEM reporter JAR on the test classpath picks this up automatically.
+                sh 'mvn test -Dutem.server.url=$UTEM_SERVER_URL'
+            }
+            post {
+                always {
+                    // Publish JUnit XML results to Jenkins (optional — UTEM is the primary dashboard)
+                    junit allowEmptyResults: true, testResults: '**/surefire-reports/*.xml'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Test run complete. View detailed results in the UTEM dashboard: $UTEM_SERVER_URL"
+        }
+    }
+}
+
+// ── Notes ────────────────────────────────────────────────────────────────────
+//
+// TestNG projects:
+//   sh 'mvn test -Dutem.server.url=$UTEM_SERVER_URL'
+//   (reporter-testng is auto-discovered via SPI — no extra config needed)
+//
+// Cucumber projects:
+//   sh 'mvn test -Dutem.server.url=$UTEM_SERVER_URL'
+//   (UtemCucumberPlugin is registered in @CucumberOptions)
+//
+// Enable Jenkins webhook feedback (optional):
+//   In UTEM's application.properties set:
+//     utem.notification.jenkins.enabled=true
+//     utem.notification.jenkins.url=http://jenkins-host/generic-webhook-trigger/invoke?token=MY_TOKEN
+//   UTEM will POST a JSON summary to Jenkins when each run finishes.
+//   Install the "Generic Webhook Trigger" Jenkins plugin to receive it.

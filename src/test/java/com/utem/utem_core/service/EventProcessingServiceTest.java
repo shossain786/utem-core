@@ -3,6 +3,7 @@ package com.utem.utem_core.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.utem.utem_core.entity.*;
+import com.utem.utem_core.notification.NotificationService;
 import com.utem.utem_core.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,6 +36,9 @@ class EventProcessingServiceTest {
     @Mock
     private AttachmentRepository attachmentRepository;
 
+    @Mock
+    private NotificationService notificationService;
+
     private ObjectMapper objectMapper;
     private EventProcessingService eventProcessingService;
 
@@ -52,7 +56,8 @@ class EventProcessingServiceTest {
                 testStepRepository,
                 attachmentRepository,
                 objectMapper,
-                Optional.empty()
+                Optional.empty(),
+                notificationService
         );
     }
 

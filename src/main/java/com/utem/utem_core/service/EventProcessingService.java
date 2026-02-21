@@ -6,6 +6,7 @@ import com.utem.utem_core.dto.EventPayload;
 import com.utem.utem_core.dto.websocket.RunSummaryMessage;
 import com.utem.utem_core.dto.websocket.WebSocketEventMessage;
 import com.utem.utem_core.entity.*;
+import com.utem.utem_core.notification.NotificationService;
 import com.utem.utem_core.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class EventProcessingService {
     private final AttachmentRepository attachmentRepository;
     private final ObjectMapper objectMapper;
     private final Optional<WebSocketBroadcasterService> broadcasterService;
+    private final NotificationService notificationService;
 
     private final Map<String, String> eventToTestRunMap = new ConcurrentHashMap<>();
     private final Map<String, String> eventToTestNodeMap = new ConcurrentHashMap<>();
@@ -125,6 +127,7 @@ public class EventProcessingService {
 
             broadcastEvent(eventLog, testRun.getId(), "TEST_RUN", testRun.getName(), testRun.getStatus().name());
             broadcastSummary(eventLog.getRunId(), testRun);
+            notificationService.notifyRunCompleted(testRun);
         });
     }
 
