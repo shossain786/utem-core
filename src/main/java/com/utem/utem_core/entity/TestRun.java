@@ -47,6 +47,9 @@ public class TestRun {
 
     private Integer skippedTests;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean archived = false;
+
     public enum RunStatus {
         RUNNING,
         PASSED,

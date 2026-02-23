@@ -43,6 +43,8 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
     private final Map<String, String> caseEventIds = new ConcurrentHashMap<>();
     // Maps TestCase id -> start time
     private final Map<String, Long> startTimes = new ConcurrentHashMap<>();
+    // Maps TestCase id -> step counter for ordering steps
+    private final Map<String, AtomicInteger> stepCounters = new ConcurrentHashMap<>();
 
     private final AtomicInteger totalTests = new AtomicInteger();
     private final AtomicInteger passedTests = new AtomicInteger();
@@ -53,6 +55,7 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
     public void setEventPublisher(EventPublisher publisher) {
         publisher.registerHandlerFor(TestRunStarted.class, this::onRunStarted);
         publisher.registerHandlerFor(TestCaseStarted.class, this::onCaseStarted);
+        publisher.registerHandlerFor(TestStepFinished.class, this::onStepFinished);
         publisher.registerHandlerFor(TestCaseFinished.class, this::onCaseFinished);
         publisher.registerHandlerFor(TestRunFinished.class, this::onRunFinished);
     }
@@ -88,9 +91,52 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
         eventQueue.enqueue(json);
     }
 
+    private void onStepFinished(TestStepFinished event) {
+        if (!(event.getTestStep() instanceof PickleStepTestStep pickleStep)) return;
+
+        String caseKey = event.getTestCase().getId().toString();
+        String caseEventId = caseEventIds.get(caseKey);
+        if (caseEventId == null) return;
+
+        int order = stepCounters.computeIfAbsent(caseKey, k -> new AtomicInteger(0))
+                .incrementAndGet();
+
+        Result result = event.getResult();
+        long durationMs = result.getDuration() != null ? result.getDuration().toMillis() : 0L;
+
+        String stepStatus = switch (result.getStatus()) {
+            case PASSED -> "PASSED";
+            case FAILED -> "FAILED";
+            default     -> "SKIPPED";
+        };
+
+        String errorMessage = null;
+        String stackTrace = null;
+        if (result.getError() != null) {
+            errorMessage = result.getError().getMessage() != null
+                    ? result.getError().getMessage()
+                    : result.getError().getClass().getName();
+            stackTrace = stackTraceToString(result.getError());
+        }
+
+        String stepName = pickleStep.getStep().getKeyword().trim()
+                + " " + pickleStep.getStep().getText();
+
+        String json = builder.buildTestStep(
+                UUID.randomUUID().toString(), runId, caseEventId,
+                stepName, stepStatus, order, durationMs, errorMessage, stackTrace);
+        eventQueue.enqueue(json);
+
+        // Capture screenshot here (before @After hooks close the browser)
+        if (result.getStatus() == Status.FAILED) {
+            captureScreenshotIfAvailable(caseEventId);
+        }
+    }
+
     private void onCaseFinished(TestCaseFinished event) {
         TestCase testCase = event.getTestCase();
         String caseKey = testCase.getId().toString();
+        stepCounters.remove(caseKey);
         String caseEventId = caseEventIds.remove(caseKey);
         if (caseEventId == null) return;
 
@@ -120,8 +166,6 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
                         UUID.randomUUID().toString(), runId, caseEventId,
                         duration, errorMessage, stackTrace);
                 eventQueue.enqueue(failJson);
-
-                captureScreenshotIfAvailable(caseEventId);
 
                 String finishJson = builder.buildCaseFinished(
                         UUID.randomUUID().toString(), runId, caseEventId, "FAILED", duration);

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,6 +73,7 @@ class AttachmentRepositoryTest {
         testStep = testStepRepository.save(testStep);
 
         screenshot = Attachment.builder()
+                .id(UUID.randomUUID().toString())
                 .testNode(testNode)
                 .testStep(testStep)
                 .name("failure_screenshot.png")
@@ -84,6 +86,7 @@ class AttachmentRepositoryTest {
                 .build();
 
         logFile = Attachment.builder()
+                .id(UUID.randomUUID().toString())
                 .testNode(testNode)
                 .name("console.log")
                 .type(Attachment.AttachmentType.LOG)
@@ -150,6 +153,7 @@ class AttachmentRepositoryTest {
         attachmentRepository.save(logFile);
 
         Attachment regularScreenshot = Attachment.builder()
+                .id(UUID.randomUUID().toString())
                 .testNode(testNode)
                 .name("regular_screenshot.png")
                 .type(Attachment.AttachmentType.SCREENSHOT)
@@ -198,6 +202,7 @@ class AttachmentRepositoryTest {
     @DisplayName("Should save video attachment")
     void shouldSaveVideoAttachment() {
         Attachment video = Attachment.builder()
+                .id(UUID.randomUUID().toString())
                 .testNode(testNode)
                 .name("test_recording.mp4")
                 .type(Attachment.AttachmentType.VIDEO)

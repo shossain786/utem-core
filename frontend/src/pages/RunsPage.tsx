@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useFilteredRuns } from '@/hooks/useApi';
+import { useFilteredRuns, useArchiveRuns } from '@/hooks/useApi';
 import { formatDuration, formatRelativeTime, formatPassRate } from '@/utils/format';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import type { RunStatus } from '@/api/types';
@@ -21,6 +21,8 @@ export default function RunsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
+  const archiveMutation = useArchiveRuns();
+
   // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchInput), 300);
@@ -39,22 +41,54 @@ export default function RunsPage() {
     debouncedSearch || null,
   );
 
+  const allIds = runsPage?.content.map((r) => r.id) ?? [];
+  const allSelected = allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !allIds.includes(id)));
+    } else {
+      setSelectedIds((prev) => [...new Set([...prev, ...allIds])]);
+    }
+  }
+
+  function handleArchive() {
+    archiveMutation.mutate(selectedIds, {
+      onSuccess: () => setSelectedIds([]),
+    });
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Test Runs</h1>
-        {selectedIds.length === 2 && (
-          <button
-            type="button"
-            onClick={() => navigate(`/runs/${selectedIds[0]}/compare/${selectedIds[1]}`)}
-            className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Compare Selected
-          </button>
-        )}
-        {selectedIds.length === 1 && (
-          <span className="text-xs text-gray-500">Select one more run to compare</span>
-        )}
+        <div className="flex items-center gap-2">
+          {selectedIds.length > 0 && (
+            <>
+              <span className="text-xs text-gray-500">{selectedIds.length} selected</span>
+              <button
+                type="button"
+                onClick={handleArchive}
+                disabled={archiveMutation.isPending}
+                className="px-3 py-1.5 text-xs font-medium bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
+              >
+                Archive
+              </button>
+            </>
+          )}
+          {selectedIds.length === 2 && (
+            <button
+              type="button"
+              onClick={() => navigate(`/runs/${selectedIds[0]}/compare/${selectedIds[1]}`)}
+              className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Compare Selected
+            </button>
+          )}
+          {selectedIds.length === 1 && (
+            <span className="text-xs text-gray-400">Select one more to compare</span>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -105,7 +139,15 @@ export default function RunsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
-                  <th className="px-3 py-2 w-8" scope="col" aria-label="Select for comparison" />
+                  <th className="px-3 py-2 w-8" scope="col">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all runs"
+                      checked={allSelected}
+                      onChange={toggleSelectAll}
+                      className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 cursor-pointer"
+                    />
+                  </th>
                   <th className="px-4 py-2 font-medium">Status</th>
                   <th className="px-4 py-2 font-medium">Name</th>
                   <th className="px-4 py-2 font-medium">Tests</th>
@@ -117,15 +159,18 @@ export default function RunsPage() {
               <tbody>
                 {runsPage.content.map((run) => {
                   const isSelected = selectedIds.includes(run.id);
-                  const isDisabled = !isSelected && selectedIds.length === 2;
                   return (
-                  <tr key={run.id} className={`border-b border-gray-50 hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}`}>
+                  <tr
+                    key={run.id}
+                    draggable
+                    onDragStart={(e) => e.dataTransfer.setData('runId', run.id)}
+                    className={`border-b border-gray-50 hover:bg-gray-50 cursor-grab active:cursor-grabbing ${isSelected ? 'bg-blue-50' : ''}`}
+                  >
                     <td className="px-3 py-2.5">
                       <input
                         type="checkbox"
-                        aria-label={`Select run ${run.name} for comparison`}
+                        aria-label={`Select run ${run.name}`}
                         checked={isSelected}
-                        disabled={isDisabled}
                         onChange={() =>
                           setSelectedIds((prev) =>
                             prev.includes(run.id)
@@ -133,7 +178,8 @@ export default function RunsPage() {
                               : [...prev, run.id],
                           )
                         }
-                        className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 disabled:opacity-30 cursor-pointer"
+                        className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 cursor-pointer"
+                        onClick={(e) => e.stopPropagation()}
                       />
                     </td>
                     <td className="px-4 py-2.5">
@@ -148,6 +194,7 @@ export default function RunsPage() {
                       <Link
                         to={`/runs/${run.id}`}
                         className="font-medium text-gray-900 hover:text-blue-600"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {run.name}
                       </Link>

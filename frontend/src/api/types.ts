@@ -24,6 +24,7 @@ export interface TestRunSummary {
   failedTests: number | null;
   skippedTests: number | null;
   passRate: number | null;
+  archived: boolean;
 }
 
 export interface TestNodeSummary {

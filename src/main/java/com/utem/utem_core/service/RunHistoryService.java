@@ -40,30 +40,63 @@ public class RunHistoryService {
     private final HierarchyReconstructionService hierarchyReconstructionService;
 
     /**
-     * Get all runs with pagination, newest first.
+     * Get active (non-archived) runs with pagination, newest first.
      */
     @Transactional(readOnly = true)
     public Page<TestRunSummaryDTO> getAllRuns(int page, int size) {
-        return testRunRepository.findAllByOrderByStartTimeDesc(PageRequest.of(page, size))
+        return testRunRepository.findByArchivedFalseOrderByStartTimeDesc(PageRequest.of(page, size))
                 .map(TestRunSummaryDTO::from);
     }
 
     /**
-     * Get runs filtered by status with pagination.
+     * Get active runs filtered by status with pagination.
      */
     @Transactional(readOnly = true)
     public Page<TestRunSummaryDTO> getRunsByStatus(TestRun.RunStatus status, int page, int size) {
-        return testRunRepository.findByStatusOrderByStartTimeDesc(status, PageRequest.of(page, size))
+        return testRunRepository.findByArchivedFalseAndStatusOrderByStartTimeDesc(status, PageRequest.of(page, size))
                 .map(TestRunSummaryDTO::from);
     }
 
     /**
-     * Search runs by name with pagination.
+     * Search active runs by name with pagination.
      */
     @Transactional(readOnly = true)
     public Page<TestRunSummaryDTO> searchRuns(String name, int page, int size) {
-        return testRunRepository.findByNameContainingIgnoreCaseOrderByStartTimeDesc(name, PageRequest.of(page, size))
+        return testRunRepository.findByArchivedFalseAndNameContainingIgnoreCaseOrderByStartTimeDesc(name, PageRequest.of(page, size))
                 .map(TestRunSummaryDTO::from);
+    }
+
+    /**
+     * Get archived runs with pagination, newest first.
+     */
+    @Transactional(readOnly = true)
+    public Page<TestRunSummaryDTO> getArchivedRuns(int page, int size) {
+        return testRunRepository.findByArchivedTrueOrderByStartTimeDesc(PageRequest.of(page, size))
+                .map(TestRunSummaryDTO::from);
+    }
+
+    /**
+     * Archive a set of runs by ID.
+     */
+    @Transactional
+    public void archiveRuns(List<String> ids) {
+        List<TestRun> runs = testRunRepository.findAllById(ids);
+        runs.forEach(r -> r.setArchived(true));
+        testRunRepository.saveAll(runs);
+        log.info("Archived {} runs: {}", runs.size(), ids);
+    }
+
+    /**
+     * Restore a single archived run back to the active list.
+     */
+    @Transactional
+    public TestRunSummaryDTO unarchiveRun(String runId) {
+        TestRun run = testRunRepository.findById(runId)
+                .orElseThrow(() -> new TestRunNotFoundException(runId));
+        run.setArchived(false);
+        TestRun saved = testRunRepository.save(run);
+        log.info("Unarchived run {} ('{}')", runId, run.getName());
+        return TestRunSummaryDTO.from(saved);
     }
 
     /**

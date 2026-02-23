@@ -17,7 +17,6 @@ import java.time.Instant;
 public class Attachment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)

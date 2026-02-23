@@ -111,7 +111,7 @@ class RunHistoryServiceTest {
             TestRun run2 = createTestRun("run-2", "Run 2", TestRun.RunStatus.FAILED, 10, 5, 4, 1);
             Page<TestRun> page = new PageImpl<>(List.of(run1, run2), PageRequest.of(0, 10), 2);
 
-            when(testRunRepository.findAllByOrderByStartTimeDesc(any(PageRequest.class))).thenReturn(page);
+            when(testRunRepository.findByArchivedFalseOrderByStartTimeDesc(any(PageRequest.class))).thenReturn(page);
 
             Page<TestRunSummaryDTO> result = service.getAllRuns(0, 10);
 
@@ -125,7 +125,7 @@ class RunHistoryServiceTest {
         @DisplayName("Should return empty page when no runs exist")
         void shouldReturnEmptyPage() {
             Page<TestRun> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
-            when(testRunRepository.findAllByOrderByStartTimeDesc(any(PageRequest.class))).thenReturn(emptyPage);
+            when(testRunRepository.findByArchivedFalseOrderByStartTimeDesc(any(PageRequest.class))).thenReturn(emptyPage);
 
             Page<TestRunSummaryDTO> result = service.getAllRuns(0, 10);
 
@@ -144,7 +144,7 @@ class RunHistoryServiceTest {
             TestRun run = createTestRun("run-1", "Failed Run", TestRun.RunStatus.FAILED, 10, 5, 4, 1);
             Page<TestRun> page = new PageImpl<>(List.of(run), PageRequest.of(0, 10), 1);
 
-            when(testRunRepository.findByStatusOrderByStartTimeDesc(
+            when(testRunRepository.findByArchivedFalseAndStatusOrderByStartTimeDesc(
                     eq(TestRun.RunStatus.FAILED), any(PageRequest.class))).thenReturn(page);
 
             Page<TestRunSummaryDTO> result = service.getRunsByStatus(TestRun.RunStatus.FAILED, 0, 10);
@@ -164,7 +164,7 @@ class RunHistoryServiceTest {
             TestRun run = createTestRun("run-1", "Login Tests", TestRun.RunStatus.PASSED, 5, 5, 0, 0);
             Page<TestRun> page = new PageImpl<>(List.of(run), PageRequest.of(0, 10), 1);
 
-            when(testRunRepository.findByNameContainingIgnoreCaseOrderByStartTimeDesc(
+            when(testRunRepository.findByArchivedFalseAndNameContainingIgnoreCaseOrderByStartTimeDesc(
                     eq("login"), any(PageRequest.class))).thenReturn(page);
 
             Page<TestRunSummaryDTO> result = service.searchRuns("login", 0, 10);

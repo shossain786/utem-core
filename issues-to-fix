@@ -1,0 +1,5 @@
+1. Screenshot not getting atached as broken
+2. If I run 2 test suites at same time, due 1 test failure in 
+    one test run, report is showing both the runs as failure
+3. if 1 test fail form a feature then other features also showing as red.
+4. 

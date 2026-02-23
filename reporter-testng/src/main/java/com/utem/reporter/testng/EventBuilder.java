@@ -87,6 +87,24 @@ public final class EventBuilder {
         return buildEvent(eventId, runId, "TEST_SKIPPED", parentId, payload);
     }
 
+    public String buildTestStep(String eventId, String runId, String parentId,
+                               String name, String stepStatus, int stepOrder,
+                               Long duration, String errorMessage, String stackTrace) {
+        StringBuilder payload = new StringBuilder("{");
+        payload.append("\"name\":\"").append(escape(name)).append("\"");
+        payload.append(",\"stepStatus\":\"").append(stepStatus).append("\"");
+        payload.append(",\"stepOrder\":").append(stepOrder);
+        if (duration != null) payload.append(",\"duration\":").append(duration);
+        if (errorMessage != null) {
+            payload.append(",\"errorMessage\":\"").append(escape(errorMessage)).append("\"");
+        }
+        if (stackTrace != null) {
+            payload.append(",\"stackTrace\":\"").append(escape(stackTrace)).append("\"");
+        }
+        payload.append("}");
+        return buildEvent(eventId, runId, "TEST_STEP", parentId, payload.toString());
+    }
+
     public String buildAttachment(String eventId, String runId, String parentId,
                                   String name, String mimeType, long fileSize,
                                   boolean isFailureScreenshot) {

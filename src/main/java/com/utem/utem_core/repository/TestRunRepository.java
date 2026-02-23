@@ -38,6 +38,15 @@ public interface TestRunRepository extends JpaRepository<TestRun, String> {
 
     List<TestRun> findByStatusInOrderByStartTimeDesc(Collection<TestRun.RunStatus> statuses, Pageable pageable);
 
+    // ── Archive queries ──────────────────────────────────────────────
+    Page<TestRun> findByArchivedFalseOrderByStartTimeDesc(Pageable pageable);
+
+    Page<TestRun> findByArchivedFalseAndStatusOrderByStartTimeDesc(TestRun.RunStatus status, Pageable pageable);
+
+    Page<TestRun> findByArchivedFalseAndNameContainingIgnoreCaseOrderByStartTimeDesc(String name, Pageable pageable);
+
+    Page<TestRun> findByArchivedTrueOrderByStartTimeDesc(Pageable pageable);
+
     long countByStatus(TestRun.RunStatus status);
 
     @Query("SELECT r FROM TestRun r WHERE (:status IS NULL OR r.status = :status) " +

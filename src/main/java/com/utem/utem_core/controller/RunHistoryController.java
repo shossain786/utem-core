@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,6 +89,38 @@ public class RunHistoryController {
     @GetMapping("/summary")
     public ResponseEntity<Map<String, Object>> getRunSummaryStats() {
         return ResponseEntity.ok(runHistoryService.getRunSummaryStats());
+    }
+
+    /**
+     * Get archived runs with pagination.
+     */
+    @GetMapping("/archived")
+    public ResponseEntity<Page<TestRunSummaryDTO>> getArchivedRuns(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(runHistoryService.getArchivedRuns(page, size));
+    }
+
+    /**
+     * Archive one or more runs. Body: { "ids": ["id1", "id2", ...] }
+     */
+    @PostMapping("/archive/bulk")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void archiveRuns(@RequestBody Map<String, List<String>> body) {
+        List<String> ids = body.get("ids");
+        if (ids != null && !ids.isEmpty()) {
+            log.info("Archiving {} run(s): {}", ids.size(), ids);
+            runHistoryService.archiveRuns(ids);
+        }
+    }
+
+    /**
+     * Restore an archived run back to the active list.
+     */
+    @PostMapping("/{runId}/unarchive")
+    public ResponseEntity<TestRunSummaryDTO> unarchiveRun(@PathVariable String runId) {
+        log.info("Unarchiving run {}", runId);
+        return ResponseEntity.ok(runHistoryService.unarchiveRun(runId));
     }
 
     /**

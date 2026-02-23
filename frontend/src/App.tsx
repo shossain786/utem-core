@@ -12,6 +12,7 @@ import TrendsPage from './pages/TrendsPage';
 import InsightsPage from './pages/InsightsPage';
 import FailureClustersPage from './pages/FailureClustersPage';
 import PerformancePage from './pages/PerformancePage';
+import ArchivedPage from './pages/ArchivedPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ function App() {
               <Route path="/insights" element={<InsightsPage />} />
               <Route path="/failures" element={<FailureClustersPage />} />
               <Route path="/performance" element={<PerformancePage />} />
+              <Route path="/archive" element={<ArchivedPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

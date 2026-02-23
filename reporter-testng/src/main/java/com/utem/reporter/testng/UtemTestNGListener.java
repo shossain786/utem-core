@@ -103,10 +103,12 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
         resultToEventId.put(System.identityHashCode(result), caseEventId);
         String parentId = contextToEventId.getOrDefault(result.getTestContext().getName(), runEventId);
         eventQueue.enqueue(builder.buildCaseStarted(caseEventId, runId, parentId, buildTestName(result)));
+        UtemTestContext.current.set(new UtemTestContext(runId, caseEventId, eventQueue, builder));
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        UtemTestContext.current.remove();
         String caseEventId = resultToEventId.remove(System.identityHashCode(result));
         if (caseEventId == null) return;
         long duration = result.getEndMillis() - result.getStartMillis();
@@ -116,6 +118,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onTestFailure(ITestResult result) {
+        UtemTestContext.current.remove();
         String caseEventId = resultToEventId.remove(System.identityHashCode(result));
         if (caseEventId == null) return;
         long duration = result.getEndMillis() - result.getStartMillis();
@@ -128,6 +131,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onTestSkipped(ITestResult result) {
+        UtemTestContext.current.remove();
         String caseEventId = resultToEventId.remove(System.identityHashCode(result));
         if (caseEventId == null) return;
         long duration = result.getEndMillis() - result.getStartMillis();

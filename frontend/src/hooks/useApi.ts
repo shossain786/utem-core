@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
 import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary } from '@/api/types';
 
@@ -190,6 +190,42 @@ export function useInsightsSummary(recentRuns: number) {
     queryFn: async () => {
       const { data } = await apiClient.get<InsightsSummary>('/insights/summary', { params: { recentRuns } });
       return data;
+    },
+  });
+}
+
+export function useArchivedRuns(page = 0, size = 20) {
+  return useQuery({
+    queryKey: ['archived-runs', page, size],
+    queryFn: async () => {
+      const { data } = await apiClient.get<Page<TestRunSummary>>('/runs/archived', { params: { page, size } });
+      return data;
+    },
+  });
+}
+
+export function useArchiveRuns() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      await apiClient.post('/runs/archive/bulk', { ids });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['runs'] });
+      queryClient.invalidateQueries({ queryKey: ['archived-runs'] });
+    },
+  });
+}
+
+export function useUnarchiveRun() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (runId: string) => {
+      await apiClient.post(`/runs/${runId}/unarchive`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['runs'] });
+      queryClient.invalidateQueries({ queryKey: ['archived-runs'] });
     },
   });
 }

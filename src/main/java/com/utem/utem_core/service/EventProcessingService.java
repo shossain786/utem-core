@@ -299,6 +299,7 @@ public class EventProcessingService {
         }
 
         Attachment attachment = Attachment.builder()
+                .id(eventLog.getEventId())
                 .testNode(testNode)
                 .testStep(testStep)
                 .name(payload.name() != null ? payload.name() : "Unnamed Attachment")
