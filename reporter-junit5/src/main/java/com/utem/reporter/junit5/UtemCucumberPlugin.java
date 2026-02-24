@@ -237,7 +237,8 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
             String attachmentEventId = UUID.randomUUID().toString();
             String json = builder.buildAttachment(attachmentEventId, runId, testCaseEventId,
                     "failure-screenshot.png", "image/png", screenshot.length(), true);
-            eventQueue.enqueue(json);
+            // Send synchronously so the DB record exists before the file upload arrives
+            httpClient.sendEvent(json);
             httpClient.uploadFile(attachmentEventId, screenshot.toPath(), "failure-screenshot.png");
         } catch (Exception e) {
             System.err.println("[UTEM] Screenshot capture failed: " + e.getMessage());
