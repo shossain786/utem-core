@@ -105,7 +105,7 @@ public class EventProcessingService {
         log.debug("Created TestRun {} for event {}", saved.getId(), eventLog.getEventId());
 
         broadcastEvent(eventLog, saved.getId(), "TEST_RUN", saved.getName(), saved.getStatus().name());
-        broadcastSummary(eventLog.getRunId(), saved);
+        broadcastSummary(saved.getId(), saved);
     }
 
     private void handleTestRunFinished(EventLog eventLog, EventPayload payload) {
@@ -126,7 +126,7 @@ public class EventProcessingService {
             log.debug("Updated TestRun {} for event {}", testRunId, eventLog.getEventId());
 
             broadcastEvent(eventLog, testRun.getId(), "TEST_RUN", testRun.getName(), testRun.getStatus().name());
-            broadcastSummary(eventLog.getRunId(), testRun);
+            broadcastSummary(testRun.getId(), testRun);
             notificationService.notifyRunCompleted(testRun);
         });
     }

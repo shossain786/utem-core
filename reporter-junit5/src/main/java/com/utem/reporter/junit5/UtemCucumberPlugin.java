@@ -39,6 +39,10 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
 
     // Maps feature URI -> eventId for the feature's SUITE_STARTED event
     private final Map<URI, String> featureEventIds = new ConcurrentHashMap<>();
+    // Maps feature URI -> failure count (for per-feature status in onRunFinished)
+    private final Map<URI, AtomicInteger> featureFailCounts = new ConcurrentHashMap<>();
+    // Maps TestCase id -> feature URI (so onCaseFinished can credit the right feature)
+    private final Map<String, URI> caseFeatureUri = new ConcurrentHashMap<>();
     // Maps TestCase id -> eventId for CASE_STARTED event
     private final Map<String, String> caseEventIds = new ConcurrentHashMap<>();
     // Maps TestCase id -> start time
@@ -80,6 +84,9 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
             eventQueue.enqueue(json);
             return fEventId;
         });
+
+        // Track which feature this case belongs to (for per-feature failure counting)
+        caseFeatureUri.put(caseKey, testCase.getUri());
 
         // Send case started
         String caseEventId = UUID.randomUUID().toString();
@@ -143,6 +150,8 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
         Long startTime = startTimes.remove(caseKey);
         Long duration = startTime != null ? System.currentTimeMillis() - startTime : null;
 
+        URI featureUri = caseFeatureUri.remove(caseKey);
+
         Result result = event.getResult();
         Status status = result.getStatus();
 
@@ -158,6 +167,11 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
             }
             case FAILED -> {
                 failedTests.incrementAndGet();
+                // Track failure against the owning feature so each feature's status is independent
+                if (featureUri != null) {
+                    featureFailCounts.computeIfAbsent(featureUri, k -> new AtomicInteger(0))
+                            .incrementAndGet();
+                }
                 Throwable error = result.getError();
                 String errorMessage = error != null ? error.getMessage() : "Unknown error";
                 String stackTrace = error != null ? stackTraceToString(error) : null;
@@ -188,9 +202,10 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
     }
 
     private void onRunFinished(TestRunFinished event) {
-        // Finish all feature suites
+        // Finish all feature suites — each feature gets its OWN status based on its own failures
         for (Map.Entry<URI, String> entry : featureEventIds.entrySet()) {
-            String nodeStatus = failedTests.get() > 0 ? "FAILED" : "PASSED";
+            int featureFails = featureFailCounts.getOrDefault(entry.getKey(), new AtomicInteger(0)).get();
+            String nodeStatus = featureFails > 0 ? "FAILED" : "PASSED";
             String json = builder.buildSuiteFinished(
                     UUID.randomUUID().toString(), runId, entry.getValue(), nodeStatus, null);
             eventQueue.enqueue(json);
