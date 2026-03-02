@@ -70,6 +70,19 @@
 
 ---
 
+---
+
+## Phase 4 - User Experience & Delivery
+
+- [x] #46: Archive test runs (drag-and-drop + bulk select; `/archive` page with unarchive)
+- [x] #47: Run labels (tag runs with `-Dutem.run.label=X`; filter chips on Runs page)
+- [x] #48: Job view (group runs by pipeline name; `/jobs` card grid + `/jobs/:name` history)
+- [ ] #49: Email report delivery (send HTML run summary email on run completion)
+- [ ] #50: PDF export (export full run report as PDF from run detail page)
+- [ ] #51: Slack notification integration (SlackNotificationPlugin via incoming webhook)
+
+---
+
 ## Progress
 
 | Phase | Total | Completed | Progress |
@@ -78,4 +91,5 @@
 | Phase 1 | 6 | 6 | 100% |
 | Phase 2 | 6 | 6 | 100% |
 | Phase 3 | 8 | 8 | 100% |
-| **Overall** | **45** | **45** | **100%** |
+| Phase 4 | 6 | 3 | 50% |
+| **Overall** | **51** | **48** | **94%** |

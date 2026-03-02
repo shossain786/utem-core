@@ -3,6 +3,7 @@ package com.utem.utem_core.controller;
 import com.utem.utem_core.service.ExportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,5 +47,15 @@ public class ExportController {
                 .header("Content-Disposition", "attachment; filename=\"run-" + runId + "-junit.xml\"")
                 .contentType(MediaType.APPLICATION_XML)
                 .body(xml);
+    }
+
+    @GetMapping("/{runId}/pdf")
+    public ResponseEntity<byte[]> exportPdf(@PathVariable String runId) {
+        log.info("Exporting run {} as PDF", runId);
+        byte[] pdf = exportService.exportAsPdf(runId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "run-" + runId + ".pdf");
+        return ResponseEntity.ok().headers(headers).body(pdf);
     }
 }

@@ -4,6 +4,7 @@ const EXPORT_FORMATS = [
   { label: 'JSON', format: 'json', description: 'Full run data as JSON' },
   { label: 'CSV', format: 'csv', description: 'Test nodes as spreadsheet' },
   { label: 'JUnit XML', format: 'junit-xml', description: 'For Jenkins / GitLab CI' },
+  { label: 'PDF', format: 'pdf', description: 'Formatted report document' },
 ] as const;
 
 type ExportFormat = typeof EXPORT_FORMATS[number]['format'];
