@@ -48,7 +48,7 @@ public class UtemReporter implements TestExecutionListener {
         long count = testPlan.countTestIdentifiers(TestIdentifier::isTest);
         totalTests.set((int) count);
 
-        String json = builder.buildRunStarted(runEventId, runId, "JUnit 5 Test Run");
+        String json = builder.buildRunStarted(runEventId, runId, "JUnit 5 Test Run", config.getRunLabel());
         eventQueue.enqueue(json);
 
         System.out.println("[UTEM] Test run started: " + runId);

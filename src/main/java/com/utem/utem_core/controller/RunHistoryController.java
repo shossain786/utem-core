@@ -27,19 +27,22 @@ public class RunHistoryController {
 
     /**
      * List all runs with pagination, newest first.
-     * Optionally filter by status or search by name.
+     * Optionally filter by status, label, or search by name.
      */
     @GetMapping
     public ResponseEntity<Page<TestRunSummaryDTO>> getRuns(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) TestRun.RunStatus status,
-            @RequestParam(required = false) String name) {
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String label) {
 
         Page<TestRunSummaryDTO> result;
 
         if (name != null && !name.isBlank()) {
             result = runHistoryService.searchRuns(name, page, size);
+        } else if (label != null && !label.isBlank()) {
+            result = runHistoryService.getRunsByLabel(label, page, size);
         } else if (status != null) {
             result = runHistoryService.getRunsByStatus(status, page, size);
         } else {
@@ -47,6 +50,14 @@ public class RunHistoryController {
         }
 
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Get all distinct labels used on active runs.
+     */
+    @GetMapping("/labels")
+    public ResponseEntity<List<String>> getRunLabels() {
+        return ResponseEntity.ok(runHistoryService.getDistinctLabels());
     }
 
     /**

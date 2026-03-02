@@ -13,6 +13,7 @@ public record EventPayload(
     String metadata,
 
     // TestRun specific
+    String label,
     Integer totalTests,
     Integer passedTests,
     Integer failedTests,

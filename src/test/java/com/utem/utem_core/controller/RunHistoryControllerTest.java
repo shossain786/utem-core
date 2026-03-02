@@ -50,7 +50,7 @@ class RunHistoryControllerTest {
         return new TestRunSummaryDTO(
                 id, name, status,
                 timestamp.minus(1, ChronoUnit.HOURS), timestamp,
-                3600000L, 10, 8, 1, 1, 80.0, false
+                3600000L, 10, 8, 1, 1, 80.0, false, null
         );
     }
 
@@ -66,7 +66,7 @@ class RunHistoryControllerTest {
 
             when(runHistoryService.getAllRuns(0, 20)).thenReturn(page);
 
-            ResponseEntity<Page<TestRunSummaryDTO>> response = controller.getRuns(0, 20, null, null);
+            ResponseEntity<Page<TestRunSummaryDTO>> response = controller.getRuns(0, 20, null, null, null);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody().getContent()).hasSize(1);
@@ -82,7 +82,7 @@ class RunHistoryControllerTest {
             when(runHistoryService.getRunsByStatus(TestRun.RunStatus.FAILED, 0, 20)).thenReturn(page);
 
             ResponseEntity<Page<TestRunSummaryDTO>> response =
-                    controller.getRuns(0, 20, TestRun.RunStatus.FAILED, null);
+                    controller.getRuns(0, 20, TestRun.RunStatus.FAILED, null, null);
 
             assertThat(response.getBody().getContent().get(0).status()).isEqualTo(TestRun.RunStatus.FAILED);
             verify(runHistoryService).getRunsByStatus(TestRun.RunStatus.FAILED, 0, 20);
@@ -97,7 +97,7 @@ class RunHistoryControllerTest {
             when(runHistoryService.searchRuns("Login", 0, 20)).thenReturn(page);
 
             ResponseEntity<Page<TestRunSummaryDTO>> response =
-                    controller.getRuns(0, 20, TestRun.RunStatus.FAILED, "Login");
+                    controller.getRuns(0, 20, TestRun.RunStatus.FAILED, "Login", null);
 
             verify(runHistoryService).searchRuns("Login", 0, 20);
             verifyNoMoreInteractions(runHistoryService);
@@ -110,7 +110,7 @@ class RunHistoryControllerTest {
                     Collections.emptyList(), PageRequest.of(0, 20), 0);
             when(runHistoryService.getAllRuns(0, 20)).thenReturn(emptyPage);
 
-            ResponseEntity<Page<TestRunSummaryDTO>> response = controller.getRuns(0, 20, null, null);
+            ResponseEntity<Page<TestRunSummaryDTO>> response = controller.getRuns(0, 20, null, null, null);
 
             assertThat(response.getBody().getContent()).isEmpty();
         }

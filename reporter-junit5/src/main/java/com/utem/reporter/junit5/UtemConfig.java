@@ -8,8 +8,11 @@ public final class UtemConfig {
     private static final String PROP_KEY = "utem.server.url";
     private static final String ENV_KEY = "UTEM_SERVER_URL";
     private static final String DEFAULT_URL = "http://localhost:8080/utem";
+    private static final String LABEL_PROP_KEY = "utem.run.label";
+    private static final String LABEL_ENV_KEY = "UTEM_RUN_LABEL";
 
     private final String serverUrl;
+    private final String runLabel;
 
     public UtemConfig() {
         String url = System.getProperty(PROP_KEY);
@@ -20,6 +23,12 @@ public final class UtemConfig {
             url = DEFAULT_URL;
         }
         this.serverUrl = url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+
+        String label = System.getProperty(LABEL_PROP_KEY);
+        if (label == null || label.isBlank()) {
+            label = System.getenv(LABEL_ENV_KEY);
+        }
+        this.runLabel = (label != null && !label.isBlank()) ? label.trim() : null;
     }
 
     public String getEventsUrl() {
@@ -32,5 +41,10 @@ public final class UtemConfig {
 
     public String getAttachmentUploadUrl(String attachmentId) {
         return serverUrl + "/attachments/" + attachmentId + "/upload";
+    }
+
+    /** Returns the run label, or null if not configured. */
+    public String getRunLabel() {
+        return runLabel;
     }
 }

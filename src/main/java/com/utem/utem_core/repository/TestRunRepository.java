@@ -47,6 +47,12 @@ public interface TestRunRepository extends JpaRepository<TestRun, String> {
 
     Page<TestRun> findByArchivedTrueOrderByStartTimeDesc(Pageable pageable);
 
+    // ── Label queries ─────────────────────────────────────────────────
+    Page<TestRun> findByArchivedFalseAndLabelOrderByStartTimeDesc(String label, Pageable pageable);
+
+    @Query("SELECT DISTINCT r.label FROM TestRun r WHERE r.label IS NOT NULL AND r.archived = false ORDER BY r.label")
+    List<String> findDistinctActiveLabels();
+
     long countByStatus(TestRun.RunStatus status);
 
     @Query("SELECT r FROM TestRun r WHERE (:status IS NULL OR r.status = :status) " +

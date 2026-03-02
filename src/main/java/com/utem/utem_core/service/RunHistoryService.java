@@ -67,6 +67,23 @@ public class RunHistoryService {
     }
 
     /**
+     * Get active runs filtered by label with pagination.
+     */
+    @Transactional(readOnly = true)
+    public Page<TestRunSummaryDTO> getRunsByLabel(String label, int page, int size) {
+        return testRunRepository.findByArchivedFalseAndLabelOrderByStartTimeDesc(label, PageRequest.of(page, size))
+                .map(TestRunSummaryDTO::from);
+    }
+
+    /**
+     * Get all distinct labels used on active runs (for filter chips).
+     */
+    @Transactional(readOnly = true)
+    public List<String> getDistinctLabels() {
+        return testRunRepository.findDistinctActiveLabels();
+    }
+
+    /**
      * Get archived runs with pagination, newest first.
      */
     @Transactional(readOnly = true)

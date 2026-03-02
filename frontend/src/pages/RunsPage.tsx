@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useFilteredRuns, useArchiveRuns } from '@/hooks/useApi';
+import { useFilteredRuns, useArchiveRuns, useRunLabels } from '@/hooks/useApi';
 import { formatDuration, formatRelativeTime, formatPassRate } from '@/utils/format';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import type { RunStatus } from '@/api/types';
@@ -17,11 +17,13 @@ export default function RunsPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useState<RunStatus | null>(null);
+  const [labelFilter, setLabelFilter] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const archiveMutation = useArchiveRuns();
+  const { data: availableLabels } = useRunLabels();
 
   // Debounce search input
   useEffect(() => {
@@ -32,13 +34,14 @@ export default function RunsPage() {
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [statusFilter, debouncedSearch]);
+  }, [statusFilter, labelFilter, debouncedSearch]);
 
   const { data: runsPage, isLoading, isError } = useFilteredRuns(
     page,
     20,
     statusFilter,
     debouncedSearch || null,
+    labelFilter,
   );
 
   const allIds = runsPage?.content.map((r) => r.id) ?? [];
@@ -92,31 +95,64 @@ export default function RunsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-        <div className="flex gap-1">
-          {STATUS_FILTERS.map((filter) => (
-            <button
-              key={filter.label}
-              type="button"
-              onClick={() => setStatusFilter(filter.value)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                statusFilter === filter.value
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              {filter.label}
-            </button>
-          ))}
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex gap-1">
+            {STATUS_FILTERS.map((filter) => (
+              <button
+                key={filter.label}
+                type="button"
+                onClick={() => setStatusFilter(filter.value)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  statusFilter === filter.value
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="px-3 py-1.5 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
+          />
         </div>
 
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="px-3 py-1.5 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
-        />
+        {availableLabels && availableLabels.length > 0 && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-xs text-gray-400">Label:</span>
+            <button
+              type="button"
+              onClick={() => setLabelFilter(null)}
+              className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
+                labelFilter === null
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              All
+            </button>
+            {availableLabels.map((lbl) => (
+              <button
+                key={lbl}
+                type="button"
+                onClick={() => setLabelFilter(labelFilter === lbl ? null : lbl)}
+                className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
+                  labelFilter === lbl
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                }`}
+              >
+                {lbl}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Table */}
@@ -129,7 +165,7 @@ export default function RunsPage() {
           <div className="p-6 text-center">
             <p className="text-sm text-gray-500 mb-1">No runs found</p>
             <p className="text-xs text-gray-400">
-              {statusFilter || debouncedSearch
+              {statusFilter || debouncedSearch || labelFilter
                 ? 'Try adjusting your filters.'
                 : 'Send events to the API to see test runs appear here.'}
             </p>
@@ -191,13 +227,20 @@ export default function RunsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-2.5">
-                      <Link
-                        to={`/runs/${run.id}`}
-                        className="font-medium text-gray-900 hover:text-blue-600"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {run.name}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/runs/${run.id}`}
+                          className="font-medium text-gray-900 hover:text-blue-600"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {run.name}
+                        </Link>
+                        {run.label && (
+                          <span className="px-1.5 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full">
+                            {run.label}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>
                     <td className="px-4 py-2.5 text-gray-600">{formatPassRate(run.passRate)}</td>

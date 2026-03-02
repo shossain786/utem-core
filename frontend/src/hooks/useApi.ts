@@ -20,14 +20,26 @@ export function useFilteredRuns(
   size = 20,
   status?: RunStatus | null,
   name?: string | null,
+  label?: string | null,
 ) {
   return useQuery({
-    queryKey: ['runs', page, size, status, name],
+    queryKey: ['runs', page, size, status, name, label],
     queryFn: async () => {
       const params: Record<string, string | number> = { page, size };
       if (status) params.status = status;
       if (name) params.name = name;
+      if (label) params.label = label;
       const { data } = await apiClient.get<Page<TestRunSummary>>('/runs', { params });
+      return data;
+    },
+  });
+}
+
+export function useRunLabels() {
+  return useQuery({
+    queryKey: ['runs', 'labels'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<string[]>('/runs/labels');
       return data;
     },
   });

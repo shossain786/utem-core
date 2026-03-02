@@ -20,7 +20,8 @@ public record TestRunSummaryDTO(
         Integer failedTests,
         Integer skippedTests,
         Double passRate,
-        boolean archived
+        boolean archived,
+        String label
 ) {
     public static TestRunSummaryDTO from(TestRun run) {
         Long duration = null;
@@ -45,7 +46,8 @@ public record TestRunSummaryDTO(
                 run.getFailedTests(),
                 run.getSkippedTests(),
                 passRate,
-                run.isArchived()
+                run.isArchived(),
+                run.getLabel()
         );
     }
 }

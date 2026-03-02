@@ -50,6 +50,9 @@ public class TestRun {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean archived = false;
 
+    @Column(length = 100)
+    private String label;
+
     public enum RunStatus {
         RUNNING,
         PASSED,
