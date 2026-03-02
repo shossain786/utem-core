@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary } from '@/api/types';
 
 export function useRuns(page = 0, size = 20, refetchInterval?: number | false) {
   return useQuery({
@@ -239,5 +239,29 @@ export function useUnarchiveRun() {
       queryClient.invalidateQueries({ queryKey: ['runs'] });
       queryClient.invalidateQueries({ queryKey: ['archived-runs'] });
     },
+  });
+}
+
+export function useJobs() {
+  return useQuery({
+    queryKey: ['jobs'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<JobSummary[]>('/jobs');
+      return data;
+    },
+  });
+}
+
+export function useJobRuns(jobName: string | undefined, page = 0, size = 20) {
+  return useQuery({
+    queryKey: ['jobs', jobName, page, size],
+    queryFn: async () => {
+      const { data } = await apiClient.get<Page<TestRunSummary>>(
+        `/jobs/${encodeURIComponent(jobName!)}/runs`,
+        { params: { page, size } },
+      );
+      return data;
+    },
+    enabled: !!jobName,
   });
 }

@@ -26,6 +26,15 @@ export interface TestRunSummary {
   passRate: number | null;
   archived: boolean;
   label: string | null;
+  jobName: string | null;
+}
+
+export interface JobSummary {
+  jobName: string;
+  latestStatus: RunStatus;
+  latestRunId: string;
+  lastRunAt: string;
+  totalRuns: number;
 }
 
 export interface TestNodeSummary {

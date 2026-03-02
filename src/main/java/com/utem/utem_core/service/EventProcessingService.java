@@ -98,6 +98,7 @@ public class EventProcessingService {
                 .failedTests(0)
                 .skippedTests(0)
                 .label(payload.label())
+                .jobName(payload.jobName())
                 .build();
 
         TestRun saved = testRunRepository.save(testRun);

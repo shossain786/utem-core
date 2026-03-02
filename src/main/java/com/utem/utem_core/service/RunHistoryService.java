@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,6 +82,30 @@ public class RunHistoryService {
     @Transactional(readOnly = true)
     public List<String> getDistinctLabels() {
         return testRunRepository.findDistinctActiveLabels();
+    }
+
+    /**
+     * Get a summary card for each distinct job name (active runs only).
+     */
+    @Transactional(readOnly = true)
+    public List<JobSummaryDTO> getJobList() {
+        return testRunRepository.findDistinctActiveJobNames().stream()
+                .map(name -> testRunRepository
+                        .findTopByJobNameAndArchivedFalseOrderByStartTimeDesc(name)
+                        .map(latest -> JobSummaryDTO.from(name, latest,
+                                testRunRepository.countByJobNameAndArchivedFalse(name)))
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    /**
+     * Get paginated run history for a specific job name.
+     */
+    @Transactional(readOnly = true)
+    public Page<TestRunSummaryDTO> getRunsByJob(String jobName, int page, int size) {
+        return testRunRepository.findByJobNameAndArchivedFalseOrderByStartTimeDesc(
+                jobName, PageRequest.of(page, size)).map(TestRunSummaryDTO::from);
     }
 
     /**

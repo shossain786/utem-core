@@ -14,6 +14,7 @@ public record EventPayload(
 
     // TestRun specific
     String label,
+    String jobName,
     Integer totalTests,
     Integer passedTests,
     Integer failedTests,

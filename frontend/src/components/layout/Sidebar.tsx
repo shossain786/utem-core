@@ -5,6 +5,7 @@ import { useArchiveRuns } from '@/hooks/useApi';
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
   { to: '/runs', label: 'Test Runs', icon: '🧪' },
+  { to: '/jobs', label: 'Jobs', icon: '💼' },
   { to: '/search', label: 'Search', icon: '🔍' },
   { to: '/flakiness', label: 'Flakiness', icon: '⚡' },
   { to: '/trends', label: 'Trends', icon: '📈' },

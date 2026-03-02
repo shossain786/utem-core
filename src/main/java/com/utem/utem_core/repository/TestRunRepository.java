@@ -53,6 +53,16 @@ public interface TestRunRepository extends JpaRepository<TestRun, String> {
     @Query("SELECT DISTINCT r.label FROM TestRun r WHERE r.label IS NOT NULL AND r.archived = false ORDER BY r.label")
     List<String> findDistinctActiveLabels();
 
+    // ── Job queries ───────────────────────────────────────────────────
+    Page<TestRun> findByJobNameAndArchivedFalseOrderByStartTimeDesc(String jobName, Pageable pageable);
+
+    Optional<TestRun> findTopByJobNameAndArchivedFalseOrderByStartTimeDesc(String jobName);
+
+    long countByJobNameAndArchivedFalse(String jobName);
+
+    @Query("SELECT DISTINCT r.jobName FROM TestRun r WHERE r.jobName IS NOT NULL AND r.archived = false ORDER BY r.jobName")
+    List<String> findDistinctActiveJobNames();
+
     long countByStatus(TestRun.RunStatus status);
 
     @Query("SELECT r FROM TestRun r WHERE (:status IS NULL OR r.status = :status) " +

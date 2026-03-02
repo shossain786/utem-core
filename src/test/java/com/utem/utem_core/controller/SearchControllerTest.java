@@ -83,7 +83,7 @@ class SearchControllerTest {
             TestRunSummaryDTO run = new TestRunSummaryDTO(
                     "run-1", "Regression", TestRun.RunStatus.PASSED,
                     now.minus(1, ChronoUnit.HOURS), now, 3600000L,
-                    10, 8, 1, 1, 80.0, false, null);
+                    10, 8, 1, 1, 80.0, false, null, null);
             Page<TestRunSummaryDTO> page = new PageImpl<>(List.of(run));
 
             Instant from = now.minus(7, ChronoUnit.DAYS);

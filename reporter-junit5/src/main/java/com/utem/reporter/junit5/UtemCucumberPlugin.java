@@ -66,7 +66,7 @@ public class UtemCucumberPlugin implements ConcurrentEventListener {
 
     private void onRunStarted(TestRunStarted event) {
         runEventId = UUID.randomUUID().toString();
-        String json = builder.buildRunStarted(runEventId, runId, "Cucumber Test Run", config.getRunLabel());
+        String json = builder.buildRunStarted(runEventId, runId, "Cucumber Test Run", config.getRunLabel(), config.getJobName());
         eventQueue.enqueue(json);
         System.out.println("[UTEM] Cucumber test run started: " + runId);
     }

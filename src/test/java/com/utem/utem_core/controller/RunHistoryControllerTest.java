@@ -50,7 +50,7 @@ class RunHistoryControllerTest {
         return new TestRunSummaryDTO(
                 id, name, status,
                 timestamp.minus(1, ChronoUnit.HOURS), timestamp,
-                3600000L, 10, 8, 1, 1, 80.0, false, null
+                3600000L, 10, 8, 1, 1, 80.0, false, null, null
         );
     }
 

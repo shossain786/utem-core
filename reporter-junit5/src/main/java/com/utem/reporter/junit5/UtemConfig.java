@@ -10,9 +10,12 @@ public final class UtemConfig {
     private static final String DEFAULT_URL = "http://localhost:8080/utem";
     private static final String LABEL_PROP_KEY = "utem.run.label";
     private static final String LABEL_ENV_KEY = "UTEM_RUN_LABEL";
+    private static final String JOB_PROP_KEY = "utem.job.name";
+    private static final String JOB_ENV_KEY = "UTEM_JOB_NAME";
 
     private final String serverUrl;
     private final String runLabel;
+    private final String jobName;
 
     public UtemConfig() {
         String url = System.getProperty(PROP_KEY);
@@ -29,6 +32,12 @@ public final class UtemConfig {
             label = System.getenv(LABEL_ENV_KEY);
         }
         this.runLabel = (label != null && !label.isBlank()) ? label.trim() : null;
+
+        String job = System.getProperty(JOB_PROP_KEY);
+        if (job == null || job.isBlank()) {
+            job = System.getenv(JOB_ENV_KEY);
+        }
+        this.jobName = (job != null && !job.isBlank()) ? job.trim() : null;
     }
 
     public String getEventsUrl() {
@@ -46,5 +55,10 @@ public final class UtemConfig {
     /** Returns the run label, or null if not configured. */
     public String getRunLabel() {
         return runLabel;
+    }
+
+    /** Returns the job name, or null if not configured. */
+    public String getJobName() {
+        return jobName;
     }
 }

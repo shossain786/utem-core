@@ -53,6 +53,9 @@ public class TestRun {
     @Column(length = 100)
     private String label;
 
+    @Column(length = 200)
+    private String jobName;
+
     public enum RunStatus {
         RUNNING,
         PASSED,
