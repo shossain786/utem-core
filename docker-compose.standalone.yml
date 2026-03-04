@@ -1,0 +1,16 @@
+services:
+  utem-core:
+    build:
+      context: .
+      dockerfile: Dockerfile.standalone
+    image: utem-core:latest
+    container_name: utem-core
+    ports:
+      - "8080:8080"
+    volumes:
+      - utem-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  utem-data:
+    driver: local

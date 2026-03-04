@@ -1,0 +1,10 @@
+# Lightweight image for running a pre-built JAR.
+# Build the JAR first on the host: mvn clean package -DskipTests
+# Then copy: utem-core-0.1.0.jar, Dockerfile.standalone, docker-compose.standalone.yml
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+RUN mkdir -p /app/data
+COPY utem-core-0.1.0.jar app.jar
+ENV SPRING_DATASOURCE_URL=jdbc:sqlite:/app/data/utem.db
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
