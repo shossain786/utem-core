@@ -1,0 +1,16 @@
+services:
+  utem-core:
+    build: .
+    image: utem-core:latest
+    container_name: utem-core
+    ports:
+      - "8080:8080"
+    volumes:
+      - utem-data:/app/data
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlite:/app/data/utem.db
+    restart: unless-stopped
+
+volumes:
+  utem-data:
+    driver: local

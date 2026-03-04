@@ -1,0 +1,10 @@
+target/
+frontend/node_modules/
+frontend/dist/
+src/main/resources/static/
+*.db
+.git/
+.idea/
+*.iml
+reporter-junit5/
+reporter-testng/
