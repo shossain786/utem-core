@@ -6,6 +6,10 @@ export default defineConfig({
   define: {
     global: 'globalThis',
   },
+  build: {
+    outDir: '../src/main/resources/static',
+    emptyOutDir: true,
+  },
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,

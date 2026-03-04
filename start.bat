@@ -2,16 +2,20 @@
 echo Starting UTEM Core...
 echo.
 
-echo [1/2] Starting Spring Boot backend on port 8080...
-start "UTEM-Backend" cmd /c "cd /d %~dp0 && mvnw.cmd spring-boot:run"
+REM Check Java is installed
+java -version >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Java is not installed or not in PATH.
+    echo Please install Java 17 or later from https://adoptium.net/
+    pause
+    exit /b 1
+)
 
-echo [2/2] Starting React frontend on port 5173...
-start "UTEM-Frontend" cmd /c "cd /d %~dp0frontend && npm run dev"
+echo Dashboard will open at: http://localhost:8080
+echo Press Ctrl+C to stop.
+echo.
 
-echo.
-echo Both services starting:
-echo   Backend:  http://localhost:8080
-echo   Frontend: http://localhost:5173
-echo.
-echo Close the opened windows to stop individual services,
-echo or run stop.bat to stop both.
+REM Open browser after 5 seconds (gives Spring Boot time to start)
+start "" cmd /c "timeout /t 5 >nul && start http://localhost:8080"
+
+java -jar "%~dp0target\utem-core-0.1.0.jar"
