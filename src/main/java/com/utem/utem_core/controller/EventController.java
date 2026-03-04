@@ -7,6 +7,7 @@ import com.utem.utem_core.repository.EventLogRepository;
 import com.utem.utem_core.service.EventProcessingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/utem/events")
 @RequiredArgsConstructor
+@Slf4j
 public class EventController {
 
     private final EventLogRepository eventLogRepository;
@@ -67,7 +69,15 @@ public class EventController {
             .toList();
 
         List<EventLog> saved = eventLogRepository.saveAll(eventLogs);
-        saved.forEach(eventProcessingService::processEvent);
+        for (EventLog eventLog : saved) {
+            try {
+                eventProcessingService.processEvent(eventLog);
+            } catch (Exception e) {
+                log.error("[UTEM] Failed to process event {} ({}): {} — {}",
+                        eventLog.getEventId(), eventLog.getEventType(),
+                        e.getClass().getSimpleName(), e.getMessage(), e);
+            }
+        }
         List<EventResponse> responses = saved.stream()
             .map(EventResponse::from)
             .toList();

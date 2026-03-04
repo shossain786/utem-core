@@ -77,7 +77,7 @@ public final class EventQueue {
 
         boolean sent = httpClient.sendBatch(batch);
         if (!sent) {
-            // Re-queue failed events (best effort, avoid infinite loop with capacity check)
+            // Re-queue failed events during normal operation (best effort)
             for (String json : batch) {
                 if (!queue.offer(json)) break;
             }
@@ -85,8 +85,15 @@ public final class EventQueue {
     }
 
     private void drainRemaining() {
-        while (!queue.isEmpty()) {
-            drainBatch();
+        // Drain everything that's left into a local list so we don't re-queue
+        // on failure (which would cause an infinite loop at shutdown).
+        List<String> pending = new ArrayList<>();
+        queue.drainTo(pending);
+        if (pending.isEmpty()) return;
+
+        for (int i = 0; i < pending.size(); i += BATCH_SIZE) {
+            List<String> batch = pending.subList(i, Math.min(i + BATCH_SIZE, pending.size()));
+            httpClient.sendBatch(new ArrayList<>(batch));
         }
     }
 }
