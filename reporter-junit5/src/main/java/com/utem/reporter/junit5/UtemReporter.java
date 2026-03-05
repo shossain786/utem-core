@@ -37,6 +37,7 @@ public class UtemReporter implements TestExecutionListener {
     private final Map<String, Long> startTimes = new ConcurrentHashMap<>();
 
     private String runEventId;
+    private boolean disabled = false;
     private final AtomicInteger totalTests = new AtomicInteger();
     private final AtomicInteger passedTests = new AtomicInteger();
     private final AtomicInteger failedTests = new AtomicInteger();
@@ -44,11 +45,20 @@ public class UtemReporter implements TestExecutionListener {
 
     @Override
     public void testPlanExecutionStarted(TestPlan testPlan) {
+        // When Cucumber runs via @RunWith(Cucumber.class), the JUnit Vintage engine is used.
+        // UtemCucumberPlugin handles reporting in that case — skip here to avoid duplicate runs.
+        if (testPlan.getRoots().stream().anyMatch(id ->
+                id.getUniqueId().contains("junit-vintage") || id.getUniqueId().contains("cucumber"))) {
+            disabled = true;
+            System.out.println("[UTEM] Cucumber run detected — deferring to UtemCucumberPlugin");
+            return;
+        }
+
         runEventId = UUID.randomUUID().toString();
         long count = testPlan.countTestIdentifiers(TestIdentifier::isTest);
         totalTests.set((int) count);
 
-        String json = builder.buildRunStarted(runEventId, runId, "JUnit 5 Test Run", config.getRunLabel(), config.getJobName());
+        String json = builder.buildRunStarted(runEventId, runId, config.getRunName("JUnit 5 Test Run"), config.getRunLabel(), config.getJobName());
         eventQueue.enqueue(json);
 
         System.out.println("[UTEM] Test run started: " + runId);
@@ -56,6 +66,7 @@ public class UtemReporter implements TestExecutionListener {
 
     @Override
     public void testPlanExecutionFinished(TestPlan testPlan) {
+        if (disabled) return;
         String eventId = UUID.randomUUID().toString();
         String json = builder.buildRunFinished(eventId, runId, runEventId,
                 totalTests.get(), passedTests.get(), failedTests.get(), skippedTests.get());
@@ -68,6 +79,7 @@ public class UtemReporter implements TestExecutionListener {
 
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
+        if (disabled) return;
         String eventId = UUID.randomUUID().toString();
         identifierToEventId.put(testIdentifier.getUniqueId(), eventId);
         startTimes.put(testIdentifier.getUniqueId(), System.currentTimeMillis());
@@ -87,6 +99,7 @@ public class UtemReporter implements TestExecutionListener {
 
     @Override
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult result) {
+        if (disabled) return;
         String startEventId = identifierToEventId.get(testIdentifier.getUniqueId());
         if (startEventId == null) return;
 
@@ -105,6 +118,7 @@ public class UtemReporter implements TestExecutionListener {
 
     @Override
     public void executionSkipped(TestIdentifier testIdentifier, String reason) {
+        if (disabled) return;
         // For skipped tests, we need to send START + SKIPPED + FINISHED
         String eventId = UUID.randomUUID().toString();
         identifierToEventId.put(testIdentifier.getUniqueId(), eventId);

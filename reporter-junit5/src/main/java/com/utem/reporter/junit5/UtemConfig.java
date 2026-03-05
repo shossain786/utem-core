@@ -12,10 +12,13 @@ public final class UtemConfig {
     private static final String LABEL_ENV_KEY = "UTEM_RUN_LABEL";
     private static final String JOB_PROP_KEY = "utem.job.name";
     private static final String JOB_ENV_KEY = "UTEM_JOB_NAME";
+    private static final String NAME_PROP_KEY = "utem.run.name";
+    private static final String NAME_ENV_KEY = "UTEM_RUN_NAME";
 
     private final String serverUrl;
     private final String runLabel;
     private final String jobName;
+    private final String runName;
 
     public UtemConfig() {
         String url = System.getProperty(PROP_KEY);
@@ -38,6 +41,12 @@ public final class UtemConfig {
             job = System.getenv(JOB_ENV_KEY);
         }
         this.jobName = (job != null && !job.isBlank()) ? job.trim() : null;
+
+        String name = System.getProperty(NAME_PROP_KEY);
+        if (name == null || name.isBlank()) {
+            name = System.getenv(NAME_ENV_KEY);
+        }
+        this.runName = (name != null && !name.isBlank()) ? name.trim() : null;
     }
 
     public String getEventsUrl() {
@@ -60,5 +69,13 @@ public final class UtemConfig {
     /** Returns the job name, or null if not configured. */
     public String getJobName() {
         return jobName;
+    }
+
+    /**
+     * Returns the custom run name if set via {@code -Dutem.run.name} or {@code UTEM_RUN_NAME},
+     * otherwise returns the provided default name.
+     */
+    public String getRunName(String defaultName) {
+        return runName != null ? runName : defaultName;
     }
 }
