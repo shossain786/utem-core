@@ -1,7 +1,6 @@
 services:
   utem-core:
-    build: .
-    image: utem-core:latest
+    image: shossain786/utem-core:latest
     container_name: utem-core
     ports:
       - "9090:8080"
