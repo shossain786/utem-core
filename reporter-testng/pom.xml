@@ -4,25 +4,47 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.utem</groupId>
+    <groupId>io.github.shossain786</groupId>
     <artifactId>utem-reporter-testng</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <name>UTEM Reporter - TestNG</name>
-    <description>TestNG listener that reports test results to UTEM Core in real time</description>
+    <description>Zero-dependency test reporter that streams TestNG results to the UTEM Core real-time dashboard. Supports screenshot capture via Selenium WebDriver.</description>
+    <url>https://github.com/shossain786/utem-core</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>shossain786</name>
+            <email>shossain786@users.noreply.github.com</email>
+            <url>https://github.com/shossain786</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/shossain786/utem-core.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/shossain786/utem-core.git</developerConnection>
+        <url>https://github.com/shossain786/utem-core</url>
+    </scm>
 
     <properties>
         <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <testng.version>7.10.2</testng.version>
         <selenium.version>4.18.1</selenium.version>
     </properties>
 
     <dependencies>
-        <!-- TestNG (provided - user's test runtime supplies it) -->
+        <!-- TestNG API (provided - user's test runtime supplies it) -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -39,5 +61,83 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 1. Source JAR (required by Maven Central) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 2. Javadoc JAR (required by Maven Central) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.12.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
+            </plugin>
+
+            <!-- 3. GPG signing (required by Maven Central) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.8</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
+            </plugin>
+
+            <!-- 4. Central Portal publishing plugin -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <deploymentName>utem-reporter-testng-${project.version}</deploymentName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

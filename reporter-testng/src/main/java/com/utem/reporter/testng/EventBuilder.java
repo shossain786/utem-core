@@ -8,9 +8,16 @@ import java.time.Instant;
  */
 public final class EventBuilder {
 
-    public String buildRunStarted(String eventId, String runId, String name) {
-        String payload = "{\"name\":\"" + escape(name) + "\"}";
-        return buildEvent(eventId, runId, "TEST_RUN_STARTED", null, payload);
+    public String buildRunStarted(String eventId, String runId, String name, String label, String jobName) {
+        StringBuilder payload = new StringBuilder("{\"name\":\"").append(escape(name)).append("\"");
+        if (label != null && !label.isBlank()) {
+            payload.append(",\"label\":\"").append(escape(label)).append("\"");
+        }
+        if (jobName != null && !jobName.isBlank()) {
+            payload.append(",\"jobName\":\"").append(escape(jobName)).append("\"");
+        }
+        payload.append("}");
+        return buildEvent(eventId, runId, "TEST_RUN_STARTED", null, payload.toString());
     }
 
     public String buildRunFinished(String eventId, String runId, String parentId,

@@ -57,7 +57,9 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
     public void onStart(ISuite suite) {
         runId = UUID.randomUUID().toString();
         runEventId = UUID.randomUUID().toString();
-        eventQueue.enqueue(builder.buildRunStarted(runEventId, runId, suite.getName()));
+        String runName = config.getRunName(suite.getName());
+        eventQueue.enqueue(builder.buildRunStarted(runEventId, runId, runName,
+                config.getRunLabel(), config.getJobName()));
     }
 
     @Override
