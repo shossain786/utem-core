@@ -1,6 +1,6 @@
 # UTEM Reporter for Playwright
 
-Streams Playwright test results to [UTEM Core](../README.md) in real time as tests run.
+Streams Playwright test results to [UTEM Core](https://github.com/shossain786/utem-core) in real time as tests run.
 Zero external dependencies — uses only Node.js built-ins.
 
 ## Installation
@@ -83,4 +83,4 @@ export default defineConfig({
 
 - Node.js ≥ 18
 - Playwright ≥ 1.35.0
-- UTEM Core server running (see [UTEM Core setup](../README.md))
+- UTEM Core server running (see [UTEM Core setup](https://github.com/shossain786/utem-core))
