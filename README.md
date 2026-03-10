@@ -100,13 +100,15 @@ High-Level Flow:
 
 ## Supported Frameworks
 
-| Framework | Package | Registry |
-|-----------|---------|----------|
-| JUnit 5 + Cucumber | `io.github.shossain786:utem-reporter-junit5` | Maven Central |
-| TestNG | `io.github.shossain786:utem-reporter-testng` | Maven Central |
-| Playwright (JS/TS) | `utem-reporter-playwright` | npm |
-| Jest | `utem-jest-reporter` | npm |
-| pytest | `utem-pytest-reporter` | PyPI |
+| Framework | Package | Registry | Docs |
+|-----------|---------|----------|------|
+| JUnit 5 + Cucumber | `io.github.shossain786:utem-reporter-junit5` | Maven Central | [README](reporter-junit5/README.md) |
+| TestNG | `io.github.shossain786:utem-reporter-testng` | Maven Central | [README](reporter-testng/README.md) |
+| Playwright (JS/TS) | `utem-reporter-playwright` | npm | [README](reporter-playwright/README.md) |
+| Jest | `utem-jest-reporter` | npm | — |
+| pytest | `utem-pytest-reporter` | PyPI | — |
+
+All reporters support a **disable flag** so the reporter stays on the classpath/config but sends nothing to the UTEM server — useful for running tests directly from the IDE. See each reporter's README for details.
 
 ---
 

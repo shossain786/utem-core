@@ -26,7 +26,7 @@ export default defineConfig({
 
 ## Configuration
 
-All configuration is done via environment variables — no code changes required.
+### Environment Variables
 
 | Environment Variable | Description | Default |
 |----------------------|-------------|---------|
@@ -34,6 +34,7 @@ All configuration is done via environment variables — no code changes required
 | `UTEM_RUN_NAME` | Custom name for the test run | `Playwright Test Run` |
 | `UTEM_RUN_LABEL` | Label to tag the run (e.g. `regression`, `smoke`) | _(none)_ |
 | `UTEM_JOB_NAME` | CI job name (e.g. Jenkins build name) | _(none)_ |
+| `UTEM_DISABLED` | Set to `true` to disable the reporter entirely | `false` |
 
 **Example — running with custom name:**
 ```bash
@@ -48,6 +49,50 @@ npx playwright test
 process.env.UTEM_SERVER_URL = 'http://myserver:8080/utem';
 process.env.UTEM_RUN_NAME  = 'Checkout E2E Suite';
 ```
+
+### Config File (`utem.config.json`)
+
+For settings that apply whenever you run tests (including directly from your IDE), create a `utem.config.json` file in your project root:
+
+```json
+{
+  "serverUrl": "http://myserver:8080/utem",
+  "runName": "Checkout E2E Suite",
+  "runLabel": "regression",
+  "jobName": "nightly",
+  "disabled": false
+}
+```
+
+| Key | Description | Default |
+|-----|-------------|---------|
+| `serverUrl` | UTEM Core server URL | `http://localhost:8080/utem` |
+| `runName` | Custom name for the test run | `Playwright Test Run` |
+| `runLabel` | Label to tag the run | _(none)_ |
+| `jobName` | CI job name | _(none)_ |
+| `disabled` | Set to `true` to disable the reporter entirely | `false` |
+
+**Priority order:** Environment variable → `utem.config.json` → built-in default.
+
+## Disabling the Reporter
+
+Sometimes you want to run tests without sending results to UTEM (e.g. during local development or when running individual tests from the IDE).
+
+**Option 1 — environment variable (one-off):**
+```bash
+UTEM_DISABLED=true npx playwright test
+```
+
+**Option 2 — `utem.config.json` (always disabled until you change it back):**
+
+Create `utem.config.json` in your project root:
+```json
+{
+  "disabled": true
+}
+```
+
+When disabled, the reporter prints a single log line and sends no HTTP requests to the UTEM server.
 
 ## What Gets Reported
 
