@@ -123,18 +123,42 @@ High-Level Flow:
 
 ## Installation
 
-### Clone Repository
+### Option 1 — Docker (recommended, no build required)
+
+Pull and run the pre-built image from Docker Hub:
 
 ```bash
-git clone https://github.com/your-org/utem-core.git
-cd utem-core
+docker pull sddmhossain/utem-core
+docker run -d -p 8080:8080 --name utem-core sddmhossain/utem-core
 ```
 
-### Backend Setup
+Or with a persistent database volume so data survives container restarts:
 
 ```bash
-mvn clean install
-mvn spring-boot:run
+docker run -d \
+  -p 8080:8080 \
+  -v utem-data:/app/data \
+  --name utem-core \
+  sddmhossain/utem-core
+```
+
+Dashboard will be available at **http://localhost:8080**
+
+> If port 8080 is in use (e.g. Jenkins), map to a different host port:
+> ```bash
+> docker run -d -p 9090:8080 --name utem-core sddmhossain/utem-core
+> ```
+> Then access at **http://localhost:9090**
+
+---
+
+### Option 2 — Build from Source
+
+```bash
+git clone https://github.com/shossain786/utem-core.git
+cd utem-core
+mvn clean package -DskipTests
+java -jar target/utem-core-*.jar
 ```
 
 The server will start on port 8080.

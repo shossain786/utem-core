@@ -83,4 +83,11 @@ export default defineConfig({
 
 - Node.js ≥ 18
 - Playwright ≥ 1.35.0
-- UTEM Core server running (see [UTEM Core setup](https://github.com/shossain786/utem-core))
+- UTEM Core server running
+
+**Quickstart with Docker:**
+```bash
+docker run -d -p 8080:8080 --name utem-core sddmhossain/utem-core
+```
+
+See [UTEM Core](https://github.com/shossain786/utem-core) for full setup options.

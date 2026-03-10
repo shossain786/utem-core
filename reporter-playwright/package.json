@@ -1,6 +1,6 @@
 {
   "name": "utem-reporter-playwright",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Zero-dependency Playwright reporter that streams test results to the UTEM Core real-time dashboard.",
   "main": "dist/UtemReporter.js",
   "types": "dist/UtemReporter.d.ts",
