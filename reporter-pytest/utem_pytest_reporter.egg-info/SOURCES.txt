@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+utem_pytest_reporter/__init__.py
+utem_pytest_reporter/plugin.py
+utem_pytest_reporter.egg-info/PKG-INFO
+utem_pytest_reporter.egg-info/SOURCES.txt
+utem_pytest_reporter.egg-info/dependency_links.txt
+utem_pytest_reporter.egg-info/entry_points.txt
+utem_pytest_reporter.egg-info/top_level.txt

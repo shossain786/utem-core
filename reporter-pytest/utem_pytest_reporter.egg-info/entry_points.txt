@@ -1,0 +1,2 @@
+[pytest11]
+utem = utem_pytest_reporter.plugin
