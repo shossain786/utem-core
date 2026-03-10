@@ -3,17 +3,37 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.backends.legacy:build"
 
 [project]
-name = "utem-reporter"
+name = "utem-pytest-reporter"
 version = "0.1.0"
-description = "pytest plugin that streams test results to UTEM Core in real time"
+description = "Real-time pytest reporter for UTEM Core — streams test results as tests run"
 readme = "README.md"
 requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Saddam Hossain"},
+]
+keywords = ["pytest", "testing", "reporting", "utem", "real-time"]
+classifiers = [
+    "Framework :: Pytest",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+    "License :: OSI Approved :: MIT License",
+]
 # Zero runtime dependencies — uses only the Python standard library
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/shossain786/utem-core"
+Repository = "https://github.com/shossain786/utem-core"
+
 [project.entry-points."pytest11"]
-utem-reporter = "utem_reporter.plugin"
+utem = "utem_pytest_reporter.plugin"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["utem_reporter*"]
+include = ["utem_pytest_reporter*"]

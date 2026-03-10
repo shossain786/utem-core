@@ -106,7 +106,7 @@ High-Level Flow:
 | TestNG | `io.github.shossain786:utem-reporter-testng` | Maven Central | [README](reporter-testng/README.md) |
 | Playwright (JS/TS) | `utem-reporter-playwright` | npm | [README](reporter-playwright/README.md) |
 | Jest | `utem-jest-reporter` | npm | — |
-| pytest | `utem-pytest-reporter` | PyPI | — |
+| pytest | `utem-pytest-reporter` | PyPI | [README](reporter-pytest/README.md) |
 
 All reporters support a **disable flag** so the reporter stays on the classpath/config but sends nothing to the UTEM server — useful for running tests directly from the IDE. See each reporter's README for details.
 

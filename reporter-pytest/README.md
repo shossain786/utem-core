@@ -1,21 +1,17 @@
 # UTEM Reporter for pytest
 
-Streams test results to [UTEM Core](../README.md) in real time as tests run.
+Streams pytest test results to [UTEM Core](https://github.com/shossain786/utem-core) in real time as tests run.
+Zero external dependencies — uses only the Python standard library.
 
 ## Installation
 
 ```bash
-pip install -e .
-```
-
-Or install from the built wheel:
-```bash
-pip install utem-reporter-0.1.0-py3-none-any.whl
+pip install utem-pytest-reporter
 ```
 
 ## Usage
 
-Once installed, the plugin is auto-discovered by pytest. No configuration in `conftest.py` or `pytest.ini` is needed.
+Once installed the plugin is auto-discovered by pytest — no changes to `conftest.py` or `pytest.ini` needed.
 
 ```bash
 # Point to your UTEM Core server
@@ -27,26 +23,84 @@ pytest --utem-url=http://localhost:8080/utem
 
 ## Configuration
 
-| Method | Example |
-|--------|---------|
-| Environment variable | `UTEM_SERVER_URL=http://host:8080/utem` |
-| Command-line option | `pytest --utem-url=http://host:8080/utem` |
-| Default | `http://localhost:8080/utem` |
+### Environment Variables / CLI
 
-## Selenium Screenshot Support (Optional)
+| Environment Variable | CLI option | Description | Default |
+|----------------------|------------|-------------|---------|
+| `UTEM_SERVER_URL` | `--utem-url` | UTEM Core server URL | `http://localhost:8080/utem` |
+| `UTEM_RUN_NAME` | — | Custom name for the test run | pytest session name |
+| `UTEM_RUN_LABEL` | — | Label to tag the run (e.g. `regression`, `smoke`) | _(none)_ |
+| `UTEM_JOB_NAME` | — | CI job name (e.g. Jenkins build name) | _(none)_ |
+| `UTEM_DISABLED` | — | Set to `true` to disable the reporter entirely | `false` |
+
+**Example:**
+```bash
+UTEM_SERVER_URL=http://myserver:8080/utem \
+UTEM_RUN_NAME="Checkout E2E Suite" \
+UTEM_RUN_LABEL="regression" \
+pytest
+```
+
+### Config File (`utem.config.json`)
+
+For settings that apply whenever you run tests (including directly from your IDE), create a `utem.config.json` file in your project root:
+
+```json
+{
+  "serverUrl": "http://myserver:8080/utem",
+  "runName": "My Test Suite",
+  "runLabel": "regression",
+  "jobName": "nightly",
+  "disabled": false
+}
+```
+
+| Key | Description | Default |
+|-----|-------------|---------|
+| `serverUrl` | UTEM Core server URL | `http://localhost:8080/utem` |
+| `runName` | Custom name for the test run | pytest session name |
+| `runLabel` | Label to tag the run | _(none)_ |
+| `jobName` | CI job name | _(none)_ |
+| `disabled` | Set to `true` to disable the reporter entirely | `false` |
+
+**Priority order:** `--utem-url` CLI → Environment variable → `utem.config.json` → built-in default.
+
+## Disabling the Reporter
+
+Sometimes you want to run tests without sending results to UTEM (e.g. during local development or when running individual tests from the IDE).
+
+**Option 1 — environment variable (one-off):**
+```bash
+UTEM_DISABLED=true pytest
+```
+
+**Option 2 — `utem.config.json` (always disabled until you change it back):**
+
+Create `utem.config.json` in your project root:
+```json
+{
+  "disabled": true
+}
+```
+
+When disabled, the reporter prints a single log line and sends no HTTP requests to the UTEM server.
+
+## Screenshot Support (Selenium)
 
 Register your WebDriver in a fixture to get automatic screenshots on failure:
 
 ```python
 import pytest
-import utem_reporter
+import utem_pytest_reporter
 
 @pytest.fixture(autouse=True)
 def utem_driver(driver):
-    utem_reporter.register_driver(driver)
+    utem_pytest_reporter.register_driver(driver)
     yield
-    utem_reporter.unregister_driver()
+    utem_pytest_reporter.unregister_driver()
 ```
+
+Screenshots are automatically attached to the failing test in the UTEM dashboard.
 
 ## What Gets Reported
 
@@ -59,3 +113,17 @@ def utem_driver(driver):
 | Test failure | `TEST_FAILED` + `TEST_CASE_FINISHED` |
 | Test skip | `TEST_SKIPPED` + `TEST_CASE_FINISHED` |
 | Session end | `TEST_SUITE_FINISHED` × N + `TEST_RUN_FINISHED` |
+| Failure screenshot | `ATTACHMENT` + file upload |
+
+## Requirements
+
+- Python 3.8+
+- pytest 7+
+- UTEM Core server running
+
+**Quickstart with Docker:**
+```bash
+docker run -d -p 8080:8080 --name utem-core sddmhossain/utem-core
+```
+
+See [UTEM Core](https://github.com/shossain786/utem-core) for full setup options.
