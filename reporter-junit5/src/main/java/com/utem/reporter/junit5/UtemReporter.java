@@ -47,6 +47,11 @@ public class UtemReporter implements TestExecutionListener {
     public void testPlanExecutionStarted(TestPlan testPlan) {
         // When Cucumber runs via @RunWith(Cucumber.class), the JUnit Vintage engine is used.
         // UtemCucumberPlugin handles reporting in that case — skip here to avoid duplicate runs.
+        if (config.isDisabled()) {
+            disabled = true;
+            System.out.println("[UTEM] Reporter disabled via utem.disabled=true — no events will be sent");
+            return;
+        }
         if (testPlan.getRoots().stream().anyMatch(id ->
                 id.getUniqueId().contains("junit-vintage") || id.getUniqueId().contains("cucumber"))) {
             disabled = true;

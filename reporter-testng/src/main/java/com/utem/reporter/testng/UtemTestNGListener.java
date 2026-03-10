@@ -35,6 +35,8 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
     private final EventQueue eventQueue = new EventQueue(httpClient);
     private final EventBuilder builder = new EventBuilder();
 
+    private volatile boolean disabled = false;
+
     /** runId shared across all events in one suite execution. */
     private volatile String runId;
     /** eventId of the TEST_RUN_STARTED event. */
@@ -55,6 +57,11 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onStart(ISuite suite) {
+        if (config.isDisabled()) {
+            disabled = true;
+            System.out.println("[UTEM] Reporter disabled via utem.disabled=true — no events will be sent");
+            return;
+        }
         runId = UUID.randomUUID().toString();
         runEventId = UUID.randomUUID().toString();
         String runName = config.getRunName(suite.getName());
@@ -64,6 +71,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onFinish(ISuite suite) {
+        if (disabled) return;
         String finishId = UUID.randomUUID().toString();
         eventQueue.enqueue(builder.buildRunFinished(
                 finishId, runId, runEventId,
@@ -75,6 +83,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onStart(ITestContext context) {
+        if (disabled) return;
         String suiteEventId = UUID.randomUUID().toString();
         contextToEventId.put(context.getName(), suiteEventId);
         eventQueue.enqueue(builder.buildSuiteStarted(suiteEventId, runId, runEventId, context.getName()));
@@ -82,6 +91,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onFinish(ITestContext context) {
+        if (disabled) return;
         String suiteEventId = contextToEventId.remove(context.getName());
         if (suiteEventId == null) return;
 
@@ -101,6 +111,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onTestStart(ITestResult result) {
+        if (disabled) return;
         String caseEventId = UUID.randomUUID().toString();
         resultToEventId.put(System.identityHashCode(result), caseEventId);
         String parentId = contextToEventId.getOrDefault(result.getTestContext().getName(), runEventId);
@@ -110,6 +121,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        if (disabled) return;
         UtemTestContext.current.remove();
         String caseEventId = resultToEventId.remove(System.identityHashCode(result));
         if (caseEventId == null) return;
@@ -120,6 +132,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onTestFailure(ITestResult result) {
+        if (disabled) return;
         UtemTestContext.current.remove();
         String caseEventId = resultToEventId.remove(System.identityHashCode(result));
         if (caseEventId == null) return;
@@ -133,6 +146,7 @@ public class UtemTestNGListener implements ISuiteListener, ITestListener {
 
     @Override
     public void onTestSkipped(ITestResult result) {
+        if (disabled) return;
         UtemTestContext.current.remove();
         String caseEventId = resultToEventId.remove(System.identityHashCode(result));
         if (caseEventId == null) return;

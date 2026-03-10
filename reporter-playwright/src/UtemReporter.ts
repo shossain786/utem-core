@@ -6,20 +6,44 @@ import type {
   TestResult,
   FullResult,
 } from '@playwright/test/reporter';
-import { createReadStream, statSync } from 'fs';
+import { createReadStream, existsSync, readFileSync, statSync } from 'fs';
 import { request as httpsRequest } from 'https';
 import { request as httpRequest } from 'http';
 import { randomUUID } from 'crypto';
+import { join } from 'path';
 
 // ── Config resolution ─────────────────────────────────────────────────
 
+interface UtemFileConfig {
+  serverUrl?: string;
+  runName?: string;
+  runLabel?: string;
+  jobName?: string;
+  disabled?: boolean;
+}
+
+function loadFileConfig(): UtemFileConfig {
+  const filePath = join(process.cwd(), 'utem.config.json');
+  if (!existsSync(filePath)) return {};
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8')) as UtemFileConfig;
+  } catch (_) { return {}; }
+}
+
 function resolveConfig() {
-  const url = process.env['UTEM_SERVER_URL']?.trim();
-  const serverUrl = (url ? url.replace(/\/$/, '') : 'http://localhost:8080/utem');
-  const runName  = process.env['UTEM_RUN_NAME']?.trim()  || 'Playwright Test Run';
-  const runLabel = process.env['UTEM_RUN_LABEL']?.trim() || null;
-  const jobName  = process.env['UTEM_JOB_NAME']?.trim()  || null;
-  return { serverUrl, runName, runLabel, jobName };
+  const file = loadFileConfig();
+
+  const rawUrl = process.env['UTEM_SERVER_URL']?.trim() || file.serverUrl?.trim();
+  const serverUrl = rawUrl ? rawUrl.replace(/\/$/, '') : 'http://localhost:8080/utem';
+
+  const runName  = process.env['UTEM_RUN_NAME']?.trim()  || file.runName?.trim()  || 'Playwright Test Run';
+  const runLabel = process.env['UTEM_RUN_LABEL']?.trim() || file.runLabel?.trim() || null;
+  const jobName  = process.env['UTEM_JOB_NAME']?.trim()  || file.jobName?.trim()  || null;
+
+  const disabledEnv  = process.env['UTEM_DISABLED']?.trim().toLowerCase() === 'true';
+  const disabled     = disabledEnv || file.disabled === true;
+
+  return { serverUrl, runName, runLabel, jobName, disabled };
 }
 
 // ── HTTP helpers ──────────────────────────────────────────────────────
@@ -183,11 +207,16 @@ class UtemReporter implements Reporter {
   private total = 0; private passed = 0; private failed = 0; private skipped = 0;
 
   onBegin(_config: FullConfig, _suite: Suite): void {
+    if (this.cfg.disabled) {
+      console.log('[UTEM] Reporter disabled via UTEM_DISABLED=true — no events will be sent');
+      return;
+    }
     const { runName, runLabel, jobName } = this.cfg;
     this.events.push(evRunStarted(this.runEventId, this.runId, runName, runLabel, jobName));
   }
 
   onTestBegin(test: TestCase, result: TestResult): void {
+    if (this.cfg.disabled) return;
     const parent = test.parent;
 
     // Lazily register parent suite
@@ -206,6 +235,7 @@ class UtemReporter implements Reporter {
   }
 
   onTestEnd(test: TestCase, result: TestResult): void {
+    if (this.cfg.disabled) return;
     const caseId   = this.caseIds.get(result);
     const duration = result.duration;
     const parent   = test.parent;
@@ -243,6 +273,7 @@ class UtemReporter implements Reporter {
   }
 
   async onEnd(_result: FullResult): Promise<void> {
+    if (this.cfg.disabled) return;
     const { serverUrl } = this.cfg;
 
     // Close all suites
