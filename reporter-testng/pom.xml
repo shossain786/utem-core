@@ -6,7 +6,7 @@
 
     <groupId>io.github.shossain786</groupId>
     <artifactId>utem-reporter-testng</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <packaging>jar</packaging>
 
     <name>UTEM Reporter - TestNG</name>
