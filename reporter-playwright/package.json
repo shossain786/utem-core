@@ -1,0 +1,41 @@
+{
+  "name": "utem-reporter-playwright",
+  "version": "0.1.0",
+  "description": "Zero-dependency Playwright reporter that streams test results to the UTEM Core real-time dashboard.",
+  "main": "dist/UtemReporter.js",
+  "types": "dist/UtemReporter.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/UtemReporter.js",
+      "types": "./dist/UtemReporter.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "playwright",
+    "reporter",
+    "utem",
+    "test-reporting",
+    "real-time"
+  ],
+  "author": "shossain786",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shossain786/utem-core.git"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.35.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^25.4.0",
+    "typescript": "^5.7.0"
+  }
+}
