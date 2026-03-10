@@ -1,95 +1,29 @@
-# UTEM Core - Development Checklist
+# UTEM Core — Backlog
 
-## MVP Phase
+## Reporter Gaps
+- [ ] Jest reporter (`utem-jest-reporter`) — npm
+- [ ] Cypress reporter
+- [ ] Robot Framework listener
 
-### Backend - Database Layer
-- [x] #1: Create TestRun entity and repository
-- [x] #2: Create TestNode entity and repository
-- [x] #3: Create TestStep entity and repository
-- [x] #4: Create Attachment entity and repository
-- [x] #5: Create EventLog entity and repository
+## Notifications & Alerts
+- [ ] Slack / Teams / Email — alert on run completion, new failures, or flakiness threshold breached
+- [ ] Webhooks — POST to any URL when a run finishes (CI/CD integration)
 
-### Backend - Services & Controllers
-- [x] #6: Create Event Ingestion Controller
-- [x] #7: Create Event Processing Service
-- [x] #8: Create Hierarchy Reconstruction Service
-- [x] #9: Configure WebSocket for real-time updates
-- [x] #10: Create Attachment Storage Service
-- [x] #11: Create Attachment Controller
-- [x] #12: Create Run History Service
-- [x] #13: Create Run History Controller
-- [x] #14: Create Flakiness Detection Service
-- [x] #15: Create Search and Filter Service
-- [x] #16: Create Search Controller
+## Intelligence
+- [ ] Failure clustering — group similar stack traces ("15 tests failed for the same root cause")
+- [ ] AI failure analysis — send failure + stack trace to Claude API, get plain-English diagnosis and suggested fix
+- [ ] Flakiness scoring — per-test pass rate over last N runs with a flakiness badge
 
-### Frontend
-- [x] #17: Setup React frontend with Vite
-- [x] #18: Create WebSocket client integration
-- [x] #19: Create Dashboard component
-- [x] #20: Create Test Run List component
-- [x] #21: Create Hierarchy Tree View component
-- [x] #22: Create Step Details component
-- [x] #23: Create Attachment Viewer component
-- [x] #24: Create Search and Filter UI component
-- [x] #25: Create Flakiness Indicator component
+## CI/CD Integration
+- [ ] GitHub Actions / Jenkins plugin — post run summary as a PR comment with pass/fail badge
+- [ ] Quality gates — fail the build if flakiness score > threshold or new failures vs baseline
 
----
+## User Experience
+- [ ] Test search — search by test name across all historical runs
+- [ ] Pinned runs — bookmark important runs (release candidates, baselines)
+- [ ] Run tagging / custom labels UI — set labels directly in the dashboard, not just via CLI
+- [ ] Dark mode
 
-## Phase 1 - Enhanced Features
-
-- [x] #26: Enhanced event validation and error handling
-- [x] #27: Resume interrupted runs support
-- [x] #28: Enhanced real-time visualization
-- [x] #29: Execution history comparison
-- [x] #30: Trend analysis dashboard
-- [x] #31: Export and reporting features
-
----
-
-## Phase 2 - Advanced Analytics
-
-- [x] #32: Advanced failure insights service
-- [x] #33: Failure clustering algorithm
-- [x] #34: Failure clustering UI component
-- [x] #35: Performance analysis service
-- [x] #36: Performance dashboard UI
-- [x] #37: Advanced insights dashboard
-
----
-
-## Phase 3 - Ecosystem
-
-- [x] #38: Adapter SDK and documentation
-- [x] #39: JUnit adapter implementation (reporter-junit5 — JUnit 5 + Cucumber)
-- [x] #40: TestNG adapter implementation
-- [x] #41: Pytest adapter implementation
-- [x] #42: JavaScript/Jest adapter implementation
-- [x] #43: Plugin architecture design and implementation
-- [x] #44: Enterprise CI/CD integrations (Jenkins)
-- [x] #45: Notification integrations (Microsoft Teams)
-
----
-
----
-
-## Phase 4 - User Experience & Delivery
-
-- [x] #46: Archive test runs (drag-and-drop + bulk select; `/archive` page with unarchive)
-- [x] #47: Run labels (tag runs with `-Dutem.run.label=X`; filter chips on Runs page)
-- [x] #48: Job view (group runs by pipeline name; `/jobs` card grid + `/jobs/:name` history)
-- [x] #49: Email report delivery (send HTML run summary email on run completion)
-- [x] #50: PDF export (export full run report as PDF from run detail page)
-- [ ] #51: Slack notification integration (SlackNotificationPlugin via incoming webhook)
-
----
-
-## Progress
-
-| Phase | Total | Completed | Progress |
-|-------|-------|-----------|----------|
-| MVP | 25 | 25 | 100% |
-| Phase 1 | 6 | 6 | 100% |
-| Phase 2 | 6 | 6 | 100% |
-| Phase 3 | 8 | 8 | 100% |
-| Phase 4 | 6 | 5 | 83% |
-| **Overall** | **51** | **50** | **98%** |
+## Multi-user / Teams
+- [ ] Basic auth / API key — protect the server from unauthorized writes
+- [ ] Projects — namespace runs by project so one UTEM server can serve multiple teams
