@@ -98,6 +98,18 @@ High-Level Flow:
 
 ---
 
+## Supported Frameworks
+
+| Framework | Package | Registry |
+|-----------|---------|----------|
+| JUnit 5 + Cucumber | `io.github.shossain786:utem-reporter-junit5` | Maven Central |
+| TestNG | `io.github.shossain786:utem-reporter-testng` | Maven Central |
+| Playwright (JS/TS) | `utem-reporter-playwright` | npm |
+| Jest | `utem-jest-reporter` | npm |
+| pytest | `utem-pytest-reporter` | PyPI |
+
+---
+
 ## Getting Started
 
 ### Prerequisites
