@@ -180,6 +180,91 @@ Default configuration uses SQLite for simplicity.
 
 ---
 
+## Notifications & Alerts
+
+UTEM can notify your team whenever a test run completes (or fails). Two configuration methods are supported and can be used simultaneously.
+
+### Option 1 — Dashboard UI (recommended)
+
+Open the dashboard → **Notifications** in the sidebar → **Add Channel**.
+
+Supported channel types:
+
+| Type | Description |
+|------|-------------|
+| **Slack** | Posts a Block Kit message to a Slack incoming webhook |
+| **Teams** | Posts a MessageCard to a Microsoft Teams incoming webhook |
+| **Webhook** | HTTP POST JSON payload to any URL (Jenkins, custom CI, etc.) |
+| **Email** | HTML email via SMTP (requires `spring.mail.*` config, see below) |
+
+Each channel has a **"Notify on failures only"** toggle — enable it to suppress notifications for passing runs.
+
+Use the **Test** button on any channel to send a sample notification immediately.
+
+---
+
+### Option 2 — `application.properties` (static / CI config)
+
+Add any of the following blocks to `src/main/resources/application.properties`:
+
+**Slack**
+```properties
+utem.notification.slack.enabled=true
+utem.notification.slack.webhook-url=https://hooks.slack.com/services/T.../B.../...
+utem.notification.dashboard-base-url=http://your-utem-server:8080
+```
+
+**Microsoft Teams**
+```properties
+utem.notification.teams.enabled=true
+utem.notification.teams.webhook-url=https://outlook.office.com/webhook/...
+utem.notification.dashboard-base-url=http://your-utem-server:8080
+```
+
+**Generic Webhook / Jenkins**
+```properties
+utem.notification.jenkins.enabled=true
+utem.notification.jenkins.url=http://jenkins-host/generic-webhook-trigger/invoke?token=MY_TOKEN
+utem.notification.dashboard-base-url=http://your-utem-server:8080
+```
+
+**Email**
+```properties
+utem.notification.email.enabled=true
+utem.notification.email.to=qa-team@example.com,manager@example.com
+utem.notification.email.from=utem@example.com
+
+# Standard Spring Mail SMTP settings
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=sender@example.com
+spring.mail.password=your-app-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+```
+
+> **Note:** Property-based channels and UI-managed channels both fire independently when a run finishes. Avoid configuring the same destination in both places to prevent duplicate notifications.
+
+---
+
+### Webhook Payload (Webhook / Jenkins)
+
+```json
+{
+  "runId": "abc-123",
+  "runName": "Checkout E2E Suite",
+  "status": "FAILED",
+  "total": 50,
+  "passed": 45,
+  "failed": 5,
+  "skipped": 0,
+  "passRate": "90.0%",
+  "dashboardUrl": "http://your-utem-server:8080/#/runs/abc-123"
+}
+```
+
+---
+
 ## API Overview
 
 ### Event Ingestion Endpoint
