@@ -39,6 +39,9 @@ class EventProcessingServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private NotificationChannelService notificationChannelService;
+
     private ObjectMapper objectMapper;
     private EventProcessingService eventProcessingService;
 
@@ -57,7 +60,8 @@ class EventProcessingServiceTest {
                 attachmentRepository,
                 objectMapper,
                 Optional.empty(),
-                notificationService
+                notificationService,
+                notificationChannelService
         );
     }
 
