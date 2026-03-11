@@ -1,13 +1,20 @@
 # UTEM Core — Backlog
 
 ## Reporter Gaps
+- [x] pytest reporter (`utem-pytest-reporter`) — PyPI ✅ v0.1.0
+- [x] TestNG reporter (`utem-reporter-testng`) — Maven Central ✅ v0.1.1
+- [x] Playwright reporter (`utem-reporter-playwright`) — npm ✅ v0.1.5
 - [ ] Jest reporter (`utem-jest-reporter`) — npm
 - [ ] Cypress reporter
 - [ ] Robot Framework listener
 
 ## Notifications & Alerts
-- [ ] Slack / Teams / Email — alert on run completion, new failures, or flakiness threshold breached
-- [ ] Webhooks — POST to any URL when a run finishes (CI/CD integration)
+- [x] Slack notifications — incoming webhook, Block Kit format ✅ v0.2.0
+- [x] Teams notifications — incoming webhook, MessageCard format ✅ v0.2.0
+- [x] Email notifications — HTML email via SMTP ✅ v0.2.0
+- [x] Webhooks — generic HTTP POST JSON (Jenkins, custom CI) ✅ v0.2.0
+- [x] Dashboard UI to manage channels (add/edit/delete/test/toggle) ✅ v0.2.0
+- [ ] Notify on flakiness threshold breached
 
 ## Intelligence
 - [ ] Failure clustering — group similar stack traces ("15 tests failed for the same root cause")
@@ -19,7 +26,6 @@
 - [ ] Quality gates — fail the build if flakiness score > threshold or new failures vs baseline
 
 ## User Experience
-- [ ] Test search — search by test name across all historical runs
 - [ ] Pinned runs — bookmark important runs (release candidates, baselines)
 - [ ] Run tagging / custom labels UI — set labels directly in the dashboard, not just via CLI
 - [ ] Dark mode
