@@ -12,6 +12,7 @@ const navItems = [
   { to: '/insights', label: 'Insights', icon: '💡' },
   { to: '/failures', label: 'Failures', icon: '🔥' },
   { to: '/performance', label: 'Performance', icon: '⏱️' },
+  { to: '/notifications', label: 'Notifications', icon: '🔔' },
 ];
 
 export default function Sidebar() {

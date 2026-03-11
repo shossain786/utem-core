@@ -288,6 +288,19 @@ export interface RunSummaryMessage {
 
 // ============ Spring Data Page ============
 
+export type ChannelType = 'SLACK' | 'TEAMS' | 'EMAIL' | 'WEBHOOK';
+
+export interface NotificationChannel {
+  id: number;
+  name: string;
+  type: ChannelType;
+  webhookUrl: string | null;
+  emailTo: string | null;
+  enabled: boolean;
+  notifyOnFailureOnly: boolean;
+  createdAt: string;
+}
+
 export interface Page<T> {
   content: T[];
   totalElements: number;

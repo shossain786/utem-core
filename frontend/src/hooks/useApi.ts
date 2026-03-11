@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel } from '@/api/types';
 
 export function useRuns(page = 0, size = 20, refetchInterval?: number | false) {
   return useQuery({
@@ -263,5 +263,57 @@ export function useJobRuns(jobName: string | undefined, page = 0, size = 20) {
       return data;
     },
     enabled: !!jobName,
+  });
+}
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+export function useNotificationChannels() {
+  return useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<NotificationChannel[]>('/notifications');
+      return data;
+    },
+  });
+}
+
+export function useCreateNotificationChannel() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (dto: Omit<NotificationChannel, 'id' | 'createdAt'>) => {
+      const { data } = await apiClient.post<NotificationChannel>('/notifications', dto);
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
+  });
+}
+
+export function useUpdateNotificationChannel() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...dto }: Omit<NotificationChannel, 'createdAt'>) => {
+      const { data } = await apiClient.put<NotificationChannel>(`/notifications/${id}`, dto);
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
+  });
+}
+
+export function useDeleteNotificationChannel() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.delete(`/notifications/${id}`);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
+  });
+}
+
+export function useTestNotificationChannel() {
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.post(`/notifications/${id}/test`);
+    },
   });
 }
