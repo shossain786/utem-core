@@ -27,7 +27,7 @@
 
 ## User Experience
 - [x] Run tagging / custom labels UI — inline edit in Runs list and Run detail header ✅ v0.3.0
-- [ ] Pinned runs — bookmark important runs (release candidates, baselines)
+- [x] Pinned runs — bookmark important runs (release candidates, baselines)
 - [ ] Dark mode
 
 ## Multi-user / Teams
