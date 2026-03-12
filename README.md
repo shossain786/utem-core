@@ -180,6 +180,48 @@ Default configuration uses SQLite for simplicity.
 
 ---
 
+## Run Labels
+
+Labels let you tag and categorise test runs (e.g. `regression`, `smoke`, `release-v2`) for filtering and grouping in the dashboard.
+
+### Setting a label from the reporter
+
+Pass the label when running tests:
+
+```bash
+# JUnit 5 / TestNG
+mvn test -Dutem.run.label=regression
+
+# Playwright / pytest
+UTEM_RUN_LABEL=regression npx playwright test
+UTEM_RUN_LABEL=regression pytest
+```
+
+Or set it in your config file (`utem.properties` / `utem.config.json`):
+```properties
+utem.run.label=regression
+```
+
+### Editing labels from the dashboard
+
+Labels can be added or changed directly in the dashboard — no need to re-run tests.
+
+**On the Runs list page:**
+- If a run already has a label, click the label badge to edit it inline.
+- If a run has no label, hover over the row and click **+ label**.
+- Existing labels appear as autocomplete suggestions as you type.
+- Press **Enter** to save or **Escape** to cancel.
+
+**On the Run detail page:**
+- The label is shown next to the run name in the header.
+- Click it to edit, same keyboard shortcuts apply.
+
+### Filtering by label
+
+The Runs page shows label filter chips at the top — click any label to show only runs with that label.
+
+---
+
 ## Notifications & Alerts
 
 UTEM can notify your team whenever a test run completes (or fails). Two configuration methods are supported and can be used simultaneously.
