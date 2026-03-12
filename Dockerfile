@@ -18,7 +18,7 @@ WORKDIR /app
 # Create data directory for SQLite database
 RUN mkdir -p /app/data
 
-COPY --from=build /app/target/utem-core-0.2.0.jar app.jar
+COPY --from=build /app/target/utem-core-0.3.0.jar app.jar
 
 # Store the SQLite DB in /app/data (mounted as a volume for persistence)
 ENV SPRING_DATASOURCE_URL=jdbc:sqlite:/app/data/utem.db
