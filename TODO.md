@@ -4,7 +4,7 @@
 - [x] pytest reporter (`utem-pytest-reporter`) — PyPI ✅ v0.1.0
 - [x] TestNG reporter (`utem-reporter-testng`) — Maven Central ✅ v0.1.1
 - [x] Playwright reporter (`utem-reporter-playwright`) — npm ✅ v0.1.5
-- [ ] Jest reporter (`utem-jest-reporter`) — npm
+- [x] Jest reporter (`utem-jest-reporter`) — code complete, publish to npm pending
 - [ ] Cypress reporter
 - [ ] Robot Framework listener
 
@@ -17,9 +17,9 @@
 - [ ] Notify on flakiness threshold breached
 
 ## Intelligence
-- [ ] Failure clustering — group similar stack traces ("15 tests failed for the same root cause")
+- [x] Failure clustering — group similar stack traces, hotspot detection ✅ v0.2.0
 - [ ] AI failure analysis — send failure + stack trace to Claude API, get plain-English diagnosis and suggested fix
-- [ ] Flakiness scoring — per-test pass rate over last N runs with a flakiness badge
+- [x] Flakiness scoring — per-test pass rate, flakiness badge, FlakinessPage ✅ v0.2.0
 
 ## CI/CD Integration
 - [ ] GitHub Actions / Jenkins plugin — post run summary as a PR comment with pass/fail badge
