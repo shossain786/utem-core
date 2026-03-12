@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useFilteredRuns, useArchiveRuns, useRunLabels } from '@/hooks/useApi';
+import { useFilteredRuns, useArchiveRuns, useRunLabels, useUpdateRun } from '@/hooks/useApi';
 import { formatDuration, formatRelativeTime, formatPassRate } from '@/utils/format';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import type { RunStatus } from '@/api/types';
@@ -12,6 +12,83 @@ const STATUS_FILTERS: Array<{ label: string; value: RunStatus | null }> = [
   { label: 'Failed', value: 'FAILED' },
   { label: 'Aborted', value: 'ABORTED' },
 ];
+
+// ── Inline label editor ─────────────────────────────────────────────────────
+
+function LabelEditor({
+  runId, currentLabel, availableLabels,
+}: { runId: string; currentLabel: string | null; availableLabels: string[] }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(currentLabel ?? '');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const updateRun = useUpdateRun();
+
+  function startEdit(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setValue(currentLabel ?? '');
+    setEditing(true);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }
+
+  function commit() {
+    setEditing(false);
+    const trimmed = value.trim();
+    if (trimmed === (currentLabel ?? '')) return;
+    updateRun.mutate({ runId, label: trimmed });
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') commit();
+    if (e.key === 'Escape') { setValue(currentLabel ?? ''); setEditing(false); }
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={commit}
+          onKeyDown={onKeyDown}
+          list={`labels-${runId}`}
+          placeholder="Add label…"
+          className="px-1.5 py-0.5 text-xs border border-indigo-400 rounded-full w-28 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        />
+        <datalist id={`labels-${runId}`}>
+          {availableLabels.map((l) => <option key={l} value={l} />)}
+        </datalist>
+      </div>
+    );
+  }
+
+  if (currentLabel) {
+    return (
+      <button
+        type="button"
+        onClick={startEdit}
+        title="Click to edit label"
+        className="px-1.5 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 transition-colors"
+      >
+        {currentLabel}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={startEdit}
+      title="Add label"
+      className="px-1.5 py-0.5 text-xs text-gray-400 rounded-full border border-dashed border-gray-300 hover:border-indigo-400 hover:text-indigo-500 transition-colors opacity-0 group-hover:opacity-100"
+    >
+      + label
+    </button>
+  );
+}
+
+// ── Page ────────────────────────────────────────────────────────────────────
 
 export default function RunsPage() {
   const navigate = useNavigate();
@@ -200,7 +277,7 @@ export default function RunsPage() {
                     key={run.id}
                     draggable
                     onDragStart={(e) => e.dataTransfer.setData('runId', run.id)}
-                    className={`border-b border-gray-50 hover:bg-gray-50 cursor-grab active:cursor-grabbing ${isSelected ? 'bg-blue-50' : ''}`}
+                    className={`group border-b border-gray-50 hover:bg-gray-50 cursor-grab active:cursor-grabbing ${isSelected ? 'bg-blue-50' : ''}`}
                   >
                     <td className="px-3 py-2.5">
                       <input
@@ -235,11 +312,11 @@ export default function RunsPage() {
                         >
                           {run.name}
                         </Link>
-                        {run.label && (
-                          <span className="px-1.5 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full">
-                            {run.label}
-                          </span>
-                        )}
+                        <LabelEditor
+                          runId={run.id}
+                          currentLabel={run.label}
+                          availableLabels={availableLabels ?? []}
+                        />
                       </div>
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>

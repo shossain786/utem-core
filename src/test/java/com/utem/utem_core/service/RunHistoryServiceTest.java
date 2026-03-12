@@ -211,7 +211,7 @@ class RunHistoryServiceTest {
         @DisplayName("Should delegate to HierarchyReconstructionService")
         void shouldDelegateToHierarchyService() {
             TestRunHierarchyDTO hierarchy = new TestRunHierarchyDTO(
-                    "run-1", "Test Run", TestRun.RunStatus.PASSED,
+                    "run-1", "Test Run", null, TestRun.RunStatus.PASSED,
                     timestamp, timestamp, NodeStatistics.empty(), Collections.emptyList());
 
             when(hierarchyReconstructionService.getFullHierarchy("run-1")).thenReturn(hierarchy);

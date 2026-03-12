@@ -11,6 +11,7 @@ import java.util.List;
 public record TestRunHierarchyDTO(
     String runId,
     String name,
+    String label,
     TestRun.RunStatus status,
     Instant startTime,
     Instant endTime,
@@ -25,6 +26,7 @@ public record TestRunHierarchyDTO(
         return new TestRunHierarchyDTO(
             run.getId(),
             run.getName(),
+            run.getLabel(),
             run.getStatus(),
             run.getStartTime(),
             run.getEndTime(),

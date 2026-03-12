@@ -112,6 +112,7 @@ export interface HierarchyNode {
 export interface TestRunHierarchy {
   runId: string;
   name: string;
+  label: string | null;
   status: RunStatus;
   startTime: string;
   endTime: string | null;

@@ -135,6 +135,20 @@ public class RunHistoryController {
     }
 
     /**
+     * Update run metadata (label and/or name) from the dashboard UI.
+     * Pass null or omit a field to leave it unchanged. Pass empty string to clear the label.
+     */
+    @PatchMapping("/{runId}")
+    public ResponseEntity<TestRunSummaryDTO> updateRun(
+            @PathVariable String runId,
+            @RequestBody Map<String, String> body) {
+        String label = body.containsKey("label") ? body.get("label") : null;
+        String name  = body.get("name");
+        log.info("Updating run {} metadata — label={} name={}", runId, label, name);
+        return ResponseEntity.ok(runHistoryService.updateRunMetadata(runId, label, name));
+    }
+
+    /**
      * Manually abort a run stuck in RUNNING status (e.g. after CI pipeline crash).
      * Returns 409 if the run is not currently RUNNING.
      */

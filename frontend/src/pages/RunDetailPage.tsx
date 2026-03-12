@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useRunDetail } from '@/hooks/useApi';
+import { useRunDetail, useRunLabels, useUpdateRun } from '@/hooks/useApi';
 import { useRunEvents, useRunSummary, useWebSocket } from '@/hooks/useWebSocket';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import { formatDuration, formatRelativeTime } from '@/utils/format';
@@ -16,6 +16,11 @@ export default function RunDetailPage() {
   const { status: wsStatus } = useWebSocket();
   const [selectedStep, setSelectedStep] = useState<TestStep | null>(null);
   const viewer = useAttachmentViewer();
+  const [editingLabel, setEditingLabel] = useState(false);
+  const [labelValue, setLabelValue] = useState('');
+  const labelInputRef = useRef<HTMLInputElement>(null);
+  const updateRun = useUpdateRun();
+  const { data: availableLabels } = useRunLabels();
 
   // Fall back to polling every 10s when WebSocket is disconnected
   const { data: hierarchy, isLoading, isError, dataUpdatedAt } = useRunDetail(
@@ -68,6 +73,53 @@ export default function RunDetailPage() {
 
           {/* Run name */}
           <h1 className="text-lg font-bold text-gray-900">{hierarchy.name}</h1>
+
+          {/* Label — click to edit */}
+          {editingLabel ? (
+            <div className="flex items-center gap-1">
+              <input
+                ref={labelInputRef}
+                value={labelValue}
+                onChange={(e) => setLabelValue(e.target.value)}
+                onBlur={() => {
+                  setEditingLabel(false);
+                  const trimmed = labelValue.trim();
+                  if (trimmed !== (hierarchy.label ?? '')) {
+                    updateRun.mutate({ runId: runId!, label: trimmed });
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') labelInputRef.current?.blur();
+                  if (e.key === 'Escape') { setLabelValue(hierarchy.label ?? ''); setEditingLabel(false); }
+                }}
+                list="detail-labels"
+                placeholder="Add label…"
+                autoFocus
+                className="px-1.5 py-0.5 text-xs border border-indigo-400 rounded-full w-28 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+              <datalist id="detail-labels">
+                {(availableLabels ?? []).map((l) => <option key={l} value={l} />)}
+              </datalist>
+            </div>
+          ) : hierarchy.label ? (
+            <button
+              type="button"
+              onClick={() => { setLabelValue(hierarchy.label!); setEditingLabel(true); }}
+              title="Click to edit label"
+              className="px-1.5 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 transition-colors"
+            >
+              {hierarchy.label}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => { setLabelValue(''); setEditingLabel(true); }}
+              title="Add label"
+              className="px-1.5 py-0.5 text-xs text-gray-400 rounded-full border border-dashed border-gray-300 hover:border-indigo-400 hover:text-indigo-500 transition-colors"
+            >
+              + label
+            </button>
+          )}
 
           <div className="ml-auto flex items-center gap-3">
             {/* Last updated timestamp */}

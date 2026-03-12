@@ -242,6 +242,23 @@ export function useUnarchiveRun() {
   });
 }
 
+export function useUpdateRun() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ runId, label, name }: { runId: string; label?: string; name?: string }) => {
+      const body: Record<string, string> = {};
+      if (label !== undefined) body.label = label;
+      if (name  !== undefined) body.name  = name;
+      await apiClient.patch(`/runs/${runId}`, body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['runs'] });
+      queryClient.invalidateQueries({ queryKey: ['run-labels'] });
+      queryClient.invalidateQueries({ queryKey: ['run-detail'] });
+    },
+  });
+}
+
 export function useJobs() {
   return useQuery({
     queryKey: ['jobs'],

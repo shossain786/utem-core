@@ -142,6 +142,24 @@ public class RunHistoryService {
     }
 
     /**
+     * Update the label (and optionally name) of a run.
+     */
+    @Transactional
+    public TestRunSummaryDTO updateRunMetadata(String runId, String label, String name) {
+        TestRun run = testRunRepository.findById(runId)
+                .orElseThrow(() -> new TestRunNotFoundException(runId));
+        if (label != null) {
+            run.setLabel(label.isBlank() ? null : label.trim());
+        }
+        if (name != null && !name.isBlank()) {
+            run.setName(name.trim());
+        }
+        TestRun saved = testRunRepository.save(run);
+        log.info("Updated metadata for run {} — label='{}' name='{}'", runId, saved.getLabel(), saved.getName());
+        return TestRunSummaryDTO.from(saved);
+    }
+
+    /**
      * Get a single run summary by ID.
      */
     @Transactional(readOnly = true)

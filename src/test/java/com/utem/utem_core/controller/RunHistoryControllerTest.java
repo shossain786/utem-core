@@ -151,7 +151,7 @@ class RunHistoryControllerTest {
         @DisplayName("Should return full hierarchy")
         void shouldReturnHierarchy() {
             TestRunHierarchyDTO hierarchy = new TestRunHierarchyDTO(
-                    "run-1", "Test Run", TestRun.RunStatus.PASSED,
+                    "run-1", "Test Run", null, TestRun.RunStatus.PASSED,
                     timestamp, timestamp, NodeStatistics.empty(), Collections.emptyList());
 
             when(runHistoryService.getRunDetail("run-1")).thenReturn(hierarchy);
