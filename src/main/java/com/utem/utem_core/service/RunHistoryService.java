@@ -160,6 +160,41 @@ public class RunHistoryService {
     }
 
     /**
+     * Pin a run so it appears at the top of the list.
+     */
+    @Transactional
+    public TestRunSummaryDTO pinRun(String runId) {
+        TestRun run = testRunRepository.findById(runId)
+                .orElseThrow(() -> new TestRunNotFoundException(runId));
+        run.setPinned(true);
+        TestRun saved = testRunRepository.save(run);
+        log.info("Pinned run {} ('{}')", runId, run.getName());
+        return TestRunSummaryDTO.from(saved);
+    }
+
+    /**
+     * Unpin a run.
+     */
+    @Transactional
+    public TestRunSummaryDTO unpinRun(String runId) {
+        TestRun run = testRunRepository.findById(runId)
+                .orElseThrow(() -> new TestRunNotFoundException(runId));
+        run.setPinned(false);
+        TestRun saved = testRunRepository.save(run);
+        log.info("Unpinned run {} ('{}')", runId, run.getName());
+        return TestRunSummaryDTO.from(saved);
+    }
+
+    /**
+     * Get all pinned runs, newest first.
+     */
+    @Transactional(readOnly = true)
+    public List<TestRunSummaryDTO> getPinnedRuns() {
+        return testRunRepository.findByPinnedTrueAndArchivedFalseOrderByStartTimeDesc()
+                .stream().map(TestRunSummaryDTO::from).toList();
+    }
+
+    /**
      * Get a single run summary by ID.
      */
     @Transactional(readOnly = true)

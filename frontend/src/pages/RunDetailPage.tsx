@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useRunDetail, useRunLabels, useUpdateRun } from '@/hooks/useApi';
+import { useRunDetail, useRunLabels, useUpdateRun, useRunById, usePinRun, useUnpinRun } from '@/hooks/useApi';
 import { useRunEvents, useRunSummary, useWebSocket } from '@/hooks/useWebSocket';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import { formatDuration, formatRelativeTime } from '@/utils/format';
@@ -21,6 +21,10 @@ export default function RunDetailPage() {
   const labelInputRef = useRef<HTMLInputElement>(null);
   const updateRun = useUpdateRun();
   const { data: availableLabels } = useRunLabels();
+  const { data: runSummary } = useRunById(runId);
+  const pinRun = usePinRun();
+  const unpinRun = useUnpinRun();
+  const isPinned = runSummary?.pinned ?? false;
 
   // Fall back to polling every 10s when WebSocket is disconnected
   const { data: hierarchy, isLoading, isError, dataUpdatedAt } = useRunDetail(
@@ -133,6 +137,17 @@ export default function RunDetailPage() {
               <span className="text-sm text-gray-400">
                 {formatDuration(stats.totalDuration)}
               </span>
+            )}
+            {/* Pin */}
+            {runId && (
+              <button
+                type="button"
+                onClick={() => isPinned ? unpinRun.mutate(runId) : pinRun.mutate(runId)}
+                title={isPinned ? 'Unpin run' : 'Pin run'}
+                className={`text-sm transition-colors ${isPinned ? 'text-amber-500 hover:text-amber-600' : 'text-gray-300 hover:text-amber-400'}`}
+              >
+                📌
+              </button>
             )}
             {/* Export */}
             {runId && <ExportDropdown runId={runId} />}

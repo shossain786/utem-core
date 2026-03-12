@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useFilteredRuns, useArchiveRuns, useRunLabels, useUpdateRun } from '@/hooks/useApi';
+import { useFilteredRuns, useArchiveRuns, useRunLabels, useUpdateRun, usePinnedRuns, usePinRun, useUnpinRun } from '@/hooks/useApi';
 import { formatDuration, formatRelativeTime, formatPassRate } from '@/utils/format';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
-import type { RunStatus } from '@/api/types';
+import type { RunStatus, TestRunSummary } from '@/api/types';
 
 const STATUS_FILTERS: Array<{ label: string; value: RunStatus | null }> = [
   { label: 'All', value: null },
@@ -88,6 +88,93 @@ function LabelEditor({
   );
 }
 
+// ── Pin button ───────────────────────────────────────────────────────────────
+
+function PinButton({ run }: { run: TestRunSummary }) {
+  const pinRun = usePinRun();
+  const unpinRun = useUnpinRun();
+
+  function toggle(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (run.pinned) {
+      unpinRun.mutate(run.id);
+    } else {
+      pinRun.mutate(run.id);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      title={run.pinned ? 'Unpin run' : 'Pin run'}
+      className={`transition-all ${
+        run.pinned
+          ? 'text-amber-500 hover:text-amber-600'
+          : 'text-gray-300 hover:text-amber-400 opacity-0 group-hover:opacity-100'
+      }`}
+    >
+      📌
+    </button>
+  );
+}
+
+// ── Run row ──────────────────────────────────────────────────────────────────
+
+function RunRow({
+  run, isSelected, onSelect, availableLabels,
+}: {
+  run: TestRunSummary;
+  isSelected: boolean;
+  onSelect: () => void;
+  availableLabels: string[];
+}) {
+  return (
+    <tr
+      draggable
+      onDragStart={(e) => e.dataTransfer.setData('runId', run.id)}
+      className={`group border-b border-gray-50 hover:bg-gray-50 cursor-grab active:cursor-grabbing ${
+        isSelected ? 'bg-blue-50' : run.pinned ? 'bg-amber-50' : ''
+      }`}
+    >
+      <td className="px-3 py-2.5">
+        <input
+          type="checkbox"
+          aria-label={`Select run ${run.name}`}
+          checked={isSelected}
+          onChange={onSelect}
+          className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 cursor-pointer"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </td>
+      <td className="px-4 py-2.5">
+        <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${RUN_STATUS_TEXT_COLORS[run.status]}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${RUN_STATUS_COLORS[run.status]}`} />
+          {run.status}
+        </span>
+      </td>
+      <td className="px-4 py-2.5">
+        <div className="flex items-center gap-2">
+          <PinButton run={run} />
+          <Link
+            to={`/runs/${run.id}`}
+            className="font-medium text-gray-900 hover:text-blue-600"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {run.name}
+          </Link>
+          <LabelEditor runId={run.id} currentLabel={run.label} availableLabels={availableLabels} />
+        </div>
+      </td>
+      <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>
+      <td className="px-4 py-2.5 text-gray-600">{formatPassRate(run.passRate)}</td>
+      <td className="px-4 py-2.5 text-gray-600">{formatDuration(run.duration)}</td>
+      <td className="px-4 py-2.5 text-gray-500">{formatRelativeTime(run.startTime)}</td>
+    </tr>
+  );
+}
+
 // ── Page ────────────────────────────────────────────────────────────────────
 
 export default function RunsPage() {
@@ -101,6 +188,7 @@ export default function RunsPage() {
 
   const archiveMutation = useArchiveRuns();
   const { data: availableLabels } = useRunLabels();
+  const { data: pinnedRuns = [] } = usePinnedRuns();
 
   // Debounce search input
   useEffect(() => {
@@ -124,6 +212,9 @@ export default function RunsPage() {
   const allIds = runsPage?.content.map((r) => r.id) ?? [];
   const allSelected = allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
 
+  // Exclude pinned runs that already appear in the pinned section from the main list
+  const mainRuns = runsPage?.content.filter((r) => !r.pinned) ?? [];
+
   function toggleSelectAll() {
     if (allSelected) {
       setSelectedIds((prev) => prev.filter((id) => !allIds.includes(id)));
@@ -137,6 +228,28 @@ export default function RunsPage() {
       onSuccess: () => setSelectedIds([]),
     });
   }
+
+  const tableHeaders = (
+    <thead>
+      <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+        <th className="px-3 py-2 w-8" scope="col">
+          <input
+            type="checkbox"
+            aria-label="Select all runs"
+            checked={allSelected}
+            onChange={toggleSelectAll}
+            className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 cursor-pointer"
+          />
+        </th>
+        <th className="px-4 py-2 font-medium">Status</th>
+        <th className="px-4 py-2 font-medium">Name</th>
+        <th className="px-4 py-2 font-medium">Tests</th>
+        <th className="px-4 py-2 font-medium">Pass Rate</th>
+        <th className="px-4 py-2 font-medium">Duration</th>
+        <th className="px-4 py-2 font-medium">Started</th>
+      </tr>
+    </thead>
+  );
 
   return (
     <div>
@@ -232,13 +345,42 @@ export default function RunsPage() {
         )}
       </div>
 
-      {/* Table */}
+      {/* Pinned runs */}
+      {pinnedRuns.length > 0 && !statusFilter && !labelFilter && !debouncedSearch && (
+        <div className="bg-white rounded-lg border border-amber-200 mb-4">
+          <div className="px-4 py-2 border-b border-amber-100 flex items-center gap-2">
+            <span className="text-sm">📌</span>
+            <span className="text-xs font-semibold text-amber-700">Pinned</span>
+            <span className="text-xs text-amber-500">{pinnedRuns.length} run{pinnedRuns.length !== 1 ? 's' : ''}</span>
+          </div>
+          <table className="w-full text-sm">
+            {tableHeaders}
+            <tbody>
+              {pinnedRuns.map((run) => (
+                <RunRow
+                  key={run.id}
+                  run={run}
+                  isSelected={selectedIds.includes(run.id)}
+                  onSelect={() =>
+                    setSelectedIds((prev) =>
+                      prev.includes(run.id) ? prev.filter((id) => id !== run.id) : [...prev, run.id]
+                    )
+                  }
+                  availableLabels={availableLabels ?? []}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Main table */}
       <div className="bg-white rounded-lg border border-gray-200">
         {isLoading ? (
           <div className="p-6 text-center text-sm text-gray-500">Loading...</div>
         ) : isError ? (
           <div className="p-6 text-center text-sm text-red-500">Failed to load runs.</div>
-        ) : !runsPage || runsPage.empty ? (
+        ) : !runsPage || (mainRuns.length === 0 && page === 0) ? (
           <div className="p-6 text-center">
             <p className="text-sm text-gray-500 mb-1">No runs found</p>
             <p className="text-xs text-gray-400">
@@ -250,82 +392,21 @@ export default function RunsPage() {
         ) : (
           <>
             <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
-                  <th className="px-3 py-2 w-8" scope="col">
-                    <input
-                      type="checkbox"
-                      aria-label="Select all runs"
-                      checked={allSelected}
-                      onChange={toggleSelectAll}
-                      className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 cursor-pointer"
-                    />
-                  </th>
-                  <th className="px-4 py-2 font-medium">Status</th>
-                  <th className="px-4 py-2 font-medium">Name</th>
-                  <th className="px-4 py-2 font-medium">Tests</th>
-                  <th className="px-4 py-2 font-medium">Pass Rate</th>
-                  <th className="px-4 py-2 font-medium">Duration</th>
-                  <th className="px-4 py-2 font-medium">Started</th>
-                </tr>
-              </thead>
+              {tableHeaders}
               <tbody>
-                {runsPage.content.map((run) => {
-                  const isSelected = selectedIds.includes(run.id);
-                  return (
-                  <tr
+                {mainRuns.map((run) => (
+                  <RunRow
                     key={run.id}
-                    draggable
-                    onDragStart={(e) => e.dataTransfer.setData('runId', run.id)}
-                    className={`group border-b border-gray-50 hover:bg-gray-50 cursor-grab active:cursor-grabbing ${isSelected ? 'bg-blue-50' : ''}`}
-                  >
-                    <td className="px-3 py-2.5">
-                      <input
-                        type="checkbox"
-                        aria-label={`Select run ${run.name}`}
-                        checked={isSelected}
-                        onChange={() =>
-                          setSelectedIds((prev) =>
-                            prev.includes(run.id)
-                              ? prev.filter((id) => id !== run.id)
-                              : [...prev, run.id],
-                          )
-                        }
-                        className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 cursor-pointer"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <span
-                        className={`inline-flex items-center gap-1.5 text-xs font-medium ${RUN_STATUS_TEXT_COLORS[run.status]}`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${RUN_STATUS_COLORS[run.status]}`} />
-                        {run.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <div className="flex items-center gap-2">
-                        <Link
-                          to={`/runs/${run.id}`}
-                          className="font-medium text-gray-900 hover:text-blue-600"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {run.name}
-                        </Link>
-                        <LabelEditor
-                          runId={run.id}
-                          currentLabel={run.label}
-                          availableLabels={availableLabels ?? []}
-                        />
-                      </div>
-                    </td>
-                    <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>
-                    <td className="px-4 py-2.5 text-gray-600">{formatPassRate(run.passRate)}</td>
-                    <td className="px-4 py-2.5 text-gray-600">{formatDuration(run.duration)}</td>
-                    <td className="px-4 py-2.5 text-gray-500">{formatRelativeTime(run.startTime)}</td>
-                  </tr>
-                  );
-                })}
+                    run={run}
+                    isSelected={selectedIds.includes(run.id)}
+                    onSelect={() =>
+                      setSelectedIds((prev) =>
+                        prev.includes(run.id) ? prev.filter((id) => id !== run.id) : [...prev, run.id]
+                      )
+                    }
+                    availableLabels={availableLabels ?? []}
+                  />
+                ))}
               </tbody>
             </table>
 

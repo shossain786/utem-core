@@ -45,6 +45,17 @@ export function useRunLabels() {
   });
 }
 
+export function useRunById(runId: string | undefined) {
+  return useQuery({
+    queryKey: ['runs', runId],
+    queryFn: async () => {
+      const { data } = await apiClient.get<TestRunSummary>(`/runs/${runId}`);
+      return data;
+    },
+    enabled: !!runId,
+  });
+}
+
 export function useRunDetail(runId: string | undefined, refetchInterval?: number | false) {
   return useQuery({
     queryKey: ['runs', runId, 'detail'],
@@ -202,6 +213,44 @@ export function useInsightsSummary(recentRuns: number) {
     queryFn: async () => {
       const { data } = await apiClient.get<InsightsSummary>('/insights/summary', { params: { recentRuns } });
       return data;
+    },
+  });
+}
+
+export function usePinnedRuns() {
+  return useQuery({
+    queryKey: ['pinned-runs'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<TestRunSummary[]>('/runs/pinned');
+      return data;
+    },
+  });
+}
+
+export function usePinRun() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (runId: string) => {
+      const { data } = await apiClient.post<TestRunSummary>(`/runs/${runId}/pin`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['runs'] });
+      queryClient.invalidateQueries({ queryKey: ['pinned-runs'] });
+    },
+  });
+}
+
+export function useUnpinRun() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (runId: string) => {
+      const { data } = await apiClient.post<TestRunSummary>(`/runs/${runId}/unpin`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['runs'] });
+      queryClient.invalidateQueries({ queryKey: ['pinned-runs'] });
     },
   });
 }

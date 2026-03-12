@@ -103,6 +103,32 @@ public class RunHistoryController {
     }
 
     /**
+     * Get all pinned runs, newest first.
+     */
+    @GetMapping("/pinned")
+    public ResponseEntity<List<TestRunSummaryDTO>> getPinnedRuns() {
+        return ResponseEntity.ok(runHistoryService.getPinnedRuns());
+    }
+
+    /**
+     * Pin a run so it appears at the top of the list.
+     */
+    @PostMapping("/{runId}/pin")
+    public ResponseEntity<TestRunSummaryDTO> pinRun(@PathVariable String runId) {
+        log.info("Pinning run {}", runId);
+        return ResponseEntity.ok(runHistoryService.pinRun(runId));
+    }
+
+    /**
+     * Unpin a run.
+     */
+    @PostMapping("/{runId}/unpin")
+    public ResponseEntity<TestRunSummaryDTO> unpinRun(@PathVariable String runId) {
+        log.info("Unpinning run {}", runId);
+        return ResponseEntity.ok(runHistoryService.unpinRun(runId));
+    }
+
+    /**
      * Get archived runs with pagination.
      */
     @GetMapping("/archived")

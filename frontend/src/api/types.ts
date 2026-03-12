@@ -25,6 +25,7 @@ export interface TestRunSummary {
   skippedTests: number | null;
   passRate: number | null;
   archived: boolean;
+  pinned: boolean;
   label: string | null;
   jobName: string | null;
 }

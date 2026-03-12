@@ -38,6 +38,9 @@ public interface TestRunRepository extends JpaRepository<TestRun, String> {
 
     List<TestRun> findByStatusInOrderByStartTimeDesc(Collection<TestRun.RunStatus> statuses, Pageable pageable);
 
+    // ── Pin queries ───────────────────────────────────────────────────
+    List<TestRun> findByPinnedTrueAndArchivedFalseOrderByStartTimeDesc();
+
     // ── Archive queries ──────────────────────────────────────────────
     Page<TestRun> findByArchivedFalseOrderByStartTimeDesc(Pageable pageable);
 

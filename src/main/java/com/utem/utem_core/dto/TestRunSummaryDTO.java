@@ -21,6 +21,7 @@ public record TestRunSummaryDTO(
         Integer skippedTests,
         Double passRate,
         boolean archived,
+        boolean pinned,
         String label,
         String jobName
 ) {
@@ -48,6 +49,7 @@ public record TestRunSummaryDTO(
                 run.getSkippedTests(),
                 passRate,
                 run.isArchived(),
+                run.isPinned(),
                 run.getLabel(),
                 run.getJobName()
         );

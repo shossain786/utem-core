@@ -47,8 +47,13 @@ public class TestRun {
 
     private Integer skippedTests;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean archived = false;
+
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean pinned = false;
 
     @Column(length = 100)
     private String label;
