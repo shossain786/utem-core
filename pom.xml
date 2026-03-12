@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.utem</groupId>
 	<artifactId>utem-core</artifactId>
-	<version>0.2.0</version>
+	<version>0.3.0</version>
 	<name>utem-core</name>
 	<description>UTEM Core - Universal Test Execution Monitor. Real-time test reporting backend with WebSocket dashboard, analytics, and multi-framework adapter support.</description>
 	<licenses>

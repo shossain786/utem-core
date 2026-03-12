@@ -26,8 +26,8 @@
 - [ ] Quality gates — fail the build if flakiness score > threshold or new failures vs baseline
 
 ## User Experience
+- [x] Run tagging / custom labels UI — inline edit in Runs list and Run detail header ✅ v0.3.0
 - [ ] Pinned runs — bookmark important runs (release candidates, baselines)
-- [ ] Run tagging / custom labels UI — set labels directly in the dashboard, not just via CLI
 - [ ] Dark mode
 
 ## Multi-user / Teams

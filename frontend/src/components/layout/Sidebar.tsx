@@ -83,7 +83,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-sidebar-hover text-xs text-gray-500">
-        v0.2.0
+        v0.3.0
       </div>
     </aside>
   );

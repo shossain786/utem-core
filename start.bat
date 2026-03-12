@@ -18,4 +18,4 @@ echo.
 REM Open browser after 5 seconds (gives Spring Boot time to start)
 start "" cmd /c "timeout /t 5 >nul && start http://localhost:8080"
 
-java -jar "%~dp0target\utem-core-0.1.0.jar"
+java -jar "%~dp0target\utem-core-0.3.0.jar"
