@@ -1,13 +1,16 @@
 package com.utem.utem_core.controller;
 
+import com.utem.utem_core.dto.DiagnosisDTO;
 import com.utem.utem_core.dto.FailureClusterDTO;
 import com.utem.utem_core.dto.FailureHotspotDTO;
 import com.utem.utem_core.dto.FailureInsightsDTO;
+import com.utem.utem_core.service.FailureDiagnosisService;
 import com.utem.utem_core.service.FailureInsightsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +24,7 @@ import java.util.List;
 public class FailureInsightsController {
 
     private final FailureInsightsService failureInsightsService;
+    private final FailureDiagnosisService failureDiagnosisService;
 
     @GetMapping("/hotspots")
     public ResponseEntity<List<FailureHotspotDTO>> getHotspots(
@@ -40,6 +44,11 @@ public class FailureInsightsController {
     public ResponseEntity<FailureInsightsDTO> getSummary(
             @RequestParam(defaultValue = "30") int recentRuns) {
         return ResponseEntity.ok(failureInsightsService.getInsights(20, clamp(recentRuns, 1, 200)));
+    }
+
+    @GetMapping("/steps/{stepId}/diagnosis")
+    public ResponseEntity<DiagnosisDTO> getStepDiagnosis(@PathVariable String stepId) {
+        return ResponseEntity.ok(failureDiagnosisService.diagnoseStep(stepId));
     }
 
     private static int clamp(int value, int min, int max) {

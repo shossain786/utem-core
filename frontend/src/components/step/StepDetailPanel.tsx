@@ -1,6 +1,7 @@
 import { STEP_STATUS_COLORS, STEP_STATUS_TEXT_COLORS } from '@/utils/status';
 import { formatDuration, formatTimestamp, formatFileSize } from '@/utils/format';
 import { attachmentDownloadUrl, isImageAttachment, isVideoAttachment } from '@/utils/attachmentUtils';
+import { useStepDiagnosis } from '@/hooks/useApi';
 import type { TestStep, AttachmentSummary, AttachmentType } from '@/api/types';
 
 const ATTACHMENT_TYPE_ICONS: Record<AttachmentType, string> = {
@@ -88,6 +89,12 @@ function AttachmentItem({
   );
 }
 
+const CONFIDENCE_STYLES: Record<string, string> = {
+  HIGH:   'bg-orange-100 text-orange-700 border-orange-200',
+  MEDIUM: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+  LOW:    'bg-gray-100 text-gray-600 border-gray-200',
+};
+
 export default function StepDetailPanel({
   step,
   onClose,
@@ -97,18 +104,20 @@ export default function StepDetailPanel({
   onClose: () => void;
   onAttachmentClick?: (attachments: AttachmentSummary[], index: number) => void;
 }) {
+  const isFailed = step?.status === 'FAILED';
+  const { data: diagnosis, isLoading: diagLoading } = useStepDiagnosis(
+    isFailed ? step?.id : null
+  );
+
   if (!step) return null;
 
-  const hasError = step.status === 'FAILED' && (step.errorMessage || step.stackTrace);
+  const hasError = isFailed && (step.errorMessage || step.stackTrace);
   const hasAttachments = step.attachments.length > 0;
 
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/20 z-40"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
       {/* Panel */}
       <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white border-l border-gray-200 shadow-lg z-50 flex flex-col">
@@ -128,6 +137,7 @@ export default function StepDetailPanel({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="p-1 text-gray-400 hover:text-gray-600 rounded shrink-0"
             title="Close"
@@ -140,6 +150,37 @@ export default function StepDetailPanel({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
+
+          {/* Diagnosis Section */}
+          {isFailed && (
+            <div>
+              <h3 className="text-xs font-semibold text-gray-700 mb-2">Diagnosis</h3>
+              {diagLoading && (
+                <div className="p-3 rounded-md bg-gray-50 border border-gray-200 text-xs text-gray-400 animate-pulse">
+                  Analysing failure…
+                </div>
+              )}
+              {diagnosis && (
+                <div className="p-3 rounded-md bg-amber-50 border border-amber-200 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🔍</span>
+                    <span className="text-xs font-semibold text-amber-800">{diagnosis.category}</span>
+                    <span className={`ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded border ${CONFIDENCE_STYLES[diagnosis.confidence] ?? CONFIDENCE_STYLES.LOW}`}>
+                      {diagnosis.confidence}
+                    </span>
+                  </div>
+                  <p className="text-xs text-amber-900">{diagnosis.explanation}</p>
+                  <div className="pt-1 border-t border-amber-200">
+                    <p className="text-[11px] text-amber-700">
+                      <span className="font-medium">Suggestion: </span>
+                      {diagnosis.suggestion}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Error Section */}
           {hasError && (
             <div>

@@ -313,3 +313,10 @@ export interface Page<T> {
   last: boolean;
   empty: boolean;
 }
+
+export interface StepDiagnosis {
+  category: string;
+  explanation: string;
+  suggestion: string;
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+}

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel, StepDiagnosis } from '@/api/types';
 
 export function useRuns(page = 0, size = 20, refetchInterval?: number | false) {
   return useQuery({
@@ -381,5 +381,17 @@ export function useTestNotificationChannel() {
     mutationFn: async (id: number) => {
       await apiClient.post(`/notifications/${id}/test`);
     },
+  });
+}
+
+export function useStepDiagnosis(stepId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['diagnosis', stepId],
+    queryFn: async () => {
+      const { data } = await apiClient.get<StepDiagnosis>(`/failure-insights/steps/${stepId}/diagnosis`);
+      return data;
+    },
+    enabled: !!stepId,
+    staleTime: Infinity, // diagnosis is deterministic — no need to refetch
   });
 }

@@ -18,7 +18,7 @@
 
 ## Intelligence
 - [x] Failure clustering — group similar stack traces, hotspot detection ✅ v0.2.0
-- [ ] AI failure analysis — send failure + stack trace to Claude API, get plain-English diagnosis and suggested fix
+- [x] AI failure analysis — rule-based diagnosis engine (30+ patterns: NPE, assertions, Selenium, networking, Cucumber etc.), diagnosis panel in StepDetailPanel ✅ v0.5.0
 - [x] Flakiness scoring — per-test pass rate, flakiness badge, FlakinessPage ✅ v0.2.0
 
 ## CI/CD Integration
