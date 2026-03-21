@@ -22,12 +22,12 @@
 - [x] Flakiness scoring — per-test pass rate, flakiness badge, FlakinessPage ✅ v0.2.0
 
 ## CI/CD Integration
-- [ ] GitHub Actions / Jenkins plugin — post run summary as a PR comment with pass/fail badge
-- [ ] Quality gates — fail the build if flakiness score > threshold or new failures vs baseline
+- [x] GitHub Actions / Jenkins plugin — post run summary as a PR comment with pass/fail badge ✅ v0.6.0
+- [x] Quality gates — fail the build if flakiness score > threshold or new failures vs baseline ✅ v0.6.0
 
 ## User Experience
 - [x] Run tagging / custom labels UI — inline edit in Runs list and Run detail header ✅ v0.3.0
-- [x] Pinned runs — bookmark important runs (release candidates, baselines)
+- [x] Pinned runs — bookmark important runs (release candidates, baselines) ✅ v0.4.0
 - [ ] Dark mode
 
 ## Multi-user / Teams
