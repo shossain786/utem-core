@@ -320,3 +320,27 @@ export interface StepDiagnosis {
   suggestion: string;
   confidence: 'HIGH' | 'MEDIUM' | 'LOW';
 }
+
+export interface QualityGateViolation {
+  rule: string;
+  message: string;
+  actual: number;
+  threshold: number;
+}
+
+export interface QualityGateMetrics {
+  failRate: number;
+  avgFlakinessScore: number;
+  newFailures: number;
+  totalTests: number;
+  failedTests: number;
+  flakyTestCount: number;
+}
+
+export interface QualityGateResult {
+  runId: string;
+  passed: boolean;
+  overallStatus: 'PASSED' | 'FAILED';
+  violations: QualityGateViolation[];
+  metrics: QualityGateMetrics;
+}

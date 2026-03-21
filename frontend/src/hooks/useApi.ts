@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel, StepDiagnosis } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel, StepDiagnosis, QualityGateResult } from '@/api/types';
 
 export function useRuns(page = 0, size = 20, refetchInterval?: number | false) {
   return useQuery({
@@ -393,5 +393,24 @@ export function useStepDiagnosis(stepId: string | null | undefined) {
     },
     enabled: !!stepId,
     staleTime: Infinity, // diagnosis is deterministic — no need to refetch
+  });
+}
+
+export function useQualityGate(
+  runId: string | undefined,
+  params?: { maxFailRate?: number; maxFlakinessScore?: number; maxNewFailures?: number; baselineRunId?: string }
+) {
+  return useQuery({
+    queryKey: ['quality-gate', runId, params],
+    queryFn: async () => {
+      const { data } = await apiClient.get<QualityGateResult>(`/quality-gate/${runId}`, {
+        params,
+        // 422 is a meaningful gate-failed response, not an error — prevent axios from throwing
+        validateStatus: (s) => s === 200 || s === 422,
+      });
+      return data;
+    },
+    enabled: !!runId,
+    staleTime: 30_000,
   });
 }

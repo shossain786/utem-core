@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useRunDetail, useRunLabels, useUpdateRun, useRunById, usePinRun, useUnpinRun } from '@/hooks/useApi';
+import { useRunDetail, useRunLabels, useUpdateRun, useRunById, usePinRun, useUnpinRun, useQualityGate } from '@/hooks/useApi';
 import { useRunEvents, useRunSummary, useWebSocket } from '@/hooks/useWebSocket';
 import { RUN_STATUS_COLORS, RUN_STATUS_TEXT_COLORS } from '@/utils/status';
 import { formatDuration, formatRelativeTime } from '@/utils/format';
@@ -9,6 +9,7 @@ import StepDetailPanel from '@/components/step/StepDetailPanel';
 import AttachmentViewer from '@/components/attachment/AttachmentViewer';
 import { useAttachmentViewer } from '@/hooks/useAttachmentViewer';
 import ExportDropdown from '@/components/export/ExportDropdown';
+import QualityGateBadge from '@/components/qualitygate/QualityGateBadge';
 import type { TestStep } from '@/api/types';
 
 export default function RunDetailPage() {
@@ -25,6 +26,7 @@ export default function RunDetailPage() {
   const pinRun = usePinRun();
   const unpinRun = useUnpinRun();
   const isPinned = runSummary?.pinned ?? false;
+  const { data: gateResult } = useQualityGate(runId);
 
   // Fall back to polling every 10s when WebSocket is disconnected
   const { data: hierarchy, isLoading, isError, dataUpdatedAt } = useRunDetail(
@@ -74,6 +76,9 @@ export default function RunDetailPage() {
             />
             {hierarchy.status}
           </span>
+
+          {/* Quality gate badge */}
+          {gateResult && <QualityGateBadge gate={gateResult} />}
 
           {/* Run name */}
           <h1 className="text-lg font-bold text-gray-900">{hierarchy.name}</h1>
