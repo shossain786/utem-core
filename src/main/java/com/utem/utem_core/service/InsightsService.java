@@ -36,12 +36,12 @@ public class InsightsService {
      * <p>
      * Health score = 0.5 × avgPassRate + 0.3 × (100 − avgFlakinessRate) + 0.2 × (100 − slowTestPct)
      */
-    public InsightsSummaryDTO getSummary(int recentRuns) {
-        List<FailureHotspotDTO> allHotspots = failureInsightsService.getFailureHotspots(100, recentRuns);
-        List<FailureClusterDTO> allClusters = failureInsightsService.getFailureClusters(100, recentRuns);
-        List<SlowTestDTO> allSlowTests = performanceAnalysisService.getSlowestTests(100, recentRuns);
+    public InsightsSummaryDTO getSummary(int recentRuns, List<String> allowedProjectIds) {
+        List<FailureHotspotDTO> allHotspots = failureInsightsService.getFailureHotspots(100, recentRuns, allowedProjectIds);
+        List<FailureClusterDTO> allClusters = failureInsightsService.getFailureClusters(100, recentRuns, allowedProjectIds);
+        List<SlowTestDTO> allSlowTests = performanceAnalysisService.getSlowestTests(100, recentRuns, allowedProjectIds);
 
-        int runsAnalyzed = getRecentFinishedRunCount(recentRuns);
+        int runsAnalyzed = getRecentFinishedRunCount(recentRuns, allowedProjectIds);
 
         double healthScore = computeHealthScore(allHotspots, runsAnalyzed);
 
@@ -65,10 +65,12 @@ public class InsightsService {
 
     // ============ Private Helpers ============
 
-    private int getRecentFinishedRunCount(int limit) {
+    private int getRecentFinishedRunCount(int limit, List<String> allowedProjectIds) {
+        if (allowedProjectIds != null && allowedProjectIds.isEmpty()) return 0;
         int fetchSize = Math.min(limit * 2, 500);
-        List<TestRun> runs = testRunRepository
-                .findByStatusInOrderByStartTimeDesc(FINISHED_STATUSES, PageRequest.of(0, fetchSize));
+        List<TestRun> runs = allowedProjectIds == null
+                ? testRunRepository.findByStatusInOrderByStartTimeDesc(FINISHED_STATUSES, PageRequest.of(0, fetchSize))
+                : testRunRepository.findByStatusInAndProjectIdInOrderByStartTimeDesc(FINISHED_STATUSES, allowedProjectIds, PageRequest.of(0, fetchSize));
         return Math.min(runs.size(), limit);
     }
 

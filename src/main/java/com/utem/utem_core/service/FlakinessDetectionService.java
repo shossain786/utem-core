@@ -70,10 +70,12 @@ public class FlakinessDetectionService {
      * @return List of flaky tests sorted by flakiness rate descending
      */
     @Transactional(readOnly = true)
-    public List<FlakyTestDTO> detectFlakyTests(int minRuns, double threshold) {
+    public List<FlakyTestDTO> detectFlakyTests(int minRuns, double threshold, List<String> allowedProjectIds) {
+        if (allowedProjectIds != null && allowedProjectIds.isEmpty()) return List.of();
         // Get all distinct test names from scenario-level nodes
         List<TestNode> allTestCases = testNodeRepository.findAll().stream()
                 .filter(n -> TEST_CASE_TYPES.contains(n.getNodeType()))
+                .filter(n -> allowedProjectIds == null || (n.getTestRun() != null && allowedProjectIds.contains(n.getTestRun().getProjectId())))
                 .toList();
 
         // Group by test name + node type
@@ -168,8 +170,11 @@ public class FlakinessDetectionService {
      * Get overall flakiness report across recent N runs.
      */
     @Transactional(readOnly = true)
-    public FlakinessReportDTO getOverallFlakinessReport(int recentRunCount) {
-        List<TestRun> recentRuns = testRunRepository.findAllByOrderByStartTimeDesc();
+    public FlakinessReportDTO getOverallFlakinessReport(int recentRunCount, List<String> allowedProjectIds) {
+        if (allowedProjectIds != null && allowedProjectIds.isEmpty()) return new FlakinessReportDTO(0, 0, 0.0, List.of());
+        List<TestRun> recentRuns = allowedProjectIds == null
+                ? testRunRepository.findAllByOrderByStartTimeDesc()
+                : testRunRepository.findByProjectIdInOrderByStartTimeDesc(allowedProjectIds, org.springframework.data.domain.PageRequest.of(0, 500));
 
         if (recentRuns.size() > recentRunCount) {
             recentRuns = recentRuns.subList(0, recentRunCount);
@@ -219,8 +224,8 @@ public class FlakinessDetectionService {
      * Get the top N most flaky tests sorted by flakiness rate.
      */
     @Transactional(readOnly = true)
-    public List<FlakyTestDTO> getMostFlakyTests(int limit) {
-        List<FlakyTestDTO> all = detectFlakyTests(2, 0);
+    public List<FlakyTestDTO> getMostFlakyTests(int limit, List<String> allowedProjectIds) {
+        List<FlakyTestDTO> all = detectFlakyTests(2, 0, allowedProjectIds);
         return all.stream().limit(limit).toList();
     }
 

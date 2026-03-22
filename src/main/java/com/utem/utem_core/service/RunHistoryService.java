@@ -4,13 +4,17 @@ import com.utem.utem_core.dto.*;
 import com.utem.utem_core.entity.TestNode;
 import com.utem.utem_core.entity.TestRun;
 import com.utem.utem_core.entity.TestStep;
+import com.utem.utem_core.exception.ForbiddenException;
 import com.utem.utem_core.exception.TestRunNotFoundException;
 import com.utem.utem_core.repository.AttachmentRepository;
 import com.utem.utem_core.repository.TestNodeRepository;
 import com.utem.utem_core.repository.TestRunRepository;
 import com.utem.utem_core.repository.TestStepRepository;
+import com.utem.utem_core.security.AuthenticatedUser;
+import com.utem.utem_core.security.UserContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,9 @@ public class RunHistoryService {
     private final AttachmentStorageService attachmentStorageService;
     private final HierarchyReconstructionService hierarchyReconstructionService;
     private final RunQueryService runQueryService;
+
+    @Value("${utem.security.enabled:false}")
+    private boolean securityEnabled;
 
     /**
      * Get active (non-archived) runs with pagination, newest first.
@@ -203,6 +210,7 @@ public class RunHistoryService {
     public TestRunSummaryDTO getRunById(String runId) {
         TestRun run = testRunRepository.findById(runId)
                 .orElseThrow(() -> new TestRunNotFoundException(runId));
+        checkRunAccess(run);
         return TestRunSummaryDTO.from(run);
     }
 
@@ -212,6 +220,9 @@ public class RunHistoryService {
      */
     @Transactional(readOnly = true)
     public TestRunHierarchyDTO getRunDetail(String runId) {
+        TestRun run = testRunRepository.findById(runId)
+                .orElseThrow(() -> new TestRunNotFoundException(runId));
+        checkRunAccess(run);
         return hierarchyReconstructionService.getFullHierarchy(runId);
     }
 
@@ -381,5 +392,17 @@ public class RunHistoryService {
                 "failedRuns", failed,
                 "abortedRuns", aborted
         );
+    }
+
+    /**
+     * Throws ForbiddenException if the current user cannot access the given run's project.
+     * No-op when security is disabled or user is SUPER_ADMIN.
+     */
+    private void checkRunAccess(TestRun run) {
+        if (!securityEnabled) return;
+        AuthenticatedUser user = UserContextHolder.get();
+        if (user == null || !user.canAccessProject(run.getProjectId())) {
+            throw new ForbiddenException("Access denied to run " + run.getId());
+        }
     }
 }

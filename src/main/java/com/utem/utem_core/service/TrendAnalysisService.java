@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -31,8 +32,8 @@ public class TrendAnalysisService {
     private final TestRunRepository testRunRepository;
     private final TestNodeRepository testNodeRepository;
 
-    public TrendDataDTO getPassRateTrend(int limit) {
-        List<TestRun> runs = getRecentFinishedRuns(limit);
+    public TrendDataDTO getPassRateTrend(int limit, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(limit, allowedProjectIds);
         List<TrendDataDTO.TrendPoint> points = runs.stream()
                 .map(r -> {
                     Double value = (r.getPassedTests() != null && r.getTotalTests() != null && r.getTotalTests() > 0)
@@ -44,8 +45,8 @@ public class TrendAnalysisService {
         return new TrendDataDTO("PASS_RATE", limit, points);
     }
 
-    public TrendDataDTO getDurationTrend(int limit) {
-        List<TestRun> runs = getRecentFinishedRuns(limit);
+    public TrendDataDTO getDurationTrend(int limit, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(limit, allowedProjectIds);
         List<TrendDataDTO.TrendPoint> points = runs.stream()
                 .map(r -> {
                     Double value = (r.getEndTime() != null)
@@ -57,8 +58,8 @@ public class TrendAnalysisService {
         return new TrendDataDTO("DURATION", limit, points);
     }
 
-    public TrendDataDTO getTestCountTrend(int limit) {
-        List<TestRun> runs = getRecentFinishedRuns(limit);
+    public TrendDataDTO getTestCountTrend(int limit, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(limit, allowedProjectIds);
         List<TrendDataDTO.TrendPoint> points = runs.stream()
                 .map(r -> new TrendDataDTO.TrendPoint(
                         r.getId(), r.getName(), r.getStartTime(),
@@ -67,8 +68,8 @@ public class TrendAnalysisService {
         return new TrendDataDTO("TEST_COUNT", limit, points);
     }
 
-    public TrendDataDTO getFlakinessTrend(int limit) {
-        List<TestRun> runs = getRecentFinishedRuns(limit);
+    public TrendDataDTO getFlakinessTrend(int limit, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(limit, allowedProjectIds);
         List<TrendDataDTO.TrendPoint> points = runs.stream()
                 .map(r -> {
                     List<TestNode> testCases = testNodeRepository.findByTestRunIdAndNodeTypeIn(r.getId(), TEST_CASE_TYPES);
@@ -82,11 +83,12 @@ public class TrendAnalysisService {
     }
 
     /** Returns up to {@code limit} finished runs ordered oldest-first (for left-to-right charting). */
-    private List<TestRun> getRecentFinishedRuns(int limit) {
-        // Fetch more than limit to account for RUNNING/ABORTED runs interleaved
+    private List<TestRun> getRecentFinishedRuns(int limit, List<String> allowedProjectIds) {
+        if (allowedProjectIds != null && allowedProjectIds.isEmpty()) return List.of();
         int fetchSize = Math.min(limit * 2, 500);
-        List<TestRun> recent = testRunRepository
-                .findByStatusInOrderByStartTimeDesc(FINISHED_STATUSES, PageRequest.of(0, fetchSize));
+        List<TestRun> recent = allowedProjectIds == null
+                ? testRunRepository.findByStatusInOrderByStartTimeDesc(FINISHED_STATUSES, PageRequest.of(0, fetchSize))
+                : testRunRepository.findByStatusInAndProjectIdInOrderByStartTimeDesc(FINISHED_STATUSES, allowedProjectIds, PageRequest.of(0, fetchSize));
 
         List<TestRun> trimmed = recent.size() > limit ? recent.subList(0, limit) : recent;
         List<TestRun> result = new ArrayList<>(trimmed);

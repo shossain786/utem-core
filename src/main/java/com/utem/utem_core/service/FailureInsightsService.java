@@ -50,8 +50,8 @@ public class FailureInsightsService {
     /**
      * Returns tests with the highest failure rate across recent finished runs.
      */
-    public List<FailureHotspotDTO> getFailureHotspots(int limit, int recentRuns) {
-        List<TestRun> runs = getRecentFinishedRuns(recentRuns);
+    public List<FailureHotspotDTO> getFailureHotspots(int limit, int recentRuns, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(recentRuns, allowedProjectIds);
         if (runs.isEmpty()) return List.of();
 
         // runId → run map for lookup
@@ -124,8 +124,8 @@ public class FailureInsightsService {
      * Clusters error messages from failed steps across recent finished runs.
      * Uses normalized exact-match grouping.
      */
-    public List<FailureClusterDTO> getFailureClusters(int limit, int recentRuns) {
-        List<TestRun> runs = getRecentFinishedRuns(recentRuns);
+    public List<FailureClusterDTO> getFailureClusters(int limit, int recentRuns, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(recentRuns, allowedProjectIds);
         if (runs.isEmpty()) return List.of();
 
         // Collect all failed step error messages with context
@@ -193,21 +193,23 @@ public class FailureInsightsService {
 
     // ============ Combined ============
 
-    public FailureInsightsDTO getInsights(int limit, int recentRuns) {
-        List<TestRun> runs = getRecentFinishedRuns(recentRuns);
+    public FailureInsightsDTO getInsights(int limit, int recentRuns, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(recentRuns, allowedProjectIds);
         return new FailureInsightsDTO(
                 runs.size(),
-                getFailureHotspots(limit, recentRuns),
-                getFailureClusters(limit, recentRuns)
+                getFailureHotspots(limit, recentRuns, allowedProjectIds),
+                getFailureClusters(limit, recentRuns, allowedProjectIds)
         );
     }
 
     // ============ Private Helpers ============
 
-    private List<TestRun> getRecentFinishedRuns(int limit) {
+    private List<TestRun> getRecentFinishedRuns(int limit, List<String> allowedProjectIds) {
+        if (allowedProjectIds != null && allowedProjectIds.isEmpty()) return List.of();
         int fetchSize = Math.min(limit * 2, 500);
-        List<TestRun> recent = testRunRepository
-                .findByStatusInOrderByStartTimeDesc(FINISHED_STATUSES, PageRequest.of(0, fetchSize));
+        List<TestRun> recent = allowedProjectIds == null
+                ? testRunRepository.findByStatusInOrderByStartTimeDesc(FINISHED_STATUSES, PageRequest.of(0, fetchSize))
+                : testRunRepository.findByStatusInAndProjectIdInOrderByStartTimeDesc(FINISHED_STATUSES, allowedProjectIds, PageRequest.of(0, fetchSize));
         return recent.size() > limit ? recent.subList(0, limit) : recent;
     }
 

@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { useProjects, useCreateProject, useRegenerateApiKey, useDeleteProject } from '@/hooks/useApi';
-import type { Project } from '@/api/types';
+import { useProjects, useCreateProject, useRegenerateApiKey, useDeleteProject,
+         useProjectMembers, useAddProjectMember, useRemoveProjectMember, useUsers } from '@/hooks/useApi';
+import type { Project, ProjectMemberDTO } from '@/api/types';
+import type { MemberRole } from '@/api/types';
 
 export default function ProjectsPage() {
   const { data: projects, isLoading } = useProjects();
@@ -120,6 +122,8 @@ function ProjectCard({ project, keyVisible, copied, onToggleKey, onCopy, onRegen
   onRegenerate: () => void;
   onDelete: () => void;
 }) {
+  const [membersOpen, setMembersOpen] = useState(false);
+
   return (
     <div className={`bg-white border rounded-lg p-4 ${!project.active ? 'opacity-50' : ''}`}>
       <div className="flex items-start justify-between">
@@ -129,6 +133,10 @@ function ProjectCard({ project, keyVisible, copied, onToggleKey, onCopy, onRegen
           <p className="text-xs text-gray-400 mt-1">Created {new Date(project.createdAt).toLocaleDateString()}</p>
         </div>
         <div className="flex gap-2">
+          <button onClick={() => setMembersOpen(o => !o)}
+            className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
+            Members {membersOpen ? '▲' : '▼'}
+          </button>
           <button onClick={onRegenerate}
             className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
             title="Regenerate API key">
@@ -158,6 +166,99 @@ function ProjectCard({ project, keyVisible, copied, onToggleKey, onCopy, onRegen
       <p className="text-xs text-gray-400 mt-2">
         Add <code className="bg-gray-100 px-1 rounded">X-API-Key: {keyVisible ? project.apiKey : '***'}</code> to your reporter config
       </p>
+
+      {membersOpen && <MembersSection projectId={project.id} />}
+    </div>
+  );
+}
+
+function MembersSection({ projectId }: { projectId: string }) {
+  const { data: members, isLoading } = useProjectMembers(projectId);
+  const { data: allUsers } = useUsers();
+  const addMember = useAddProjectMember();
+  const removeMember = useRemoveProjectMember();
+
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [selectedRole, setSelectedRole] = useState<MemberRole>('VIEWER');
+
+  const memberUserIds = new Set(members?.map(m => m.userId) ?? []);
+  const availableUsers = allUsers?.filter(u => u.active && !memberUserIds.has(u.id)) ?? [];
+
+  function handleAdd(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedUserId) return;
+    addMember.mutate({ projectId, userId: selectedUserId, role: selectedRole }, {
+      onSuccess: () => setSelectedUserId(''),
+    });
+  }
+
+  return (
+    <div className="mt-4 border-t pt-3">
+      <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Members</h4>
+
+      {isLoading && <p className="text-xs text-gray-400">Loading…</p>}
+
+      {!isLoading && members?.length === 0 && (
+        <p className="text-xs text-gray-400 mb-2">No members yet. Add users below.</p>
+      )}
+
+      {members && members.length > 0 && (
+        <div className="space-y-1 mb-3">
+          {members.map(member => (
+            <MemberRow
+              key={member.userId}
+              member={member}
+              onRemove={() => removeMember.mutate({ projectId, userId: member.userId })}
+            />
+          ))}
+        </div>
+      )}
+
+      <form onSubmit={handleAdd} className="flex gap-2 items-center">
+        <select
+          value={selectedUserId}
+          onChange={e => setSelectedUserId(e.target.value)}
+          title="Select user to add"
+          className="flex-1 border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+        >
+          <option value="">Add user…</option>
+          {availableUsers.map(u => (
+            <option key={u.id} value={u.id}>{u.username}</option>
+          ))}
+        </select>
+        <select
+          value={selectedRole}
+          onChange={e => setSelectedRole(e.target.value as MemberRole)}
+          title="Select member role"
+          className="border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+        >
+          <option value="VIEWER">Viewer</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+        <button type="submit" disabled={!selectedUserId || addMember.isPending}
+          className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+          Add
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function MemberRow({ member, onRemove }: { member: ProjectMemberDTO; onRemove: () => void }) {
+  return (
+    <div className="flex items-center justify-between bg-gray-50 rounded px-2 py-1">
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-gray-700">{member.username}</span>
+        <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+          member.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-gray-200 text-gray-600'
+        }`}>
+          {member.role}
+        </span>
+      </div>
+      <button type="button" onClick={onRemove}
+        className="text-xs text-red-500 hover:text-red-700">
+        Remove
+      </button>
     </div>
   );
 }

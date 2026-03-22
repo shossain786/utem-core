@@ -37,8 +37,8 @@ public class PerformanceAnalysisService {
     /**
      * Returns the slowest tests by average duration across recent finished runs.
      */
-    public List<SlowTestDTO> getSlowestTests(int limit, int recentRuns) {
-        List<TestRun> runs = getRecentFinishedRuns(recentRuns);
+    public List<SlowTestDTO> getSlowestTests(int limit, int recentRuns, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(recentRuns, allowedProjectIds);
         if (runs.isEmpty()) return List.of();
 
         // key: "name|nodeType" → list of (duration, runId)
@@ -84,8 +84,8 @@ public class PerformanceAnalysisService {
     /**
      * Returns average/max/min/total duration broken down by node type.
      */
-    public Map<String, DurationStatsDTO> getDurationByNodeType(int recentRuns) {
-        List<TestRun> runs = getRecentFinishedRuns(recentRuns);
+    public Map<String, DurationStatsDTO> getDurationByNodeType(int recentRuns, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(recentRuns, allowedProjectIds);
         if (runs.isEmpty()) return Map.of();
 
         // nodeType → list of durations
@@ -116,21 +116,23 @@ public class PerformanceAnalysisService {
     /**
      * Combined performance report.
      */
-    public PerformanceReportDTO getPerformanceReport(int limit, int recentRuns) {
-        List<TestRun> runs = getRecentFinishedRuns(recentRuns);
+    public PerformanceReportDTO getPerformanceReport(int limit, int recentRuns, List<String> allowedProjectIds) {
+        List<TestRun> runs = getRecentFinishedRuns(recentRuns, allowedProjectIds);
         return new PerformanceReportDTO(
                 runs.size(),
-                getSlowestTests(limit, recentRuns),
-                getDurationByNodeType(recentRuns)
+                getSlowestTests(limit, recentRuns, allowedProjectIds),
+                getDurationByNodeType(recentRuns, allowedProjectIds)
         );
     }
 
     // ============ Private Helpers ============
 
-    private List<TestRun> getRecentFinishedRuns(int limit) {
+    private List<TestRun> getRecentFinishedRuns(int limit, List<String> allowedProjectIds) {
+        if (allowedProjectIds != null && allowedProjectIds.isEmpty()) return List.of();
         int fetchSize = Math.min(limit * 2, 500);
-        List<TestRun> recent = testRunRepository
-                .findByStatusInOrderByStartTimeDesc(FINISHED_STATUSES, PageRequest.of(0, fetchSize));
+        List<TestRun> recent = allowedProjectIds == null
+                ? testRunRepository.findByStatusInOrderByStartTimeDesc(FINISHED_STATUSES, PageRequest.of(0, fetchSize))
+                : testRunRepository.findByStatusInAndProjectIdInOrderByStartTimeDesc(FINISHED_STATUSES, allowedProjectIds, PageRequest.of(0, fetchSize));
         return recent.size() > limit ? recent.subList(0, limit) : recent;
     }
 }

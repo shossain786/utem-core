@@ -79,6 +79,13 @@ public interface TestRunRepository extends JpaRepository<TestRun, String> {
     @Query("SELECT r FROM TestRun r WHERE r.archived = false AND r.label = :label AND r.projectId IN :projectIds ORDER BY r.startTime DESC")
     Page<TestRun> findByArchivedFalseAndLabelAndProjectIdInOrderByStartTimeDesc(@Param("label") String label, @Param("projectIds") List<String> projectIds, Pageable pageable);
 
+    // ── Project-scoped analytics queries ─────────────────────────────
+    @Query("SELECT r FROM TestRun r WHERE r.status IN :statuses AND r.projectId IN :projectIds ORDER BY r.startTime DESC")
+    List<TestRun> findByStatusInAndProjectIdInOrderByStartTimeDesc(@Param("statuses") Collection<TestRun.RunStatus> statuses, @Param("projectIds") List<String> projectIds, Pageable pageable);
+
+    @Query("SELECT r FROM TestRun r WHERE r.projectId IN :projectIds ORDER BY r.startTime DESC")
+    List<TestRun> findByProjectIdInOrderByStartTimeDesc(@Param("projectIds") List<String> projectIds, Pageable pageable);
+
     long countByStatus(TestRun.RunStatus status);
 
     @Query("SELECT r FROM TestRun r WHERE (:status IS NULL OR r.status = :status) " +

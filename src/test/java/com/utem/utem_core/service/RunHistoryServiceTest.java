@@ -212,6 +212,8 @@ class RunHistoryServiceTest {
         @Test
         @DisplayName("Should delegate to HierarchyReconstructionService")
         void shouldDelegateToHierarchyService() {
+            TestRun run = createTestRun("run-1", "Test Run", TestRun.RunStatus.PASSED, 10, 8, 1, 1);
+            when(testRunRepository.findById("run-1")).thenReturn(Optional.of(run));
             TestRunHierarchyDTO hierarchy = new TestRunHierarchyDTO(
                     "run-1", "Test Run", null, TestRun.RunStatus.PASSED,
                     timestamp, timestamp, NodeStatistics.empty(), Collections.emptyList());

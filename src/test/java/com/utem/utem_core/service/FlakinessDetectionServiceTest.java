@@ -160,7 +160,7 @@ class FlakinessDetectionServiceTest {
 
             when(testNodeRepository.findAll()).thenReturn(List.of(n1, n2, n3, s1, s2, s3));
 
-            List<FlakyTestDTO> result = service.detectFlakyTests(2, 0);
+            List<FlakyTestDTO> result = service.detectFlakyTests(2, 0, null);
 
             assertThat(result).hasSize(1);
             assertThat(result.get(0).testName()).isEqualTo("Login Test");
@@ -179,7 +179,7 @@ class FlakinessDetectionServiceTest {
 
             when(testNodeRepository.findAll()).thenReturn(List.of(n1));
 
-            List<FlakyTestDTO> result = service.detectFlakyTests(2, 0);
+            List<FlakyTestDTO> result = service.detectFlakyTests(2, 0, null);
 
             assertThat(result).isEmpty();
         }
@@ -196,7 +196,7 @@ class FlakinessDetectionServiceTest {
 
             when(testNodeRepository.findAll()).thenReturn(List.of(n1, n2));
 
-            List<FlakyTestDTO> result = service.detectFlakyTests(2, 0);
+            List<FlakyTestDTO> result = service.detectFlakyTests(2, 0, null);
 
             // Framework marked = 100% flakiness rate
             assertThat(result).hasSize(1);
@@ -223,7 +223,7 @@ class FlakinessDetectionServiceTest {
 
             when(testNodeRepository.findAll()).thenReturn(List.of(a1, a2, a3, b1, b2, b3));
 
-            List<FlakyTestDTO> result = service.detectFlakyTests(2, 0);
+            List<FlakyTestDTO> result = service.detectFlakyTests(2, 0, null);
 
             assertThat(result).hasSize(2);
             assertThat(result.get(0).flakinessRate()).isGreaterThanOrEqualTo(result.get(1).flakinessRate());
@@ -328,7 +328,7 @@ class FlakinessDetectionServiceTest {
             when(testNodeRepository.findByTestRunIdAndNodeTypeIn(eq("run-2"), anyCollection()))
                     .thenReturn(List.of(n2, n4));
 
-            FlakinessReportDTO report = service.getOverallFlakinessReport(10);
+            FlakinessReportDTO report = service.getOverallFlakinessReport(10, null);
 
             assertThat(report.totalTests()).isEqualTo(2); // 2 distinct tests
             assertThat(report.flakyTests()).isEqualTo(1); // Login Test is flaky
@@ -353,7 +353,7 @@ class FlakinessDetectionServiceTest {
 
             when(testNodeRepository.findAll()).thenReturn(List.of(n1, n2, n3, n4));
 
-            List<FlakyTestDTO> result = service.getMostFlakyTests(1);
+            List<FlakyTestDTO> result = service.getMostFlakyTests(1, null);
 
             assertThat(result).hasSize(1);
         }
@@ -369,7 +369,7 @@ class FlakinessDetectionServiceTest {
 
             when(testNodeRepository.findAll()).thenReturn(List.of(n1, n2));
 
-            List<FlakyTestDTO> result = service.getMostFlakyTests(5);
+            List<FlakyTestDTO> result = service.getMostFlakyTests(5, null);
 
             assertThat(result).isEmpty();
         }
