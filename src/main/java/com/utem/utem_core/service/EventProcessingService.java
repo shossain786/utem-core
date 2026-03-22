@@ -3,17 +3,19 @@ package com.utem.utem_core.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utem.utem_core.dto.EventPayload;
+import com.utem.utem_core.dto.FlakyTestDTO;
 import com.utem.utem_core.dto.websocket.RunSummaryMessage;
 import com.utem.utem_core.dto.websocket.WebSocketEventMessage;
 import com.utem.utem_core.entity.*;
 import com.utem.utem_core.notification.NotificationService;
-import com.utem.utem_core.service.NotificationChannelService;
 import com.utem.utem_core.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +33,10 @@ public class EventProcessingService {
     private final Optional<WebSocketBroadcasterService> broadcasterService;
     private final NotificationService notificationService;
     private final NotificationChannelService notificationChannelService;
+    private final FlakinessDetectionService flakinessDetectionService;
+
+    @Value("${utem.notification.flakiness-threshold:0}")
+    private double flakinessThreshold;
 
     private final Map<String, String> eventToTestRunMap = new ConcurrentHashMap<>();
     private final Map<String, String> eventToTestNodeMap = new ConcurrentHashMap<>();
@@ -133,6 +139,7 @@ public class EventProcessingService {
             broadcastSummary(testRun.getId(), testRun);
             notificationService.notifyRunCompleted(testRun);
             notificationChannelService.notifyRunCompleted(testRun);
+            checkFlakinessThreshold(testRun);
         });
     }
 
@@ -386,5 +393,21 @@ public class EventProcessingService {
             RunSummaryMessage summary = RunSummaryMessage.from(runId, testRun);
             broadcaster.broadcastSummary(runId, summary);
         });
+    }
+
+    private void checkFlakinessThreshold(TestRun testRun) {
+        if (flakinessThreshold <= 0) return;
+        try {
+            List<FlakyTestDTO> breached = flakinessDetectionService.getFlakinessReport(testRun.getId())
+                    .topFlakyTests().stream()
+                    .filter(t -> t.flakinessRate() >= flakinessThreshold)
+                    .toList();
+            if (!breached.isEmpty()) {
+                log.info("Flakiness threshold {}% breached by {} test(s) in run {}", flakinessThreshold, breached.size(), testRun.getId());
+                notificationService.notifyFlakinessThresholdBreached(testRun, breached, flakinessThreshold);
+            }
+        } catch (Exception e) {
+            log.error("Flakiness threshold check failed for run {}: {}", testRun.getId(), e.getMessage());
+        }
     }
 }

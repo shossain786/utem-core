@@ -4,7 +4,7 @@
 - [x] pytest reporter (`utem-pytest-reporter`) — PyPI ✅ v0.1.0
 - [x] TestNG reporter (`utem-reporter-testng`) — Maven Central ✅ v0.1.1
 - [x] Playwright reporter (`utem-reporter-playwright`) — npm ✅ v0.1.5
-- [x] Jest reporter (`utem-jest-reporter`) — code complete, publish to npm pending
+- [x] Jest reporter (`utem-jest-reporter`) — npm ✅ v0.1.0
 - [ ] Cypress reporter
 - [ ] Robot Framework listener
 
@@ -14,7 +14,7 @@
 - [x] Email notifications — HTML email via SMTP ✅ v0.2.0
 - [x] Webhooks — generic HTTP POST JSON (Jenkins, custom CI) ✅ v0.2.0
 - [x] Dashboard UI to manage channels (add/edit/delete/test/toggle) ✅ v0.2.0
-- [ ] Notify on flakiness threshold breached
+- [x] Notify on flakiness threshold breached — alert all channels when tests exceed configured flakiness % ✅ v0.7.0
 
 ## Intelligence
 - [x] Failure clustering — group similar stack traces, hotspot detection ✅ v0.2.0

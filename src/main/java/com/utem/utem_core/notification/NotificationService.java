@@ -1,5 +1,6 @@
 package com.utem.utem_core.notification;
 
+import com.utem.utem_core.dto.FlakyTestDTO;
 import com.utem.utem_core.entity.TestRun;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,18 @@ public class NotificationService {
                 log.debug("Notification plugin '{}' fired for run {}", plugin.getName(), run.getId());
             } catch (Exception e) {
                 log.error("Notification plugin '{}' failed for run {}: {}", plugin.getName(), run.getId(), e.getMessage(), e);
+            }
+        }
+    }
+
+    public void notifyFlakinessThresholdBreached(TestRun run, List<FlakyTestDTO> flakyTests, double threshold) {
+        for (NotificationPlugin plugin : plugins) {
+            if (!plugin.isEnabled()) continue;
+            try {
+                plugin.onFlakinessThresholdBreached(run, flakyTests, threshold);
+                log.debug("Flakiness alert plugin '{}' fired for run {}", plugin.getName(), run.getId());
+            } catch (Exception e) {
+                log.error("Flakiness alert plugin '{}' failed for run {}: {}", plugin.getName(), run.getId(), e.getMessage(), e);
             }
         }
     }

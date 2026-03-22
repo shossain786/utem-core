@@ -1,5 +1,6 @@
 package com.utem.utem_core.notification;
 
+import com.utem.utem_core.dto.FlakyTestDTO;
 import com.utem.utem_core.entity.TestRun;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Sends a Slack Block Kit notification via an incoming webhook when a test run completes.
@@ -99,6 +101,53 @@ public class SlackNotificationPlugin implements NotificationPlugin {
                 +   "{\"type\":\"mrkdwn\",\"text\":\"*Results*\\n" + results + "\"},"
                 +   "{\"type\":\"mrkdwn\",\"text\":\"*Pass Rate*\\n" + String.format("%.1f%%", rate) + "\"}"
                 + "]},"
+                + "{\"type\":\"actions\",\"elements\":[{"
+                +   "\"type\":\"button\","
+                +   "\"text\":{\"type\":\"plain_text\",\"text\":\"View in UTEM\"},"
+                +   "\"url\":\"" + url + "\""
+                + "}]}"
+                + "]}";
+    }
+
+    @Override
+    public void onFlakinessThresholdBreached(TestRun run, List<FlakyTestDTO> flakyTests, double threshold) {
+        String body = buildFlakinessBlocks(run, flakyTests, threshold);
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(webhookUrl))
+                    .header("Content-Type", "application/json")
+                    .timeout(Duration.ofSeconds(10))
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 400) {
+                log.warn("Slack flakiness alert returned HTTP {} for run {}", response.statusCode(), run.getId());
+            }
+        } catch (IOException e) {
+            log.error("Slack flakiness alert failed for run {}: {}", run.getId(), e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Slack flakiness alert interrupted for run {}", run.getId());
+        }
+    }
+
+    private String buildFlakinessBlocks(TestRun run, List<FlakyTestDTO> flakyTests, double threshold) {
+        String url = dashboardBaseUrl.replaceAll("/+$", "") + "/#/runs/" + run.getId();
+        StringBuilder testList = new StringBuilder();
+        flakyTests.stream().limit(5).forEach(t ->
+            testList.append("• ").append(escape(t.testName()))
+                    .append(" (").append(String.format("%.0f%%", t.flakinessRate())).append(")\\n")
+        );
+        if (flakyTests.size() > 5) {
+            testList.append("• …and ").append(flakyTests.size() - 5).append(" more");
+        }
+        return "{"
+                + "\"blocks\":["
+                + "{\"type\":\"header\",\"text\":{\"type\":\"plain_text\","
+                +   "\"text\":\":warning: Flakiness Alert — " + escape(run.getName()) + "\"}},"
+                + "{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\","
+                +   "\"text\":\"" + flakyTests.size() + " test(s) exceeded the flakiness threshold of "
+                +   String.format("%.0f%%", threshold) + ":\\n" + testList + "\"}},"
                 + "{\"type\":\"actions\",\"elements\":[{"
                 +   "\"type\":\"button\","
                 +   "\"text\":{\"type\":\"plain_text\",\"text\":\"View in UTEM\"},"

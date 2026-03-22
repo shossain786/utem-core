@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.utem.utem_core.entity.*;
 import com.utem.utem_core.notification.NotificationService;
 import com.utem.utem_core.repository.*;
+import com.utem.utem_core.service.FlakinessDetectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,9 @@ class EventProcessingServiceTest {
     @Mock
     private NotificationChannelService notificationChannelService;
 
+    @Mock
+    private FlakinessDetectionService flakinessDetectionService;
+
     private ObjectMapper objectMapper;
     private EventProcessingService eventProcessingService;
 
@@ -61,7 +65,8 @@ class EventProcessingServiceTest {
                 objectMapper,
                 Optional.empty(),
                 notificationService,
-                notificationChannelService
+                notificationChannelService,
+                flakinessDetectionService
         );
     }
 

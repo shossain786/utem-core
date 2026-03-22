@@ -1,5 +1,6 @@
 package com.utem.utem_core.notification;
 
+import com.utem.utem_core.dto.FlakyTestDTO;
 import com.utem.utem_core.entity.TestRun;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Sends a JSON webhook notification to a Jenkins Generic Webhook Trigger endpoint
@@ -92,6 +94,42 @@ public class JenkinsNotificationPlugin implements NotificationPlugin {
                 + "\"skipped\":" + skipped + ","
                 + "\"dashboardUrl\":\"" + dashboardUrl + "\""
                 + "}";
+    }
+
+    @Override
+    public void onFlakinessThresholdBreached(TestRun run, List<FlakyTestDTO> flakyTests, double threshold) {
+        String dashboardUrl = dashboardBaseUrl.replaceAll("/+$", "") + "/runs/" + run.getId();
+        StringBuilder testNames = new StringBuilder("[");
+        flakyTests.forEach(t -> testNames.append("\"").append(escape(t.testName())).append("\","));
+        if (testNames.charAt(testNames.length() - 1) == ',') testNames.deleteCharAt(testNames.length() - 1);
+        testNames.append("]");
+
+        String payload = "{"
+                + "\"event\":\"FLAKINESS_THRESHOLD_BREACHED\","
+                + "\"runId\":\"" + run.getId() + "\","
+                + "\"runName\":\"" + escape(run.getName()) + "\","
+                + "\"flakyTestCount\":" + flakyTests.size() + ","
+                + "\"threshold\":" + threshold + ","
+                + "\"flakyTests\":" + testNames + ","
+                + "\"dashboardUrl\":\"" + dashboardUrl + "\""
+                + "}";
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(webhookUrl))
+                    .header("Content-Type", "application/json")
+                    .timeout(Duration.ofSeconds(10))
+                    .POST(HttpRequest.BodyPublishers.ofString(payload))
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 400) {
+                log.warn("Jenkins flakiness alert returned HTTP {} for run {}", response.statusCode(), run.getId());
+            }
+        } catch (IOException e) {
+            log.error("Jenkins flakiness alert failed for run {}: {}", run.getId(), e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Jenkins flakiness alert interrupted for run {}", run.getId());
+        }
     }
 
     private static String escape(String s) {

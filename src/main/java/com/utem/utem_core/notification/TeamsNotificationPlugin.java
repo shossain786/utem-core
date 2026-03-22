@@ -1,5 +1,6 @@
 package com.utem.utem_core.notification;
 
+import com.utem.utem_core.dto.FlakyTestDTO;
 import com.utem.utem_core.entity.TestRun;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Sends a Microsoft Teams MessageCard notification via an incoming webhook
@@ -102,6 +104,57 @@ public class TeamsNotificationPlugin implements NotificationPlugin {
                 +   "\"facts\":["
                 +     "{\"name\":\"Status\",\"value\":\"" + statusLabel + "\"},"
                 +     "{\"name\":\"Results\",\"value\":\"" + results + "\"}"
+                +   "],"
+                +   "\"potentialAction\":[{"
+                +     "\"@type\":\"OpenUri\","
+                +     "\"name\":\"View in UTEM\","
+                +     "\"targets\":[{\"os\":\"default\",\"uri\":\"" + dashboardUrl + "\"}]"
+                +   "}]"
+                + "}]}";
+    }
+
+    @Override
+    public void onFlakinessThresholdBreached(TestRun run, List<FlakyTestDTO> flakyTests, double threshold) {
+        String card = buildFlakinessCard(run, flakyTests, threshold);
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(webhookUrl))
+                    .header("Content-Type", "application/json")
+                    .timeout(Duration.ofSeconds(10))
+                    .POST(HttpRequest.BodyPublishers.ofString(card))
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 400) {
+                log.warn("Teams flakiness alert returned HTTP {} for run {}", response.statusCode(), run.getId());
+            }
+        } catch (IOException e) {
+            log.error("Teams flakiness alert failed for run {}: {}", run.getId(), e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Teams flakiness alert interrupted for run {}", run.getId());
+        }
+    }
+
+    private String buildFlakinessCard(TestRun run, List<FlakyTestDTO> flakyTests, double threshold) {
+        String dashboardUrl = dashboardBaseUrl.replaceAll("/+$", "") + "/runs/" + run.getId();
+        StringBuilder testList = new StringBuilder();
+        flakyTests.stream().limit(5).forEach(t ->
+            testList.append(escape(t.testName()))
+                    .append(" (").append(String.format("%.0f%%", t.flakinessRate())).append("), ")
+        );
+        if (flakyTests.size() > 5) testList.append("and ").append(flakyTests.size() - 5).append(" more");
+
+        return "{"
+                + "\"@type\":\"MessageCard\","
+                + "\"@context\":\"http://schema.org/extensions\","
+                + "\"themeColor\":\"FF8800\","
+                + "\"summary\":\"UTEM Flakiness Alert: " + escape(run.getName()) + "\","
+                + "\"sections\":[{"
+                +   "\"activityTitle\":\"⚠️ Flakiness Alert: " + escape(run.getName()) + "\","
+                +   "\"facts\":["
+                +     "{\"name\":\"Flaky Tests\",\"value\":\"" + flakyTests.size() + "\"},"
+                +     "{\"name\":\"Threshold\",\"value\":\"" + String.format("%.0f%%", threshold) + "\"},"
+                +     "{\"name\":\"Tests\",\"value\":\"" + testList + "\"}"
                 +   "],"
                 +   "\"potentialAction\":[{"
                 +     "\"@type\":\"OpenUri\","
