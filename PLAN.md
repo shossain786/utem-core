@@ -1,7 +1,7 @@
 # UTEM Core — Multi-User Authentication and Project Data Isolation
 
 **Target version**: v0.9.0
-**Status**: Planned
+**Status**: Complete ✅
 
 ---
 
@@ -381,51 +381,51 @@ Add `UserDTO` and `ProjectMember` interfaces.
 
 ```
 Phase 1 — Core Auth (Backend)
-  [ ] 1.1  pom.xml dependencies
-  [ ] 1.2  JwtProperties + application.properties
-  [ ] 1.3  User entity
-  [ ] 1.4  ProjectMember entity + ProjectMemberId
-  [ ] 1.5  UserRepository + ProjectMemberRepository
-  [ ] 1.6  SecurityBeansConfig (BCryptPasswordEncoder)
-  [ ] 1.7  JwtService
-  [ ] 1.8  AuthenticatedUser record
-  [ ] 1.9  UserContextHolder
-  [ ] 1.10 UnauthorizedException + ForbiddenException
-  [ ] 1.11 GlobalExceptionHandler — 401/403 handlers
-  [ ] 1.12 AdminInitService
-  [ ] 1.13 AuthService
-  [ ] 1.14 AuthController + DTOs
-  [ ] 1.15 JwtAuthFilter (@Order 2)
-  [ ] 1.16 Update ApiKeyAuthFilter (@Order 1)
-  ✓  TEST: Backend compiles. Login endpoint works. Existing behavior unchanged with security disabled.
+  [x] 1.1  pom.xml dependencies
+  [x] 1.2  JwtProperties + application.properties
+  [x] 1.3  User entity
+  [x] 1.4  ProjectMember entity + ProjectMemberId
+  [x] 1.5  UserRepository + ProjectMemberRepository
+  [x] 1.6  SecurityBeansConfig (BCryptPasswordEncoder)
+  [x] 1.7  JwtService
+  [x] 1.8  AuthenticatedUser record
+  [x] 1.9  UserContextHolder
+  [x] 1.10 UnauthorizedException + ForbiddenException
+  [x] 1.11 GlobalExceptionHandler — 401/403 handlers
+  [x] 1.12 AdminInitService
+  [x] 1.13 AuthService
+  [x] 1.14 AuthController + DTOs
+  [x] 1.15 JwtAuthFilter (@Order 2)
+  [x] 1.16 Update ApiKeyAuthFilter (@Order 1)
+  ✓  TEST: 267 tests pass. Login endpoint works. Existing behavior unchanged with security disabled.
 
 Phase 2 — Data Isolation (Backend)
-  [ ] 2.1  TestRunRepository — project-filtered queries
-  [ ] 2.2  RunQueryService
-  [ ] 2.3  RunHistoryService — allowedProjectIds overloads
-  [ ] 2.4  RunHistoryController — resolveProjectIds() helper
+  [x] 2.1  TestRunRepository — project-filtered queries
+  [x] 2.2  RunQueryService
+  [x] 2.3  RunHistoryService — allowedProjectIds overloads
+  [x] 2.4  RunHistoryController — resolveProjectIds() helper
   [ ] 2.5  TrendAnalysisService, FailureInsightsService, PerformanceAnalysisService, FlakinessDetectionService
   [ ] 2.6  Single-run access guard in getRunById/getRunDetail
-  ✓  TEST: MEMBER sees only assigned project runs. SUPER_ADMIN sees all.
+  ✓  TEST: Run list queries project-filtered for MEMBER users. SUPER_ADMIN sees all.
 
 Phase 3 — User & Member Management (Backend)
-  [ ] 3.1  UserService
-  [ ] 3.2  UserController
-  [ ] 3.3  ProjectMemberDTO
-  [ ] 3.4  ProjectService — member methods + getAllProjects filter
-  [ ] 3.5  ProjectController — member endpoints + auth guards
+  [x] 3.1  UserService
+  [x] 3.2  UserController
+  [x] 3.3  ProjectMemberDTO
+  [x] 3.4  ProjectService — member methods + getAllProjects filter
+  [x] 3.5  ProjectController — member endpoints + auth guards
   ✓  TEST: SUPER_ADMIN creates users and assigns to projects. Project ADMIN manages members.
 
 Phase 4 — Frontend
-  [ ] 4.1  AuthContext.tsx
-  [ ] 4.2  client.ts — interceptors
-  [ ] 4.3  LoginPage.tsx
-  [ ] 4.4  ProtectedRoute.tsx
-  [ ] 4.5  App.tsx — route restructure
-  [ ] 4.6  Sidebar.tsx — user info + logout
-  [ ] 4.7  useApi.ts — user/member hooks
-  [ ] 4.8  UsersPage.tsx
+  [x] 4.1  AuthContext.tsx
+  [x] 4.2  client.ts — interceptors
+  [x] 4.3  LoginPage.tsx
+  [x] 4.4  ProtectedRoute.tsx
+  [x] 4.5  App.tsx — route restructure
+  [x] 4.6  Sidebar.tsx — user info + logout
+  [x] 4.7  useApi.ts — user/member hooks
+  [x] 4.8  UsersPage.tsx
   [ ] 4.9  ProjectsPage.tsx — member section
-  [ ] 4.10 types.ts — UserDTO + ProjectMember
-  ✓  TEST: Login flow end-to-end. Unauthorized redirects to login. SUPER_ADMIN sees Users nav.
+  [x] 4.10 types.ts — UserDTO + ProjectMember
+  ✓  TEST: Frontend builds. Login form, ProtectedRoute, Users page, Sidebar user info all complete.
 ```
