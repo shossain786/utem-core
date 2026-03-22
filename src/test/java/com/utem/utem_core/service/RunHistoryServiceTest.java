@@ -51,6 +51,9 @@ class RunHistoryServiceTest {
     @Mock
     private HierarchyReconstructionService hierarchyReconstructionService;
 
+    @Mock
+    private RunQueryService runQueryService;
+
     private RunHistoryService service;
 
     private Instant timestamp;
@@ -64,7 +67,8 @@ class RunHistoryServiceTest {
                 testStepRepository,
                 attachmentRepository,
                 attachmentStorageService,
-                hierarchyReconstructionService
+                hierarchyReconstructionService,
+                runQueryService
         );
     }
 
@@ -111,9 +115,9 @@ class RunHistoryServiceTest {
             TestRun run2 = createTestRun("run-2", "Run 2", TestRun.RunStatus.FAILED, 10, 5, 4, 1);
             Page<TestRun> page = new PageImpl<>(List.of(run1, run2), PageRequest.of(0, 10), 2);
 
-            when(testRunRepository.findByArchivedFalseOrderByStartTimeDesc(any(PageRequest.class))).thenReturn(page);
+            when(runQueryService.getActiveRuns(isNull(), any(PageRequest.class))).thenReturn(page);
 
-            Page<TestRunSummaryDTO> result = service.getAllRuns(0, 10);
+            Page<TestRunSummaryDTO> result = service.getAllRuns(0, 10, null);
 
             assertThat(result.getContent()).hasSize(2);
             assertThat(result.getContent().get(0).name()).isEqualTo("Run 1");
@@ -125,9 +129,9 @@ class RunHistoryServiceTest {
         @DisplayName("Should return empty page when no runs exist")
         void shouldReturnEmptyPage() {
             Page<TestRun> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
-            when(testRunRepository.findByArchivedFalseOrderByStartTimeDesc(any(PageRequest.class))).thenReturn(emptyPage);
+            when(runQueryService.getActiveRuns(isNull(), any(PageRequest.class))).thenReturn(emptyPage);
 
-            Page<TestRunSummaryDTO> result = service.getAllRuns(0, 10);
+            Page<TestRunSummaryDTO> result = service.getAllRuns(0, 10, null);
 
             assertThat(result.getContent()).isEmpty();
             assertThat(result.getTotalElements()).isEqualTo(0);
@@ -144,10 +148,9 @@ class RunHistoryServiceTest {
             TestRun run = createTestRun("run-1", "Failed Run", TestRun.RunStatus.FAILED, 10, 5, 4, 1);
             Page<TestRun> page = new PageImpl<>(List.of(run), PageRequest.of(0, 10), 1);
 
-            when(testRunRepository.findByArchivedFalseAndStatusOrderByStartTimeDesc(
-                    eq(TestRun.RunStatus.FAILED), any(PageRequest.class))).thenReturn(page);
+            when(runQueryService.getActiveRunsByStatus(eq(TestRun.RunStatus.FAILED), isNull(), any(PageRequest.class))).thenReturn(page);
 
-            Page<TestRunSummaryDTO> result = service.getRunsByStatus(TestRun.RunStatus.FAILED, 0, 10);
+            Page<TestRunSummaryDTO> result = service.getRunsByStatus(TestRun.RunStatus.FAILED, 0, 10, null);
 
             assertThat(result.getContent()).hasSize(1);
             assertThat(result.getContent().get(0).status()).isEqualTo(TestRun.RunStatus.FAILED);
@@ -164,10 +167,9 @@ class RunHistoryServiceTest {
             TestRun run = createTestRun("run-1", "Login Tests", TestRun.RunStatus.PASSED, 5, 5, 0, 0);
             Page<TestRun> page = new PageImpl<>(List.of(run), PageRequest.of(0, 10), 1);
 
-            when(testRunRepository.findByArchivedFalseAndNameContainingIgnoreCaseOrderByStartTimeDesc(
-                    eq("login"), any(PageRequest.class))).thenReturn(page);
+            when(runQueryService.searchActiveRunsByName(eq("login"), isNull(), any(PageRequest.class))).thenReturn(page);
 
-            Page<TestRunSummaryDTO> result = service.searchRuns("login", 0, 10);
+            Page<TestRunSummaryDTO> result = service.searchRuns("login", 0, 10, null);
 
             assertThat(result.getContent()).hasSize(1);
             assertThat(result.getContent().get(0).name()).isEqualTo("Login Tests");

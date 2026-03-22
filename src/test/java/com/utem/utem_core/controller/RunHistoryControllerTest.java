@@ -64,7 +64,7 @@ class RunHistoryControllerTest {
             TestRunSummaryDTO run = createSummary("run-1", "Run 1", TestRun.RunStatus.PASSED);
             Page<TestRunSummaryDTO> page = new PageImpl<>(List.of(run), PageRequest.of(0, 20), 1);
 
-            when(runHistoryService.getAllRuns(0, 20)).thenReturn(page);
+            when(runHistoryService.getAllRuns(0, 20, null)).thenReturn(page);
 
             ResponseEntity<Page<TestRunSummaryDTO>> response = controller.getRuns(0, 20, null, null, null);
 
@@ -79,13 +79,13 @@ class RunHistoryControllerTest {
             TestRunSummaryDTO run = createSummary("run-1", "Failed Run", TestRun.RunStatus.FAILED);
             Page<TestRunSummaryDTO> page = new PageImpl<>(List.of(run), PageRequest.of(0, 20), 1);
 
-            when(runHistoryService.getRunsByStatus(TestRun.RunStatus.FAILED, 0, 20)).thenReturn(page);
+            when(runHistoryService.getRunsByStatus(TestRun.RunStatus.FAILED, 0, 20, null)).thenReturn(page);
 
             ResponseEntity<Page<TestRunSummaryDTO>> response =
                     controller.getRuns(0, 20, TestRun.RunStatus.FAILED, null, null);
 
             assertThat(response.getBody().getContent().get(0).status()).isEqualTo(TestRun.RunStatus.FAILED);
-            verify(runHistoryService).getRunsByStatus(TestRun.RunStatus.FAILED, 0, 20);
+            verify(runHistoryService).getRunsByStatus(TestRun.RunStatus.FAILED, 0, 20, null);
         }
 
         @Test
@@ -94,12 +94,12 @@ class RunHistoryControllerTest {
             TestRunSummaryDTO run = createSummary("run-1", "Login Tests", TestRun.RunStatus.PASSED);
             Page<TestRunSummaryDTO> page = new PageImpl<>(List.of(run), PageRequest.of(0, 20), 1);
 
-            when(runHistoryService.searchRuns("Login", 0, 20)).thenReturn(page);
+            when(runHistoryService.searchRuns("Login", 0, 20, null)).thenReturn(page);
 
             ResponseEntity<Page<TestRunSummaryDTO>> response =
                     controller.getRuns(0, 20, TestRun.RunStatus.FAILED, "Login", null);
 
-            verify(runHistoryService).searchRuns("Login", 0, 20);
+            verify(runHistoryService).searchRuns("Login", 0, 20, null);
             verifyNoMoreInteractions(runHistoryService);
         }
 
@@ -108,7 +108,7 @@ class RunHistoryControllerTest {
         void shouldReturnEmptyPage() {
             Page<TestRunSummaryDTO> emptyPage = new PageImpl<>(
                     Collections.emptyList(), PageRequest.of(0, 20), 0);
-            when(runHistoryService.getAllRuns(0, 20)).thenReturn(emptyPage);
+            when(runHistoryService.getAllRuns(0, 20, null)).thenReturn(emptyPage);
 
             ResponseEntity<Page<TestRunSummaryDTO>> response = controller.getRuns(0, 20, null, null, null);
 

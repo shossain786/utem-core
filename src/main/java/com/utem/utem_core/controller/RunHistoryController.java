@@ -2,9 +2,13 @@ package com.utem.utem_core.controller;
 
 import com.utem.utem_core.dto.*;
 import com.utem.utem_core.entity.TestRun;
+import com.utem.utem_core.exception.UnauthorizedException;
+import com.utem.utem_core.security.AuthenticatedUser;
+import com.utem.utem_core.security.UserContextHolder;
 import com.utem.utem_core.service.RunHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +29,9 @@ public class RunHistoryController {
 
     private final RunHistoryService runHistoryService;
 
+    @Value("${utem.security.enabled:false}")
+    private boolean securityEnabled;
+
     /**
      * List all runs with pagination, newest first.
      * Optionally filter by status, label, or search by name.
@@ -37,16 +44,17 @@ public class RunHistoryController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String label) {
 
+        List<String> projectIds = resolveProjectIds();
         Page<TestRunSummaryDTO> result;
 
         if (name != null && !name.isBlank()) {
-            result = runHistoryService.searchRuns(name, page, size);
+            result = runHistoryService.searchRuns(name, page, size, projectIds);
         } else if (label != null && !label.isBlank()) {
-            result = runHistoryService.getRunsByLabel(label, page, size);
+            result = runHistoryService.getRunsByLabel(label, page, size, projectIds);
         } else if (status != null) {
-            result = runHistoryService.getRunsByStatus(status, page, size);
+            result = runHistoryService.getRunsByStatus(status, page, size, projectIds);
         } else {
-            result = runHistoryService.getAllRuns(page, size);
+            result = runHistoryService.getAllRuns(page, size, projectIds);
         }
 
         return ResponseEntity.ok(result);
@@ -202,5 +210,16 @@ public class RunHistoryController {
         log.info("Deleting runs before {}", before);
         int deleted = runHistoryService.deleteRunsBefore(before);
         return ResponseEntity.ok(Map.of("deletedCount", deleted));
+    }
+
+    /**
+     * Returns the set of project IDs the current user may see, or null for SUPER_ADMIN.
+     * When security is disabled, returns null (no filter).
+     */
+    private List<String> resolveProjectIds() {
+        if (!securityEnabled) return null;
+        AuthenticatedUser user = UserContextHolder.get();
+        if (user == null) throw new UnauthorizedException("Authentication required");
+        return user.isSuperAdmin() ? null : user.projectIds();
     }
 }

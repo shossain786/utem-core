@@ -66,6 +66,19 @@ public interface TestRunRepository extends JpaRepository<TestRun, String> {
     @Query("SELECT DISTINCT r.jobName FROM TestRun r WHERE r.jobName IS NOT NULL AND r.archived = false ORDER BY r.jobName")
     List<String> findDistinctActiveJobNames();
 
+    // ── Project-scoped queries (used when security.enabled=true) ─────────
+    @Query("SELECT r FROM TestRun r WHERE r.archived = false AND r.projectId IN :projectIds ORDER BY r.startTime DESC")
+    Page<TestRun> findByArchivedFalseAndProjectIdInOrderByStartTimeDesc(@Param("projectIds") List<String> projectIds, Pageable pageable);
+
+    @Query("SELECT r FROM TestRun r WHERE r.archived = false AND r.status = :status AND r.projectId IN :projectIds ORDER BY r.startTime DESC")
+    Page<TestRun> findByArchivedFalseAndStatusAndProjectIdInOrderByStartTimeDesc(@Param("status") TestRun.RunStatus status, @Param("projectIds") List<String> projectIds, Pageable pageable);
+
+    @Query("SELECT r FROM TestRun r WHERE r.archived = false AND LOWER(r.name) LIKE LOWER(CONCAT('%', :name, '%')) AND r.projectId IN :projectIds ORDER BY r.startTime DESC")
+    Page<TestRun> findByArchivedFalseAndNameContainingIgnoreCaseAndProjectIdInOrderByStartTimeDesc(@Param("name") String name, @Param("projectIds") List<String> projectIds, Pageable pageable);
+
+    @Query("SELECT r FROM TestRun r WHERE r.archived = false AND r.label = :label AND r.projectId IN :projectIds ORDER BY r.startTime DESC")
+    Page<TestRun> findByArchivedFalseAndLabelAndProjectIdInOrderByStartTimeDesc(@Param("label") String label, @Param("projectIds") List<String> projectIds, Pageable pageable);
+
     long countByStatus(TestRun.RunStatus status);
 
     @Query("SELECT r FROM TestRun r WHERE (:status IS NULL OR r.status = :status) " +

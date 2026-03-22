@@ -39,13 +39,15 @@ public class RunHistoryService {
     private final AttachmentRepository attachmentRepository;
     private final AttachmentStorageService attachmentStorageService;
     private final HierarchyReconstructionService hierarchyReconstructionService;
+    private final RunQueryService runQueryService;
 
     /**
      * Get active (non-archived) runs with pagination, newest first.
+     * Pass allowedProjectIds=null for SUPER_ADMIN (no filter), empty list for no access.
      */
     @Transactional(readOnly = true)
-    public Page<TestRunSummaryDTO> getAllRuns(int page, int size) {
-        return testRunRepository.findByArchivedFalseOrderByStartTimeDesc(PageRequest.of(page, size))
+    public Page<TestRunSummaryDTO> getAllRuns(int page, int size, List<String> allowedProjectIds) {
+        return runQueryService.getActiveRuns(allowedProjectIds, PageRequest.of(page, size))
                 .map(TestRunSummaryDTO::from);
     }
 
@@ -53,8 +55,8 @@ public class RunHistoryService {
      * Get active runs filtered by status with pagination.
      */
     @Transactional(readOnly = true)
-    public Page<TestRunSummaryDTO> getRunsByStatus(TestRun.RunStatus status, int page, int size) {
-        return testRunRepository.findByArchivedFalseAndStatusOrderByStartTimeDesc(status, PageRequest.of(page, size))
+    public Page<TestRunSummaryDTO> getRunsByStatus(TestRun.RunStatus status, int page, int size, List<String> allowedProjectIds) {
+        return runQueryService.getActiveRunsByStatus(status, allowedProjectIds, PageRequest.of(page, size))
                 .map(TestRunSummaryDTO::from);
     }
 
@@ -62,8 +64,8 @@ public class RunHistoryService {
      * Search active runs by name with pagination.
      */
     @Transactional(readOnly = true)
-    public Page<TestRunSummaryDTO> searchRuns(String name, int page, int size) {
-        return testRunRepository.findByArchivedFalseAndNameContainingIgnoreCaseOrderByStartTimeDesc(name, PageRequest.of(page, size))
+    public Page<TestRunSummaryDTO> searchRuns(String name, int page, int size, List<String> allowedProjectIds) {
+        return runQueryService.searchActiveRunsByName(name, allowedProjectIds, PageRequest.of(page, size))
                 .map(TestRunSummaryDTO::from);
     }
 
@@ -71,8 +73,8 @@ public class RunHistoryService {
      * Get active runs filtered by label with pagination.
      */
     @Transactional(readOnly = true)
-    public Page<TestRunSummaryDTO> getRunsByLabel(String label, int page, int size) {
-        return testRunRepository.findByArchivedFalseAndLabelOrderByStartTimeDesc(label, PageRequest.of(page, size))
+    public Page<TestRunSummaryDTO> getRunsByLabel(String label, int page, int size, List<String> allowedProjectIds) {
+        return runQueryService.getActiveRunsByLabel(label, allowedProjectIds, PageRequest.of(page, size))
                 .map(TestRunSummaryDTO::from);
     }
 
