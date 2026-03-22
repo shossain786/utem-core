@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useArchiveRuns } from '@/hooks/useApi';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
@@ -19,6 +20,7 @@ const navItems = [
 export default function Sidebar() {
   const [isDragOver, setIsDragOver] = useState(false);
   const archiveMutation = useArchiveRuns();
+  const { username, role, isSuperAdmin, isAuthenticated, logout } = useAuth();
 
   function handleDragOver(e: React.DragEvent) {
     e.preventDefault();
@@ -60,6 +62,22 @@ export default function Sidebar() {
           </NavLink>
         ))}
 
+        {isSuperAdmin && (
+          <NavLink
+            to="/users"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                isActive
+                  ? 'bg-sidebar-active text-white border-l-2 border-blue-400'
+                  : 'text-gray-300 hover:bg-sidebar-hover hover:text-white border-l-2 border-transparent'
+              }`
+            }
+          >
+            <span>👥</span>
+            <span>Users</span>
+          </NavLink>
+        )}
+
         {/* Archive — also a drag-drop target */}
         <div
           onDragOver={handleDragOver}
@@ -84,7 +102,21 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-sidebar-hover text-xs text-gray-500">
-        v0.8.0
+        {isAuthenticated ? (
+          <div className="space-y-1">
+            <div className="text-gray-300 font-medium truncate">{username}</div>
+            <div className="text-gray-500">{role === 'SUPER_ADMIN' ? 'Super Admin' : 'Member'}</div>
+            <button
+              type="button"
+              onClick={logout}
+              className="mt-1 text-gray-400 hover:text-white transition-colors"
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <span>v0.9.0 · UTEM</span>
+        )}
       </div>
     </aside>
   );

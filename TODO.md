@@ -33,3 +33,8 @@
 ## Multi-user / Teams
 - [x] Basic auth / API key — X-API-Key header on write endpoints, enable via `utem.security.enabled=true` ✅ v0.8.0
 - [x] Projects — namespace runs by project, per-project API keys, Projects page in dashboard ✅ v0.8.0
+- [x] JWT authentication — login endpoint, Bearer token, 24h expiry, localStorage ✅ v0.9.0
+- [x] Role-based access — SUPER_ADMIN (full access) / MEMBER (project-scoped) ✅ v0.9.0
+- [x] User management — create/deactivate/reactivate users, reset passwords (SUPER_ADMIN) ✅ v0.9.0
+- [x] Project membership — add/remove members with ADMIN/VIEWER roles ✅ v0.9.0
+- [x] Frontend auth — LoginPage, ProtectedRoute, AuthContext, Users page, Sidebar user info ✅ v0.9.0

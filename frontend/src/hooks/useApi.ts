@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel, StepDiagnosis, QualityGateResult, Project } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel, StepDiagnosis, QualityGateResult, Project, UserDTO, ProjectMemberDTO, MemberRole } from '@/api/types';
 
 export function useRuns(page = 0, size = 20, refetchInterval?: number | false) {
   return useQuery({
@@ -454,5 +454,90 @@ export function useDeleteProject() {
       await apiClient.delete(`/projects/${id}`);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+  });
+}
+
+// ── User management ────────────────────────────────────────────────────────────
+
+export function useUsers() {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<UserDTO[]>('/users');
+      return data;
+    },
+  });
+}
+
+export function useCreateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: { username: string; email?: string; password: string; role?: string }) => {
+      const { data } = await apiClient.post<UserDTO>('/users', body);
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['users'] }),
+  });
+}
+
+export function useDeactivateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      await apiClient.delete(`/users/${userId}`);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['users'] }),
+  });
+}
+
+export function useReactivateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      await apiClient.post(`/users/${userId}/reactivate`);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['users'] }),
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async ({ userId, newPassword }: { userId: string; newPassword: string }) => {
+      await apiClient.post(`/users/${userId}/reset-password`, { newPassword });
+    },
+  });
+}
+
+// ── Project members ────────────────────────────────────────────────────────────
+
+export function useProjectMembers(projectId: string | undefined) {
+  return useQuery({
+    queryKey: ['project-members', projectId],
+    queryFn: async () => {
+      const { data } = await apiClient.get<ProjectMemberDTO[]>(`/projects/${projectId}/members`);
+      return data;
+    },
+    enabled: !!projectId,
+  });
+}
+
+export function useAddProjectMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ projectId, userId, role }: { projectId: string; userId: string; role: MemberRole }) => {
+      const { data } = await apiClient.post<ProjectMemberDTO>(`/projects/${projectId}/members`, { userId, role });
+      return data;
+    },
+    onSuccess: (_data, vars) => qc.invalidateQueries({ queryKey: ['project-members', vars.projectId] }),
+  });
+}
+
+export function useRemoveProjectMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ projectId, userId }: { projectId: string; userId: string }) => {
+      await apiClient.delete(`/projects/${projectId}/members/${userId}`);
+    },
+    onSuccess: (_data, vars) => qc.invalidateQueries({ queryKey: ['project-members', vars.projectId] }),
   });
 }

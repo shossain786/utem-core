@@ -354,3 +354,35 @@ export interface QualityGateResult {
   violations: QualityGateViolation[];
   metrics: QualityGateMetrics;
 }
+
+// ============ Auth / User Types ============
+
+export type UserRole = 'SUPER_ADMIN' | 'MEMBER';
+
+export type MemberRole = 'ADMIN' | 'VIEWER';
+
+export interface UserDTO {
+  id: string;
+  username: string;
+  email: string | null;
+  role: UserRole;
+  active: boolean;
+  createdAt: string | null;
+  projectIds: string[] | null;
+}
+
+export interface LoginResponse {
+  token: string;
+  userId: string;
+  username: string;
+  role: UserRole;
+  projectIds: string[] | null;
+}
+
+export interface ProjectMemberDTO {
+  userId: string;
+  username: string;
+  email: string | null;
+  role: MemberRole;
+  createdAt: string;
+}

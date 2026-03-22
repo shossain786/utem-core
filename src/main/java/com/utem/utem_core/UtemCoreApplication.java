@@ -1,5 +1,6 @@
 package com.utem.utem_core;
 
+import com.utem.utem_core.config.JwtProperties;
 import com.utem.utem_core.config.RecoveryProperties;
 import com.utem.utem_core.config.RetentionProperties;
 import com.utem.utem_core.config.StorageProperties;
@@ -8,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({StorageProperties.class, RetentionProperties.class, RecoveryProperties.class})
+@EnableConfigurationProperties({StorageProperties.class, RetentionProperties.class, RecoveryProperties.class, JwtProperties.class})
 public class UtemCoreApplication {
 
 	public static void main(String[] args) {
