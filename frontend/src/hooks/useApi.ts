@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel, StepDiagnosis, QualityGateResult } from '@/api/types';
+import type { TestRunSummary, TestRunHierarchy, Page, RunStatus, RunComparison, SearchResult, FlakinessReport, FlakyTest, TrendData, FailureHotspot, FailureCluster, FailureInsights, PerformanceReport, InsightsSummary, JobSummary, NotificationChannel, StepDiagnosis, QualityGateResult, Project } from '@/api/types';
 
 export function useRuns(page = 0, size = 20, refetchInterval?: number | false) {
   return useQuery({
@@ -412,5 +412,47 @@ export function useQualityGate(
     },
     enabled: !!runId,
     staleTime: 30_000,
+  });
+}
+
+export function useProjects() {
+  return useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<Project[]>('/projects');
+      return data;
+    },
+  });
+}
+
+export function useCreateProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: { name: string; description?: string }) => {
+      const { data } = await apiClient.post<Project>('/projects', body);
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+  });
+}
+
+export function useRegenerateApiKey() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await apiClient.post<Project>(`/projects/${id}/regenerate-key`);
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+  });
+}
+
+export function useDeleteProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiClient.delete(`/projects/${id}`);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
   });
 }

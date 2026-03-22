@@ -23,7 +23,8 @@ public record TestRunSummaryDTO(
         boolean archived,
         boolean pinned,
         String label,
-        String jobName
+        String jobName,
+        String projectId
 ) {
     public static TestRunSummaryDTO from(TestRun run) {
         Long duration = null;
@@ -51,7 +52,8 @@ public record TestRunSummaryDTO(
                 run.isArchived(),
                 run.isPinned(),
                 run.getLabel(),
-                run.getJobName()
+                run.getJobName(),
+                run.getProjectId()
         );
     }
 }

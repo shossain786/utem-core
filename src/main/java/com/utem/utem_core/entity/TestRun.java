@@ -61,6 +61,10 @@ public class TestRun {
     @Column(length = 200)
     private String jobName;
 
+    /** Project this run belongs to (null = unassigned / pre-project feature). */
+    @Column(length = 36)
+    private String projectId;
+
     public enum RunStatus {
         RUNNING,
         PASSED,

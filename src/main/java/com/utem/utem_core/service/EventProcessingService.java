@@ -9,6 +9,7 @@ import com.utem.utem_core.dto.websocket.WebSocketEventMessage;
 import com.utem.utem_core.entity.*;
 import com.utem.utem_core.notification.NotificationService;
 import com.utem.utem_core.repository.*;
+import com.utem.utem_core.security.ProjectContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -107,6 +108,7 @@ public class EventProcessingService {
                 .skippedTests(0)
                 .label(payload.label())
                 .jobName(payload.jobName())
+                .projectId(ProjectContextHolder.get() != null ? ProjectContextHolder.get().getId() : null)
                 .build();
 
         TestRun saved = testRunRepository.save(testRun);

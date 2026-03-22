@@ -13,6 +13,7 @@ const navItems = [
   { to: '/failures', label: 'Failures', icon: '🔥' },
   { to: '/performance', label: 'Performance', icon: '⏱️' },
   { to: '/notifications', label: 'Notifications', icon: '🔔' },
+  { to: '/projects', label: 'Projects', icon: '🗂️' },
 ];
 
 export default function Sidebar() {
@@ -83,7 +84,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-sidebar-hover text-xs text-gray-500">
-        v0.7.0
+        v0.8.0
       </div>
     </aside>
   );

@@ -16,6 +16,7 @@ import ArchivedPage from './pages/ArchivedPage';
 import JobsPage from './pages/JobsPage';
 import JobRunsPage from './pages/JobRunsPage';
 import NotificationsPage from './pages/NotificationsPage';
+import ProjectsPage from './pages/ProjectsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +48,7 @@ function App() {
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/jobs/:jobName" element={<JobRunsPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/projects" element={<ProjectsPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

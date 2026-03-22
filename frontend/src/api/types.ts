@@ -28,6 +28,16 @@ export interface TestRunSummary {
   pinned: boolean;
   label: string | null;
   jobName: string | null;
+  projectId: string | null;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string | null;
+  apiKey: string;
+  active: boolean;
+  createdAt: string;
 }
 
 export interface JobSummary {

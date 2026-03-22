@@ -14,7 +14,7 @@
 - [x] Email notifications — HTML email via SMTP ✅ v0.2.0
 - [x] Webhooks — generic HTTP POST JSON (Jenkins, custom CI) ✅ v0.2.0
 - [x] Dashboard UI to manage channels (add/edit/delete/test/toggle) ✅ v0.2.0
-- [x] Notify on flakiness threshold breached — alert all channels when tests exceed configured flakiness % ✅ v0.7.0
+- [x] Notify on flakiness threshold breached — alert all channels when tests exceed configured flakiness % ✅ v0.8.0
 
 ## Intelligence
 - [x] Failure clustering — group similar stack traces, hotspot detection ✅ v0.2.0
@@ -31,5 +31,5 @@
 - [ ] Dark mode
 
 ## Multi-user / Teams
-- [ ] Basic auth / API key — protect the server from unauthorized writes
-- [ ] Projects — namespace runs by project so one UTEM server can serve multiple teams
+- [x] Basic auth / API key — X-API-Key header on write endpoints, enable via `utem.security.enabled=true` ✅ v0.8.0
+- [x] Projects — namespace runs by project, per-project API keys, Projects page in dashboard ✅ v0.8.0
