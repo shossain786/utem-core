@@ -404,8 +404,8 @@ Phase 2 — Data Isolation (Backend)
   [x] 2.2  RunQueryService
   [x] 2.3  RunHistoryService — allowedProjectIds overloads
   [x] 2.4  RunHistoryController — resolveProjectIds() helper
-  [ ] 2.5  TrendAnalysisService, FailureInsightsService, PerformanceAnalysisService, FlakinessDetectionService
-  [ ] 2.6  Single-run access guard in getRunById/getRunDetail
+  [x] 2.5  TrendAnalysisService, FailureInsightsService, PerformanceAnalysisService, FlakinessDetectionService
+  [x] 2.6  Single-run access guard in getRunById/getRunDetail
   ✓  TEST: Run list queries project-filtered for MEMBER users. SUPER_ADMIN sees all.
 
 Phase 3 — User & Member Management (Backend)
@@ -425,7 +425,7 @@ Phase 4 — Frontend
   [x] 4.6  Sidebar.tsx — user info + logout
   [x] 4.7  useApi.ts — user/member hooks
   [x] 4.8  UsersPage.tsx
-  [ ] 4.9  ProjectsPage.tsx — member section
+  [x] 4.9  ProjectsPage.tsx — member section
   [x] 4.10 types.ts — UserDTO + ProjectMember
   ✓  TEST: Frontend builds. Login form, ProtectedRoute, Users page, Sidebar user info all complete.
 ```
