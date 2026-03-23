@@ -115,7 +115,7 @@ export default function Sidebar() {
             </button>
           </div>
         ) : (
-          <span>v0.9.0 · UTEM</span>
+          <span>v0.9.1 · UTEM</span>
         )}
       </div>
     </aside>
