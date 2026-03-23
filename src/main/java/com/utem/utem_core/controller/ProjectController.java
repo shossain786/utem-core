@@ -28,7 +28,10 @@ public class ProjectController {
 
     @GetMapping
     public List<Project> getAllProjects() {
-        return projectService.getAllProjects();
+        if (!securityEnabled) return projectService.getAllProjects(null);
+        AuthenticatedUser user = UserContextHolder.get();
+        List<String> allowedProjectIds = (user == null || user.isSuperAdmin()) ? null : user.projectIds();
+        return projectService.getAllProjects(allowedProjectIds);
     }
 
     @GetMapping("/{id}")

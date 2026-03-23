@@ -26,8 +26,10 @@ public class ProjectService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public List<Project> getAllProjects() {
-        return projectRepository.findAllByOrderByCreatedAtDesc();
+    public List<Project> getAllProjects(List<String> allowedProjectIds) {
+        if (allowedProjectIds == null) return projectRepository.findAllByOrderByCreatedAtDesc();
+        if (allowedProjectIds.isEmpty()) return List.of();
+        return projectRepository.findByIdInOrderByCreatedAtDesc(allowedProjectIds);
     }
 
     @Transactional(readOnly = true)

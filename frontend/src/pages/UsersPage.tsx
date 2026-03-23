@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUsers, useCreateUser, useDeactivateUser, useReactivateUser, useResetPassword } from '@/hooks/useApi';
 
 export default function UsersPage() {
-  const { data: users, isLoading } = useUsers();
+  const { isSuperAdmin } = useAuth();
+  const { data: users, isLoading } = useUsers(isSuperAdmin);
   const createUser = useCreateUser();
   const deactivateUser = useDeactivateUser();
   const reactivateUser = useReactivateUser();
@@ -35,6 +38,7 @@ export default function UsersPage() {
     setNewPassword('');
   }
 
+  if (!isSuperAdmin) return <Navigate to="/" replace />;
   if (isLoading) return <div className="p-6 text-gray-400">Loading…</div>;
 
   return (

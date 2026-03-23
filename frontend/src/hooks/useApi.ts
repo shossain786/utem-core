@@ -459,13 +459,14 @@ export function useDeleteProject() {
 
 // ── User management ────────────────────────────────────────────────────────────
 
-export function useUsers() {
+export function useUsers(enabled = true) {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const { data } = await apiClient.get<UserDTO[]>('/users');
       return data;
     },
+    enabled,
   });
 }
 

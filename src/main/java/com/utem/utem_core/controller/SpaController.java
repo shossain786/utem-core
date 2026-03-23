@@ -9,16 +9,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class SpaController {
 
+    @GetMapping(value = "/{path:[^\\.]*}")
+    public String spaRoot() {
+        return "forward:/index.html";
+    }
+
     @GetMapping(value = {
-        "/",
-        "/runs/**",
-        "/jobs/**",
-        "/archive",
-        "/search",
-        "/trends",
-        "/compare/**"
+        "/runs/{id}",
+        "/runs/{id}/compare/{compareId}",
+        "/jobs/{jobName}",
+        "/jobs/{jobName}/{id}"
     })
-    public String spa() {
+    public String spaNested() {
         return "forward:/index.html";
     }
 }

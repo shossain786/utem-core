@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useProjects, useCreateProject, useRegenerateApiKey, useDeleteProject,
          useProjectMembers, useAddProjectMember, useRemoveProjectMember, useUsers } from '@/hooks/useApi';
 import type { Project, ProjectMemberDTO } from '@/api/types';
 import type { MemberRole } from '@/api/types';
 
 export default function ProjectsPage() {
+  const { isSuperAdmin } = useAuth();
   const { data: projects, isLoading } = useProjects();
   const createProject = useCreateProject();
   const regenerateKey = useRegenerateApiKey();
@@ -47,12 +49,14 @@ export default function ProjectsPage() {
             Each project gets its own API key. Enable security via <code className="bg-gray-100 px-1 rounded">utem.security.enabled=true</code>.
           </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-        >
-          + New Project
-        </button>
+        {isSuperAdmin && (
+          <button
+            onClick={() => setShowCreate(true)}
+            className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+          >
+            + New Project
+          </button>
+        )}
       </div>
 
       {showCreate && (
@@ -83,6 +87,7 @@ export default function ProjectsPage() {
               Cancel
             </button>
           </div>
+
         </form>
       )}
 
@@ -100,6 +105,7 @@ export default function ProjectsPage() {
           <ProjectCard
             key={project.id}
             project={project}
+            isSuperAdmin={isSuperAdmin}
             keyVisible={visibleKeys.has(project.id)}
             copied={copied === project.id}
             onToggleKey={() => toggleKeyVisibility(project.id)}
@@ -113,8 +119,9 @@ export default function ProjectsPage() {
   );
 }
 
-function ProjectCard({ project, keyVisible, copied, onToggleKey, onCopy, onRegenerate, onDelete }: {
+function ProjectCard({ project, isSuperAdmin, keyVisible, copied, onToggleKey, onCopy, onRegenerate, onDelete }: {
   project: Project;
+  isSuperAdmin: boolean;
   keyVisible: boolean;
   copied: boolean;
   onToggleKey: () => void;
@@ -132,42 +139,43 @@ function ProjectCard({ project, keyVisible, copied, onToggleKey, onCopy, onRegen
           {project.description && <p className="text-sm text-gray-500 mt-0.5">{project.description}</p>}
           <p className="text-xs text-gray-400 mt-1">Created {new Date(project.createdAt).toLocaleDateString()}</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setMembersOpen(o => !o)}
-            className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
-            Members {membersOpen ? '▲' : '▼'}
-          </button>
-          <button onClick={onRegenerate}
-            className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
-            title="Regenerate API key">
-            ↻ Regen Key
-          </button>
-          <button onClick={onDelete}
-            className="text-xs px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100">
-            Delete
-          </button>
-        </div>
+        {isSuperAdmin && (
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setMembersOpen(o => !o)}
+              className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
+              Members {membersOpen ? '▲' : '▼'}
+            </button>
+            <button type="button" onClick={onRegenerate}
+              className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
+              title="Regenerate API key">
+              ↻ Regen Key
+            </button>
+            <button type="button" onClick={onDelete}
+              className="text-xs px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100">
+              Delete
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mt-3 flex items-center gap-2">
         <code className="flex-1 bg-gray-50 border rounded px-3 py-1.5 text-xs font-mono text-gray-700 truncate">
           {keyVisible ? project.apiKey : '•'.repeat(32)}
         </code>
-        <button onClick={onToggleKey}
+        <button type="button" onClick={onToggleKey}
           className="text-xs px-2 py-1.5 bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
           {keyVisible ? 'Hide' : 'Show'}
         </button>
-        <button onClick={onCopy}
+        <button type="button" onClick={onCopy}
           className="text-xs px-2 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100">
           {copied ? '✓ Copied' : 'Copy'}
         </button>
       </div>
-
       <p className="text-xs text-gray-400 mt-2">
         Add <code className="bg-gray-100 px-1 rounded">X-API-Key: {keyVisible ? project.apiKey : '***'}</code> to your reporter config
       </p>
 
-      {membersOpen && <MembersSection projectId={project.id} />}
+      {isSuperAdmin && membersOpen && <MembersSection projectId={project.id} />}
     </div>
   );
 }

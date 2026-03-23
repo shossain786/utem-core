@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface ProjectRepository extends JpaRepository<Project, String> {
     Optional<Project> findByApiKeyAndActiveTrue(String apiKey);
     List<Project> findAllByOrderByCreatedAtDesc();
+    List<Project> findByIdInOrderByCreatedAtDesc(List<String> ids);
     boolean existsByName(String name);
 }
