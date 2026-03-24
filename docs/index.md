@@ -37,6 +37,83 @@ features:
     details: Export runs as JSON, CSV or JUnit XML. Side-by-side run comparison with regression detection.
 ---
 
+<!-- ── Stats bar ─────────────────────────────────────────────────── -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-number">7</span>
+    <span class="stat-label">Reporters</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-number">4</span>
+    <span class="stat-label">Languages</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-number">Real-time</span>
+    <span class="stat-label">WebSocket</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-number">Self-hosted</span>
+    <span class="stat-label">Your data, your server</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-number">MIT</span>
+    <span class="stat-label">Open Source</span>
+  </div>
+</div>
+
+<!-- ── Works with ────────────────────────────────────────────────── -->
+<div class="works-with">
+  <p class="works-with-label">Works with</p>
+  <div class="framework-logos">
+    <a href="/utem-core/reporters/junit5" class="framework-badge java">JUnit 5</a>
+    <a href="/utem-core/reporters/testng" class="framework-badge java">TestNG</a>
+    <a href="/utem-core/reporters/cucumber" class="framework-badge java">Cucumber</a>
+    <a href="/utem-core/reporters/jest" class="framework-badge js">Jest</a>
+    <a href="/utem-core/reporters/cypress" class="framework-badge js">Cypress</a>
+    <a href="/utem-core/reporters/playwright" class="framework-badge js">Playwright</a>
+    <a href="/utem-core/reporters/pytest" class="framework-badge python">pytest</a>
+  </div>
+</div>
+
+<!-- ── How it works ──────────────────────────────────────────────── -->
+<div class="how-it-works">
+  <h2 class="section-title">How it works</h2>
+  <p class="section-subtitle">Up and running in under 5 minutes</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <h3>Start the server</h3>
+        <p>Run the JAR or Docker container. The dashboard is immediately available at <code>localhost:8080</code>.</p>
+        <div class="step-code">java -jar utem-core-0.9.1.jar</div>
+      </div>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <h3>Add the reporter</h3>
+        <p>One dependency in your test project. Configure the server URL and API key — no code changes needed.</p>
+        <div class="step-code">utem.server.url=http://localhost:8080</div>
+      </div>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <h3>Run your tests</h3>
+        <p>Results appear in the dashboard live. Trends, analytics, and flakiness detection update automatically.</p>
+        <div class="step-code">mvn test / npx playwright test</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FAQ ───────────────────────────────────────────────────────── -->
 <div class="faq-section">
 
 ## Frequently Asked Questions
