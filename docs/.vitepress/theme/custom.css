@@ -1,0 +1,162 @@
+/* ── Fonts ───────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --vp-font-family-base: 'Inter', sans-serif;
+}
+
+/* ── Hero animations ─────────────────────────────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+  50%       { box-shadow: 0 0 40px rgba(99,102,241,0.5); }
+}
+
+/* ── Hero section ────────────────────────────────────────────────── */
+.VPHero .name {
+  animation: fadeSlideUp 0.7s ease both;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  background-size: 200% 200%;
+  animation: fadeSlideUp 0.7s ease both, gradientShift 4s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.VPHero .text {
+  animation: fadeSlideUp 0.7s 0.15s ease both;
+}
+
+.VPHero .tagline {
+  animation: fadeSlideUp 0.7s 0.3s ease both;
+}
+
+.VPHero .actions {
+  animation: fadeSlideUp 0.7s 0.45s ease both;
+}
+
+.VPHero .image-container {
+  animation: fadeIn 0.8s 0.3s ease both;
+}
+
+.VPHero .image-container img,
+.VPHero .image-container svg {
+  animation: float 5s ease-in-out infinite;
+  filter: drop-shadow(0 20px 40px rgba(59,130,246,0.25));
+  border-radius: 16px;
+}
+
+/* ── Hero background gradient ────────────────────────────────────── */
+.VPHome .VPHero {
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(59,130,246,0.12) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 80% 50%, rgba(99,102,241,0.08) 0%, transparent 60%);
+}
+
+/* ── CTA buttons ─────────────────────────────────────────────────── */
+.VPButton.brand {
+  background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+  border: none !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.VPButton.brand:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(59,130,246,0.4) !important;
+}
+
+.VPButton.alt {
+  transition: transform 0.2s ease !important;
+}
+
+.VPButton.alt:hover {
+  transform: translateY(-2px) !important;
+}
+
+/* ── Feature cards ───────────────────────────────────────────────── */
+.VPFeature {
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+  border-radius: 12px !important;
+  animation: fadeSlideUp 0.6s ease both;
+}
+
+.VPFeature:nth-child(1) { animation-delay: 0.05s; }
+.VPFeature:nth-child(2) { animation-delay: 0.10s; }
+.VPFeature:nth-child(3) { animation-delay: 0.15s; }
+.VPFeature:nth-child(4) { animation-delay: 0.20s; }
+.VPFeature:nth-child(5) { animation-delay: 0.25s; }
+.VPFeature:nth-child(6) { animation-delay: 0.30s; }
+
+.VPFeature:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 32px rgba(59,130,246,0.15) !important;
+}
+
+.VPFeature .icon {
+  font-size: 2rem !important;
+  transition: transform 0.3s ease;
+}
+
+.VPFeature:hover .icon {
+  transform: scale(1.15);
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────── */
+.VPNav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Sidebar links ───────────────────────────────────────────────── */
+.VPSidebarItem .text {
+  transition: color 0.15s ease;
+}
+
+/* ── Code blocks ─────────────────────────────────────────────────── */
+div[class*='language-'] {
+  border-radius: 10px !important;
+  transition: box-shadow 0.2s ease;
+}
+
+div[class*='language-']:hover {
+  box-shadow: 0 4px 20px rgba(59,130,246,0.1);
+}
+
+/* ── Tip / warning / danger blocks ──────────────────────────────── */
+.custom-block {
+  border-radius: 10px !important;
+  transition: transform 0.2s ease;
+}
+
+.custom-block:hover {
+  transform: translateX(4px);
+}
+
+/* ── Table ───────────────────────────────────────────────────────── */
+.vp-doc table tr {
+  transition: background 0.15s ease;
+}
+
+/* ── Page content fade-in ────────────────────────────────────────── */
+.VPDoc .content-container {
+  animation: fadeSlideUp 0.5s ease both;
+}

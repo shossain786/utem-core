@@ -11,7 +11,7 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    logo: { svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#3b82f6"/><text x="16" y="22" font-size="16" text-anchor="middle" fill="white" font-family="monospace" font-weight="bold">U</text></svg>' },
+    logo: '/favicon.svg',
 
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
@@ -59,7 +59,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-present UTEM'
+      copyright: 'Copyright © 2026 UTEM'
     },
 
     search: {

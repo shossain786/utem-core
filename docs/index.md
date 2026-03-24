@@ -5,6 +5,9 @@ hero:
   name: "UTEM"
   text: "Universal Test Execution Monitor"
   tagline: Real-time test reporting dashboard for JUnit 5, Cucumber, TestNG, Playwright & pytest. Self-hosted.
+  image:
+    src: /hero-image.svg
+    alt: UTEM Dashboard
   actions:
     - theme: brand
       text: Get Started
