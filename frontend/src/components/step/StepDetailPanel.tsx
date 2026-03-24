@@ -23,20 +23,20 @@ function AttachmentItem({
   const isVideo = isVideoAttachment(attachment);
 
   return (
-    <div className="border border-gray-100 rounded-md p-2">
+    <div className="border border-gray-100 dark:border-gray-800 rounded-md p-2">
       {/* Header row */}
       <div className="flex items-center gap-2 text-xs mb-1">
-        <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 font-medium text-[10px]">
+        <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium text-[10px]">
           {ATTACHMENT_TYPE_ICONS[attachment.type]}
         </span>
         <span
-          className={`font-medium text-gray-700 truncate ${onClick ? 'cursor-pointer hover:text-blue-600' : ''}`}
+          className={`font-medium text-gray-700 dark:text-gray-300 truncate ${onClick ? 'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400' : ''}`}
           onClick={onClick}
         >
           {attachment.name}
         </span>
         {attachment.fileSize != null && (
-          <span className="text-gray-400 ml-auto shrink-0">{formatFileSize(attachment.fileSize)}</span>
+          <span className="text-gray-400 dark:text-gray-500 ml-auto shrink-0">{formatFileSize(attachment.fileSize)}</span>
         )}
         {attachment.isFailureScreenshot && (
           <span className="px-1.5 py-0.5 rounded bg-red-100 text-red-600 font-medium text-[10px] shrink-0">
@@ -54,7 +54,7 @@ function AttachmentItem({
           <img
             src={url}
             alt={attachment.name}
-            className="max-h-40 rounded border border-gray-200 object-contain bg-gray-50"
+            className="max-h-40 rounded border border-gray-200 dark:border-gray-700 object-contain bg-gray-50 dark:bg-gray-800"
             loading="lazy"
           />
         </div>
@@ -69,7 +69,7 @@ function AttachmentItem({
             src={url}
             controls
             preload="metadata"
-            className="max-h-40 rounded border border-gray-200 w-full"
+            className="max-h-40 rounded border border-gray-200 dark:border-gray-700 w-full"
           />
         </div>
       )}
@@ -90,9 +90,9 @@ function AttachmentItem({
 }
 
 const CONFIDENCE_STYLES: Record<string, string> = {
-  HIGH:   'bg-orange-100 text-orange-700 border-orange-200',
-  MEDIUM: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  LOW:    'bg-gray-100 text-gray-600 border-gray-200',
+  HIGH:   'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+  MEDIUM: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800',
+  LOW:    'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600',
 };
 
 export default function StepDetailPanel({
@@ -120,9 +120,9 @@ export default function StepDetailPanel({
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white border-l border-gray-200 shadow-lg z-50 flex flex-col">
+      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-lg z-50 flex flex-col">
         {/* Header */}
-        <div className="flex items-start gap-3 p-4 border-b border-gray-200">
+        <div className="flex items-start gap-3 p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className={`w-2 h-2 rounded-full shrink-0 ${STEP_STATUS_COLORS[step.status]}`} />
@@ -130,8 +130,8 @@ export default function StepDetailPanel({
                 {step.status}
               </span>
             </div>
-            <h2 className="text-sm font-bold text-gray-900 break-words">{step.name}</h2>
-            <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400">
+            <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 break-words">{step.name}</h2>
+            <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400 dark:text-gray-500">
               {step.duration != null && <span>{formatDuration(step.duration)}</span>}
               <span>{formatTimestamp(step.timestamp)}</span>
             </div>
@@ -139,7 +139,7 @@ export default function StepDetailPanel({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 rounded shrink-0"
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded shrink-0"
             title="Close"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -154,24 +154,24 @@ export default function StepDetailPanel({
           {/* Diagnosis Section */}
           {isFailed && (
             <div>
-              <h3 className="text-xs font-semibold text-gray-700 mb-2">Diagnosis</h3>
+              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Diagnosis</h3>
               {diagLoading && (
-                <div className="p-3 rounded-md bg-gray-50 border border-gray-200 text-xs text-gray-400 animate-pulse">
+                <div className="p-3 rounded-md bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs text-gray-400 dark:text-gray-500 animate-pulse">
                   Analysing failure…
                 </div>
               )}
               {diagnosis && (
-                <div className="p-3 rounded-md bg-amber-50 border border-amber-200 space-y-2">
+                <div className="p-3 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm">🔍</span>
-                    <span className="text-xs font-semibold text-amber-800">{diagnosis.category}</span>
+                    <span className="text-xs font-semibold text-amber-800 dark:text-amber-400">{diagnosis.category}</span>
                     <span className={`ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded border ${CONFIDENCE_STYLES[diagnosis.confidence] ?? CONFIDENCE_STYLES.LOW}`}>
                       {diagnosis.confidence}
                     </span>
                   </div>
-                  <p className="text-xs text-amber-900">{diagnosis.explanation}</p>
-                  <div className="pt-1 border-t border-amber-200">
-                    <p className="text-[11px] text-amber-700">
+                  <p className="text-xs text-amber-900 dark:text-amber-300">{diagnosis.explanation}</p>
+                  <div className="pt-1 border-t border-amber-200 dark:border-amber-800">
+                    <p className="text-[11px] text-amber-700 dark:text-amber-400">
                       <span className="font-medium">Suggestion: </span>
                       {diagnosis.suggestion}
                     </p>
@@ -184,13 +184,13 @@ export default function StepDetailPanel({
           {/* Error Section */}
           {hasError && (
             <div>
-              <h3 className="text-xs font-semibold text-gray-700 mb-2">Error Details</h3>
-              <div className="p-3 rounded-md bg-red-50 border border-red-200">
+              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Error Details</h3>
+              <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
                 {step.errorMessage && (
-                  <p className="text-xs text-red-700 font-medium mb-2">{step.errorMessage}</p>
+                  <p className="text-xs text-red-700 dark:text-red-400 font-medium mb-2">{step.errorMessage}</p>
                 )}
                 {step.stackTrace && (
-                  <pre className="text-[11px] leading-4 text-red-600 whitespace-pre-wrap overflow-x-auto max-h-64">
+                  <pre className="text-[11px] leading-4 text-red-600 dark:text-red-400 whitespace-pre-wrap overflow-x-auto max-h-64">
                     {step.stackTrace}
                   </pre>
                 )}
@@ -201,7 +201,7 @@ export default function StepDetailPanel({
           {/* Attachments Section */}
           {hasAttachments && (
             <div>
-              <h3 className="text-xs font-semibold text-gray-700 mb-2">
+              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Attachments ({step.attachments.length})
               </h3>
               <div className="space-y-2">
@@ -218,7 +218,7 @@ export default function StepDetailPanel({
 
           {/* Empty state */}
           {!hasError && !hasAttachments && (
-            <p className="text-xs text-gray-400 text-center py-4">
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-4">
               No additional details for this step.
             </p>
           )}

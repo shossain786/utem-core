@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useArchiveRuns } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
@@ -21,6 +22,7 @@ export default function Sidebar() {
   const [isDragOver, setIsDragOver] = useState(false);
   const archiveMutation = useArchiveRuns();
   const { username, role, isSuperAdmin, isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   function handleDragOver(e: React.DragEvent) {
     e.preventDefault();
@@ -117,6 +119,15 @@ export default function Sidebar() {
         ) : (
           <span>v0.9.1 · UTEM</span>
         )}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors py-1 mt-2"
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          <span>{theme === 'dark' ? '☀️' : '🌙'}</span>
+          <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+        </button>
       </div>
     </aside>
   );

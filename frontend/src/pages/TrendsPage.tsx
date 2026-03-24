@@ -30,7 +30,7 @@ export default function TrendsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Trend Analysis</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Trend Analysis</h1>
         <div className="flex gap-1">
           {RANGE_OPTIONS.map((opt) => (
             <button
@@ -39,8 +39,8 @@ export default function TrendsPage() {
               onClick={() => setLimit(opt.value)}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 limit === opt.value
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                  ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               {opt.label}
@@ -103,16 +103,16 @@ interface TrendChartProps {
 
 function TrendChart({ title, data, isLoading, color, yDomain, valueFormatter, yTickFormatter }: TrendChartProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
-      <h2 className="text-sm font-semibold text-gray-700 mb-4">{title}</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+      <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">{title}</h2>
 
       {isLoading ? (
         <div className="h-48 flex items-center justify-center">
-          <p className="text-sm text-gray-400">Loading...</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>
         </div>
       ) : !data || data.points.length === 0 ? (
         <div className="h-48 flex items-center justify-center">
-          <p className="text-sm text-gray-400">Not enough data yet</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Not enough data yet</p>
         </div>
       ) : (
         <>
@@ -161,7 +161,7 @@ function TrendChart({ title, data, isLoading, color, yDomain, valueFormatter, yT
               />
             </LineChart>
           </ResponsiveContainer>
-          <p className="text-xs text-gray-400 mt-1 text-right">{data.points.length} data point{data.points.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 text-right">{data.points.length} data point{data.points.length !== 1 ? 's' : ''}</p>
         </>
       )}
     </div>

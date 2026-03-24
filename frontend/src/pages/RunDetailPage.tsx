@@ -50,9 +50,9 @@ export default function RunDetailPage() {
     return (
       <div>
         <BackLink />
-        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center">
           <p className="text-sm text-red-500 mb-1">Failed to load run details.</p>
-          <p className="text-xs text-gray-400">The run may not exist or the server may be unavailable.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">The run may not exist or the server may be unavailable.</p>
         </div>
       </div>
     );
@@ -65,7 +65,7 @@ export default function RunDetailPage() {
       <BackLink />
 
       {/* Run Header */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-4">
         <div className="flex items-center gap-3 mb-3">
           {/* Status badge — pulsing dot when RUNNING */}
           <span
@@ -81,7 +81,7 @@ export default function RunDetailPage() {
           {gateResult && <QualityGateBadge gate={gateResult} />}
 
           {/* Run name */}
-          <h1 className="text-lg font-bold text-gray-900">{hierarchy.name}</h1>
+          <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">{hierarchy.name}</h1>
 
           {/* Label — click to edit */}
           {editingLabel ? (
@@ -104,7 +104,7 @@ export default function RunDetailPage() {
                 list="detail-labels"
                 placeholder="Add label…"
                 autoFocus
-                className="px-1.5 py-0.5 text-xs border border-indigo-400 rounded-full w-28 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="px-1.5 py-0.5 text-xs border border-indigo-400 rounded-full w-28 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
               />
               <datalist id="detail-labels">
                 {(availableLabels ?? []).map((l) => <option key={l} value={l} />)}
@@ -115,7 +115,7 @@ export default function RunDetailPage() {
               type="button"
               onClick={() => { setLabelValue(hierarchy.label!); setEditingLabel(true); }}
               title="Click to edit label"
-              className="px-1.5 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 transition-colors"
+              className="px-1.5 py-0.5 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
             >
               {hierarchy.label}
             </button>
@@ -124,7 +124,7 @@ export default function RunDetailPage() {
               type="button"
               onClick={() => { setLabelValue(''); setEditingLabel(true); }}
               title="Add label"
-              className="px-1.5 py-0.5 text-xs text-gray-400 rounded-full border border-dashed border-gray-300 hover:border-indigo-400 hover:text-indigo-500 transition-colors"
+              className="px-1.5 py-0.5 text-xs text-gray-400 dark:text-gray-500 rounded-full border border-dashed border-gray-300 dark:border-gray-600 hover:border-indigo-400 hover:text-indigo-500 transition-colors"
             >
               + label
             </button>
@@ -177,7 +177,7 @@ export default function RunDetailPage() {
 
         {/* Visual pass/fail bar */}
         {stats.totalNodes > 0 && (
-          <div className="flex h-1.5 rounded-full overflow-hidden mt-3 bg-gray-100">
+          <div className="flex h-1.5 rounded-full overflow-hidden mt-3 bg-gray-100 dark:bg-gray-700">
             {stats.passedNodes > 0 && (
               <div
                 className="bg-passed"
@@ -201,10 +201,10 @@ export default function RunDetailPage() {
       </div>
 
       {/* Tree View */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">Test Hierarchy</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Test Hierarchy</h2>
         {hierarchy.rootNodes.length === 0 ? (
-          <p className="text-xs text-gray-400">No test nodes found for this run.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">No test nodes found for this run.</p>
         ) : (
           <div>
             {hierarchy.rootNodes.map((node) => (
@@ -224,7 +224,7 @@ function BackLink() {
   return (
     <Link
       to="/runs"
-      className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 mb-4"
+      className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4"
     >
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

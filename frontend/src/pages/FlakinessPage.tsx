@@ -19,20 +19,20 @@ function FlakinessBar({ rate }: { rate: number }) {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div className="w-20 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(rate, 100)}%` }} />
       </div>
-      <span className="text-xs text-gray-600 w-12">{rate.toFixed(1)}%</span>
+      <span className="text-xs text-gray-600 dark:text-gray-400 w-12">{rate.toFixed(1)}%</span>
     </div>
   );
 }
 
 function FlakyTestRow({ test }: { test: FlakyTest }) {
   return (
-    <tr className="border-b border-gray-50 hover:bg-gray-50">
+    <tr className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
       <td className="px-4 py-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-900">{test.testName}</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{test.testName}</span>
           {test.frameworkMarked && (
             <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-yellow-100 text-yellow-700 shrink-0">
               Framework
@@ -55,7 +55,7 @@ function FlakyTestRow({ test }: { test: FlakyTest }) {
           <span className="text-skipped font-medium">{test.skipCount}S</span>
         </div>
       </td>
-      <td className="px-4 py-2.5 text-xs text-gray-500">{test.totalRuns}</td>
+      <td className="px-4 py-2.5 text-xs text-gray-500 dark:text-gray-400">{test.totalRuns}</td>
       <td className="px-4 py-2.5">
         {test.lastStatus && (
           <span className={`inline-flex items-center gap-1 text-xs font-medium ${NODE_STATUS_TEXT_COLORS[test.lastStatus]}`}>
@@ -83,50 +83,50 @@ export default function FlakinessPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Flakiness Report</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Flakiness Report</h1>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-500 mb-1">Total Tests</p>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Tests</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {reportLoading ? '...' : reportError ? '--' : report?.totalTests ?? 0}
           </p>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-500 mb-1">Flaky Tests</p>
-          <p className={`text-2xl font-bold ${report && report.flakyTests > 0 ? 'text-yellow-600' : 'text-gray-900'}`}>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Flaky Tests</p>
+          <p className={`text-2xl font-bold ${report && report.flakyTests > 0 ? 'text-yellow-600' : 'text-gray-900 dark:text-gray-100'}`}>
             {reportLoading ? '...' : reportError ? '--' : report?.flakyTests ?? 0}
           </p>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-500 mb-1">Flakiness Rate</p>
-          <p className={`text-2xl font-bold ${report && report.flakinessPercentage > 0 ? 'text-yellow-600' : 'text-gray-900'}`}>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Flakiness Rate</p>
+          <p className={`text-2xl font-bold ${report && report.flakinessPercentage > 0 ? 'text-yellow-600' : 'text-gray-900 dark:text-gray-100'}`}>
             {reportLoading ? '...' : reportError ? '--' : `${(report?.flakinessPercentage ?? 0).toFixed(1)}%`}
           </p>
         </div>
       </div>
 
       {/* Top Flaky Tests Table */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-700">Top Flaky Tests</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Tests with inconsistent results across recent runs</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Top Flaky Tests</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Tests with inconsistent results across recent runs</p>
         </div>
 
         {testsLoading ? (
-          <div className="p-6 text-center text-sm text-gray-500">Loading...</div>
+          <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">Loading...</div>
         ) : !topTests || topTests.length === 0 ? (
           <div className="p-6 text-center">
-            <p className="text-sm text-gray-500 mb-1">No flaky tests detected</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">No flaky tests detected</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               Tests that produce inconsistent results across runs will appear here.
             </p>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+              <tr className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
                 <th className="px-4 py-2 font-medium">Test Name</th>
                 <th className="px-4 py-2 font-medium">Type</th>
                 <th className="px-4 py-2 font-medium">Flakiness</th>

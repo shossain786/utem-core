@@ -10,8 +10,8 @@ export default function JobsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Jobs</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Named test pipelines — each card shows the latest run status.
         </p>
       </div>
@@ -22,9 +22,9 @@ export default function JobsPage() {
         <div className="text-sm text-red-500">Failed to load jobs.</div>
       ) : !jobs || jobs.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-sm text-gray-500 mb-1">No jobs yet</p>
-          <p className="text-xs text-gray-400">
-            Set <code className="bg-gray-100 px-1 rounded">-Dutem.job.name=MyJob</code> when
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">No jobs yet</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            Set <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">-Dutem.job.name=MyJob</code> when
             running tests to group them under a named job.
           </p>
         </div>
@@ -35,10 +35,10 @@ export default function JobsPage() {
               key={job.jobName}
               type="button"
               onClick={() => navigate(`/jobs/${encodeURIComponent(job.jobName)}`)}
-              className="text-left bg-white border border-gray-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-sm transition-all"
+              className="text-left bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm transition-all"
             >
               <div className="flex items-start justify-between gap-2 mb-3">
-                <h2 className="font-semibold text-gray-900 text-sm leading-snug">
+                <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-snug">
                   {job.jobName}
                 </h2>
                 <span
@@ -48,7 +48,7 @@ export default function JobsPage() {
                   {job.latestStatus}
                 </span>
               </div>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-gray-500">
                 {job.totalRuns} run{job.totalRuns !== 1 ? 's' : ''} &middot;{' '}
                 last {formatRelativeTime(job.lastRunAt)}
               </p>

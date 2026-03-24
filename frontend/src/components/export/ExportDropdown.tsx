@@ -44,7 +44,7 @@ export default function ExportDropdown({ runId }: ExportDropdownProps) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         aria-haspopup="true"
         aria-expanded={open}
       >
@@ -58,16 +58,16 @@ export default function ExportDropdown({ runId }: ExportDropdownProps) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg border border-gray-200 shadow-lg z-20 overflow-hidden">
+        <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg z-20 overflow-hidden">
           {EXPORT_FORMATS.map(({ label, format, description }) => (
             <button
               key={format}
               type="button"
               onClick={() => download(format)}
-              className="w-full text-left px-3 py-2.5 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0"
+              className="w-full text-left px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-b-0"
             >
-              <p className="text-xs font-medium text-gray-900">{label}</p>
-              <p className="text-xs text-gray-400">{description}</p>
+              <p className="text-xs font-medium text-gray-900 dark:text-gray-100">{label}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">{description}</p>
             </button>
           ))}
         </div>

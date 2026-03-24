@@ -54,7 +54,7 @@ function LabelEditor({
           onKeyDown={onKeyDown}
           list={`labels-${runId}`}
           placeholder="Add label…"
-          className="px-1.5 py-0.5 text-xs border border-indigo-400 rounded-full w-28 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="px-1.5 py-0.5 text-xs border border-indigo-400 rounded-full w-28 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
         />
         <datalist id={`labels-${runId}`}>
           {availableLabels.map((l) => <option key={l} value={l} />)}
@@ -69,7 +69,7 @@ function LabelEditor({
         type="button"
         onClick={startEdit}
         title="Click to edit label"
-        className="px-1.5 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 transition-colors"
+        className="px-1.5 py-0.5 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
       >
         {currentLabel}
       </button>
@@ -81,7 +81,7 @@ function LabelEditor({
       type="button"
       onClick={startEdit}
       title="Add label"
-      className="px-1.5 py-0.5 text-xs text-gray-400 rounded-full border border-dashed border-gray-300 hover:border-indigo-400 hover:text-indigo-500 transition-colors opacity-0 group-hover:opacity-100"
+      className="px-1.5 py-0.5 text-xs text-gray-400 dark:text-gray-500 rounded-full border border-dashed border-gray-300 dark:border-gray-600 hover:border-indigo-400 hover:text-indigo-500 transition-colors opacity-0 group-hover:opacity-100"
     >
       + label
     </button>
@@ -134,8 +134,8 @@ function RunRow({
     <tr
       draggable
       onDragStart={(e) => e.dataTransfer.setData('runId', run.id)}
-      className={`group border-b border-gray-50 hover:bg-gray-50 cursor-grab active:cursor-grabbing ${
-        isSelected ? 'bg-blue-50' : run.pinned ? 'bg-amber-50' : ''
+      className={`group border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-grab active:cursor-grabbing ${
+        isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : run.pinned ? 'bg-amber-50 dark:bg-amber-900/20' : ''
       }`}
     >
       <td className="px-3 py-2.5">
@@ -159,7 +159,7 @@ function RunRow({
           <PinButton run={run} />
           <Link
             to={`/runs/${run.id}`}
-            className="font-medium text-gray-900 hover:text-blue-600"
+            className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600"
             onClick={(e) => e.stopPropagation()}
           >
             {run.name}
@@ -167,10 +167,10 @@ function RunRow({
           <LabelEditor runId={run.id} currentLabel={run.label} availableLabels={availableLabels} />
         </div>
       </td>
-      <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>
-      <td className="px-4 py-2.5 text-gray-600">{formatPassRate(run.passRate)}</td>
-      <td className="px-4 py-2.5 text-gray-600">{formatDuration(run.duration)}</td>
-      <td className="px-4 py-2.5 text-gray-500">{formatRelativeTime(run.startTime)}</td>
+      <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{run.totalTests ?? '--'}</td>
+      <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{formatPassRate(run.passRate)}</td>
+      <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{formatDuration(run.duration)}</td>
+      <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">{formatRelativeTime(run.startTime)}</td>
     </tr>
   );
 }
@@ -231,7 +231,7 @@ export default function RunsPage() {
 
   const tableHeaders = (
     <thead>
-      <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+      <tr className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
         <th className="px-3 py-2 w-8" scope="col">
           <input
             type="checkbox"
@@ -254,11 +254,11 @@ export default function RunsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Test Runs</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Test Runs</h1>
         <div className="flex items-center gap-2">
           {selectedIds.length > 0 && (
             <>
-              <span className="text-xs text-gray-500">{selectedIds.length} selected</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{selectedIds.length} selected</span>
               <button
                 type="button"
                 onClick={handleArchive}
@@ -279,7 +279,7 @@ export default function RunsPage() {
             </button>
           )}
           {selectedIds.length === 1 && (
-            <span className="text-xs text-gray-400">Select one more to compare</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">Select one more to compare</span>
           )}
         </div>
       </div>
@@ -295,8 +295,8 @@ export default function RunsPage() {
                 onClick={() => setStatusFilter(filter.value)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                   statusFilter === filter.value
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                    ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {filter.label}
@@ -309,20 +309,20 @@ export default function RunsPage() {
             placeholder="Search by name..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
+            className="px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
           />
         </div>
 
         {availableLabels && availableLabels.length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-xs text-gray-400">Label:</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">Label:</span>
             <button
               type="button"
               onClick={() => setLabelFilter(null)}
               className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
                 labelFilter === null
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               All
@@ -347,11 +347,11 @@ export default function RunsPage() {
 
       {/* Pinned runs */}
       {pinnedRuns.length > 0 && !statusFilter && !labelFilter && !debouncedSearch && (
-        <div className="bg-white rounded-lg border border-amber-200 mb-4">
-          <div className="px-4 py-2 border-b border-amber-100 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-800 mb-4">
+          <div className="px-4 py-2 border-b border-amber-100 dark:border-amber-800 flex items-center gap-2">
             <span className="text-sm">📌</span>
-            <span className="text-xs font-semibold text-amber-700">Pinned</span>
-            <span className="text-xs text-amber-500">{pinnedRuns.length} run{pinnedRuns.length !== 1 ? 's' : ''}</span>
+            <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">Pinned</span>
+            <span className="text-xs text-amber-500 dark:text-amber-500">{pinnedRuns.length} run{pinnedRuns.length !== 1 ? 's' : ''}</span>
           </div>
           <table className="w-full text-sm">
             {tableHeaders}
@@ -375,15 +375,15 @@ export default function RunsPage() {
       )}
 
       {/* Main table */}
-      <div className="bg-white rounded-lg border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         {isLoading ? (
-          <div className="p-6 text-center text-sm text-gray-500">Loading...</div>
+          <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">Loading...</div>
         ) : isError ? (
           <div className="p-6 text-center text-sm text-red-500">Failed to load runs.</div>
         ) : !runsPage || (mainRuns.length === 0 && page === 0) ? (
           <div className="p-6 text-center">
-            <p className="text-sm text-gray-500 mb-1">No runs found</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">No runs found</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               {statusFilter || debouncedSearch || labelFilter
                 ? 'Try adjusting your filters.'
                 : 'Send events to the API to see test runs appear here.'}
@@ -411,8 +411,8 @@ export default function RunsPage() {
             </table>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-              <p className="text-xs text-gray-500">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {runsPage.totalElements} run{runsPage.totalElements !== 1 ? 's' : ''} total
               </p>
               <div className="flex items-center gap-2">
@@ -420,18 +420,18 @@ export default function RunsPage() {
                   type="button"
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={runsPage.first}
-                  className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   Page {runsPage.number + 1} of {runsPage.totalPages}
                 </span>
                 <button
                   type="button"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={runsPage.last}
-                  className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>

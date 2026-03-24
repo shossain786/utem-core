@@ -44,9 +44,9 @@ export default function ProjectsPage() {
     <div className="p-6 max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Each project gets its own API key. Enable security via <code className="bg-gray-100 px-1 rounded">utem.security.enabled=true</code>.
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Projects</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Each project gets its own API key. Enable security via <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-1 rounded">utem.security.enabled=true</code>.
           </p>
         </div>
         {isSuperAdmin && (
@@ -60,14 +60,14 @@ export default function ProjectsPage() {
       </div>
 
       {showCreate && (
-        <form onSubmit={handleCreate} className="mb-6 bg-white border rounded-lg p-4 space-y-3">
-          <h2 className="font-semibold text-gray-800">Create Project</h2>
+        <form onSubmit={handleCreate} className="mb-6 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-4 space-y-3">
+          <h2 className="font-semibold text-gray-800 dark:text-gray-200">Create Project</h2>
           <input
             type="text"
             placeholder="Project name *"
             value={name}
             onChange={e => setName(e.target.value)}
-            className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full border dark:border-gray-600 rounded px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
           <input
@@ -75,7 +75,7 @@ export default function ProjectsPage() {
             placeholder="Description (optional)"
             value={description}
             onChange={e => setDescription(e.target.value)}
-            className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full border dark:border-gray-600 rounded px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <div className="flex gap-2">
             <button type="submit" disabled={createProject.isPending}
@@ -83,7 +83,7 @@ export default function ProjectsPage() {
               Create
             </button>
             <button type="button" onClick={() => setShowCreate(false)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded hover:bg-gray-200">
+              className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded hover:bg-gray-200 dark:hover:bg-gray-600">
               Cancel
             </button>
           </div>
@@ -91,10 +91,10 @@ export default function ProjectsPage() {
         </form>
       )}
 
-      {isLoading && <p className="text-gray-500">Loading…</p>}
+      {isLoading && <p className="text-gray-500 dark:text-gray-400">Loading…</p>}
 
       {!isLoading && projects?.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-gray-400 dark:text-gray-500">
           <p className="text-lg">No projects yet</p>
           <p className="text-sm mt-1">Create a project to get an API key for your reporters.</p>
         </div>
@@ -132,17 +132,17 @@ function ProjectCard({ project, isSuperAdmin, keyVisible, copied, onToggleKey, o
   const [membersOpen, setMembersOpen] = useState(false);
 
   return (
-    <div className={`bg-white border rounded-lg p-4 ${!project.active ? 'opacity-50' : ''}`}>
+    <div className={`bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-4 ${!project.active ? 'opacity-50' : ''}`}>
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="font-semibold text-gray-900">{project.name}</h3>
-          {project.description && <p className="text-sm text-gray-500 mt-0.5">{project.description}</p>}
-          <p className="text-xs text-gray-400 mt-1">Created {new Date(project.createdAt).toLocaleDateString()}</p>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{project.name}</h3>
+          {project.description && <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{project.description}</p>}
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Created {new Date(project.createdAt).toLocaleDateString()}</p>
         </div>
         {isSuperAdmin && (
           <div className="flex gap-2">
             <button type="button" onClick={() => setMembersOpen(o => !o)}
-              className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
+              className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
               Members {membersOpen ? '▲' : '▼'}
             </button>
             <button type="button" onClick={onRegenerate}
@@ -159,7 +159,7 @@ function ProjectCard({ project, isSuperAdmin, keyVisible, copied, onToggleKey, o
       </div>
 
       <div className="mt-3 flex items-center gap-2">
-        <code className="flex-1 bg-gray-50 border rounded px-3 py-1.5 text-xs font-mono text-gray-700 truncate">
+        <code className="flex-1 bg-gray-50 dark:bg-gray-700 border dark:border-gray-600 rounded px-3 py-1.5 text-xs font-mono text-gray-700 dark:text-gray-200 truncate">
           {keyVisible ? project.apiKey : '•'.repeat(32)}
         </code>
         <button type="button" onClick={onToggleKey}
@@ -171,8 +171,8 @@ function ProjectCard({ project, isSuperAdmin, keyVisible, copied, onToggleKey, o
           {copied ? '✓ Copied' : 'Copy'}
         </button>
       </div>
-      <p className="text-xs text-gray-400 mt-2">
-        Add <code className="bg-gray-100 px-1 rounded">X-API-Key: {keyVisible ? project.apiKey : '***'}</code> to your reporter config
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+        Add <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-1 rounded">X-API-Key: {keyVisible ? project.apiKey : '***'}</code> to your reporter config
       </p>
 
       {isSuperAdmin && membersOpen && <MembersSection projectId={project.id} />}
@@ -201,13 +201,13 @@ function MembersSection({ projectId }: { projectId: string }) {
   }
 
   return (
-    <div className="mt-4 border-t pt-3">
-      <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Members</h4>
+    <div className="mt-4 border-t dark:border-gray-700 pt-3">
+      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Members</h4>
 
-      {isLoading && <p className="text-xs text-gray-400">Loading…</p>}
+      {isLoading && <p className="text-xs text-gray-400 dark:text-gray-500">Loading…</p>}
 
       {!isLoading && members?.length === 0 && (
-        <p className="text-xs text-gray-400 mb-2">No members yet. Add users below.</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">No members yet. Add users below.</p>
       )}
 
       {members && members.length > 0 && (
@@ -227,7 +227,7 @@ function MembersSection({ projectId }: { projectId: string }) {
           value={selectedUserId}
           onChange={e => setSelectedUserId(e.target.value)}
           title="Select user to add"
-          className="flex-1 border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+          className="flex-1 border dark:border-gray-600 rounded px-2 py-1 text-xs bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-400"
         >
           <option value="">Add user…</option>
           {availableUsers.map(u => (
@@ -238,7 +238,7 @@ function MembersSection({ projectId }: { projectId: string }) {
           value={selectedRole}
           onChange={e => setSelectedRole(e.target.value as MemberRole)}
           title="Select member role"
-          className="border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+          className="border dark:border-gray-600 rounded px-2 py-1 text-xs bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-400"
         >
           <option value="VIEWER">Viewer</option>
           <option value="ADMIN">Admin</option>
@@ -254,11 +254,11 @@ function MembersSection({ projectId }: { projectId: string }) {
 
 function MemberRow({ member, onRemove }: { member: ProjectMemberDTO; onRemove: () => void }) {
   return (
-    <div className="flex items-center justify-between bg-gray-50 rounded px-2 py-1">
+    <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 rounded px-2 py-1">
       <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-700">{member.username}</span>
+        <span className="text-xs text-gray-700 dark:text-gray-300">{member.username}</span>
         <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
-          member.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-gray-200 text-gray-600'
+          member.role === 'ADMIN' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
         }`}>
           {member.role}
         </span>

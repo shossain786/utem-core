@@ -47,7 +47,7 @@ export default function ComparisonPage() {
     return (
       <div>
         <BackLink runId={runId} />
-        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center">
           <p className="text-sm text-red-500">Failed to load comparison.</p>
         </div>
       </div>
@@ -71,28 +71,28 @@ export default function ComparisonPage() {
       <BackLink runId={runId} />
 
       {/* Header */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-        <h1 className="text-lg font-bold text-gray-900 mb-3">Run Comparison</h1>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-4">
+        <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">Run Comparison</h1>
         <div className="grid grid-cols-2 gap-4">
           {/* Base run */}
-          <div className="border border-gray-100 rounded-lg p-3">
-            <p className="text-xs text-gray-400 mb-1 font-medium uppercase tracking-wide">Base</p>
-            <Link to={`/runs/${baseRun.id}`} className="font-medium text-gray-900 hover:text-blue-600 text-sm">
+          <div className="border border-gray-100 dark:border-gray-700 rounded-lg p-3">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 font-medium uppercase tracking-wide">Base</p>
+            <Link to={`/runs/${baseRun.id}`} className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 text-sm">
               {baseRun.name}
             </Link>
-            <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+            <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
               <span className={RUN_STATUS_TEXT_COLORS[baseRun.status]}>{baseRun.status}</span>
               <span>·</span>
               <span>{formatRelativeTime(baseRun.startTime)}</span>
             </div>
           </div>
           {/* Compare run */}
-          <div className="border border-gray-100 rounded-lg p-3">
-            <p className="text-xs text-gray-400 mb-1 font-medium uppercase tracking-wide">Compare</p>
-            <Link to={`/runs/${compareRun.id}`} className="font-medium text-gray-900 hover:text-blue-600 text-sm">
+          <div className="border border-gray-100 dark:border-gray-700 rounded-lg p-3">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 font-medium uppercase tracking-wide">Compare</p>
+            <Link to={`/runs/${compareRun.id}`} className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 text-sm">
               {compareRun.name}
             </Link>
-            <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+            <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
               <span className={RUN_STATUS_TEXT_COLORS[compareRun.status]}>{compareRun.status}</span>
               <span>·</span>
               <span>{formatRelativeTime(compareRun.startTime)}</span>
@@ -110,38 +110,38 @@ export default function ComparisonPage() {
       </div>
 
       {/* Stats diff */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">Summary Delta (compare vs base)</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-4">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Summary Delta (compare vs base)</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center text-sm">
           <div>
-            <p className="text-xs text-gray-400">Total</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Total</p>
             <DiffArrow value={comparison.totalTestsDiff} format={(v) => String(v)} />
           </div>
           <div>
-            <p className="text-xs text-gray-400">Passed</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Passed</p>
             <DiffArrow value={-comparison.passedTestsDiff} format={(v) => String(Math.abs(v))} />
           </div>
           <div>
-            <p className="text-xs text-gray-400">Failed</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Failed</p>
             <DiffArrow value={comparison.failedTestsDiff} format={(v) => String(v)} />
           </div>
           <div>
-            <p className="text-xs text-gray-400">Pass Rate</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Pass Rate</p>
             <DiffArrow value={comparison.passRateDiff} format={(v) => `${v.toFixed(1)}%`} />
           </div>
           <div>
-            <p className="text-xs text-gray-400">Duration</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Duration</p>
             <DiffArrow value={comparison.durationDiff} format={(v) => formatDuration(Math.abs(v)) ?? '—'} />
           </div>
         </div>
       </div>
 
       {/* Node diff table */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             Test Differences
-            <span className="ml-2 text-xs font-normal text-gray-400">({comparison.nodeDiffs.length} tests)</span>
+            <span className="ml-2 text-xs font-normal text-gray-400 dark:text-gray-500">({comparison.nodeDiffs.length} tests)</span>
           </h2>
           <div className="flex gap-1">
             {DIFF_FILTERS.map((f) => (
@@ -151,8 +151,8 @@ export default function ComparisonPage() {
                 onClick={() => setFilter(f.value)}
                 className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${
                   filter === f.value
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                    ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {f.label}
@@ -162,11 +162,11 @@ export default function ComparisonPage() {
         </div>
 
         {filteredDiffs.length === 0 ? (
-          <div className="p-6 text-center text-sm text-gray-400">No tests match this filter.</div>
+          <div className="p-6 text-center text-sm text-gray-400 dark:text-gray-500">No tests match this filter.</div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+              <tr className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
                 <th className="px-4 py-2 font-medium">Type</th>
                 <th className="px-4 py-2 font-medium">Test Name</th>
                 <th className="px-4 py-2 font-medium">Base Status</th>
@@ -182,18 +182,18 @@ export default function ComparisonPage() {
                     ? diff.compareDuration - diff.baseDuration
                     : null;
                 return (
-                  <tr key={i} className={`border-b border-gray-50 ${style.row}`}>
+                  <tr key={i} className={`border-b border-gray-50 dark:border-gray-800 ${style.row}`}>
                     <td className="px-4 py-2.5">
                       <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${style.badge}`}>
                         {style.label}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 text-gray-900 font-medium max-w-xs truncate" title={diff.name}>
+                    <td className="px-4 py-2.5 text-gray-900 dark:text-gray-100 font-medium max-w-xs truncate" title={diff.name}>
                       {diff.name}
-                      <span className="ml-1.5 text-xs font-normal text-gray-400">{diff.nodeType}</span>
+                      <span className="ml-1.5 text-xs font-normal text-gray-400 dark:text-gray-500">{diff.nodeType}</span>
                     </td>
-                    <td className="px-4 py-2.5 text-xs text-gray-500">{diff.baseStatus ?? '—'}</td>
-                    <td className="px-4 py-2.5 text-xs text-gray-500">{diff.compareStatus ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-500 dark:text-gray-400">{diff.baseStatus ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-500 dark:text-gray-400">{diff.compareStatus ?? '—'}</td>
                     <td className="px-4 py-2.5 text-xs">
                       <DiffArrow value={durationDelta} format={(v) => formatDuration(Math.abs(v)) ?? '—'} />
                     </td>
@@ -210,8 +210,8 @@ export default function ComparisonPage() {
 
 function DiffCard({ label, count, colorClass }: { label: string; count: number; colorClass: string }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-3 text-center">
-      <p className="text-xs text-gray-400 mb-1">{label}</p>
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 text-center">
+      <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{label}</p>
       <p className={`text-xl font-bold ${colorClass}`}>{count}</p>
     </div>
   );
@@ -221,7 +221,7 @@ function BackLink({ runId }: { runId: string | undefined }) {
   return (
     <Link
       to={runId ? `/runs/${runId}` : '/runs'}
-      className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 mb-4"
+      className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4"
     >
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

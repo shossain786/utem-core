@@ -27,7 +27,7 @@ export default function FailureClustersPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Failure Analysis</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Failure Analysis</h1>
         <div className="flex gap-1">
           {RANGE_OPTIONS.map((opt) => (
             <button
@@ -36,8 +36,8 @@ export default function FailureClustersPage() {
               onClick={() => setRecentRuns(opt.value)}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 recentRuns === opt.value
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                  ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               {opt.label}
@@ -47,23 +47,23 @@ export default function FailureClustersPage() {
       </div>
 
       {/* Failure Hotspots */}
-      <div className="bg-white rounded-lg border border-gray-200 mb-4">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-4">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             Failure Hotspots
-            {!loadingHotspots && <span className="ml-2 text-xs font-normal text-gray-400">{hotspots.length} tests</span>}
+            {!loadingHotspots && <span className="ml-2 text-xs font-normal text-gray-400 dark:text-gray-500">{hotspots.length} tests</span>}
           </h2>
         </div>
 
         {loadingHotspots ? (
-          <div className="p-8 text-center text-sm text-gray-400">Loading...</div>
+          <div className="p-8 text-center text-sm text-gray-400 dark:text-gray-500">Loading...</div>
         ) : hotspots.length === 0 ? (
-          <div className="p-8 text-center text-sm text-gray-400">No failures found in the last {recentRuns} runs.</div>
+          <div className="p-8 text-center text-sm text-gray-400 dark:text-gray-500">No failures found in the last {recentRuns} runs.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+                <tr className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
                   <th className="px-4 py-2 font-medium">Test Name</th>
                   <th className="px-4 py-2 font-medium">Type</th>
                   <th className="px-4 py-2 font-medium">Fail Rate</th>
@@ -74,9 +74,9 @@ export default function FailureClustersPage() {
               </thead>
               <tbody>
                 {hotspots.map((h, i) => (
-                  <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  <tr key={i} className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-4 py-2.5 max-w-xs">
-                      <span className="text-gray-900 font-medium truncate block" title={h.testName}>
+                      <span className="text-gray-900 dark:text-gray-100 font-medium truncate block" title={h.testName}>
                         {h.testName}
                       </span>
                     </td>
@@ -87,7 +87,7 @@ export default function FailureClustersPage() {
                     </td>
                     <td className="px-4 py-2.5">
                       <div className="flex items-center gap-2">
-                        <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="w-20 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${h.failRate >= 75 ? 'bg-red-500' : h.failRate >= 50 ? 'bg-orange-400' : 'bg-yellow-400'}`}
                             style={{ width: `${h.failRate}%` }}
@@ -98,12 +98,12 @@ export default function FailureClustersPage() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-2.5 text-gray-600 text-xs">
+                    <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400 text-xs">
                       {h.failCount}/{h.totalRuns} runs
                     </td>
                     <td className="px-4 py-2.5 max-w-xs">
                       {h.lastErrorMessage ? (
-                        <span className="text-xs text-gray-500 truncate block" title={h.lastErrorMessage}>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate block" title={h.lastErrorMessage}>
                           {h.lastErrorMessage.length > 60 ? h.lastErrorMessage.substring(0, 60) + '…' : h.lastErrorMessage}
                         </span>
                       ) : (
@@ -128,20 +128,20 @@ export default function FailureClustersPage() {
       </div>
 
       {/* Error Clusters */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             Error Clusters
-            {!loadingClusters && <span className="ml-2 text-xs font-normal text-gray-400">{clusters.length} distinct patterns</span>}
+            {!loadingClusters && <span className="ml-2 text-xs font-normal text-gray-400 dark:text-gray-500">{clusters.length} distinct patterns</span>}
           </h2>
         </div>
 
         {loadingClusters ? (
-          <div className="p-8 text-center text-sm text-gray-400">Loading...</div>
+          <div className="p-8 text-center text-sm text-gray-400 dark:text-gray-500">Loading...</div>
         ) : clusters.length === 0 ? (
-          <div className="p-8 text-center text-sm text-gray-400">No error clusters detected.</div>
+          <div className="p-8 text-center text-sm text-gray-400 dark:text-gray-500">No error clusters detected.</div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-700">
             {clusters.map((cluster) => (
               <ClusterRow
                 key={cluster.clusterId}
@@ -167,18 +167,18 @@ function ClusterRow({ cluster, expanded, onToggle }: {
   return (
     <div className="px-4 py-3">
       <div className="flex items-start gap-3">
-        <span className="inline-flex items-center justify-center min-w-6 h-6 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+        <span className="inline-flex items-center justify-center min-w-6 h-6 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-full">
           {cluster.occurrences}
         </span>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-mono text-gray-700 truncate" title={cluster.representativeError}>
+          <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate" title={cluster.representativeError}>
             {cluster.representativeError.length > 120
               ? cluster.representativeError.substring(0, 120) + '…'
               : cluster.representativeError}
           </p>
           <div className="flex items-center gap-3 mt-1">
-            <span className="text-xs text-gray-400">{cluster.affectedTests.length} test{cluster.affectedTests.length !== 1 ? 's' : ''}</span>
-            <span className="text-xs text-gray-400">{cluster.runIds.length} run{cluster.runIds.length !== 1 ? 's' : ''}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">{cluster.affectedTests.length} test{cluster.affectedTests.length !== 1 ? 's' : ''}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">{cluster.runIds.length} run{cluster.runIds.length !== 1 ? 's' : ''}</span>
             <button
               type="button"
               onClick={onToggle}
@@ -188,14 +188,14 @@ function ClusterRow({ cluster, expanded, onToggle }: {
             </button>
           </div>
           {expanded && (
-            <div className="mt-2 p-3 bg-gray-50 rounded-md">
-              <p className="text-xs font-medium text-gray-600 mb-1">Affected tests:</p>
+            <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Affected tests:</p>
               <ul className="space-y-0.5">
                 {cluster.affectedTests.map((t) => (
-                  <li key={t} className="text-xs text-gray-700 font-mono">• {t}</li>
+                  <li key={t} className="text-xs text-gray-700 dark:text-gray-300 font-mono">• {t}</li>
                 ))}
               </ul>
-              <p className="text-xs font-mono text-gray-500 mt-2 whitespace-pre-wrap break-all">
+              <p className="text-xs font-mono text-gray-500 dark:text-gray-400 mt-2 whitespace-pre-wrap break-all">
                 {cluster.representativeError}
               </p>
             </div>

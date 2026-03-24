@@ -11,16 +11,16 @@ const NODE_TYPE_LABELS: Record<NodeType, string> = {
 };
 
 const NODE_TYPE_COLORS: Record<NodeType, string> = {
-  SUITE: 'bg-blue-100 text-blue-700',
-  FEATURE: 'bg-purple-100 text-purple-700',
-  SCENARIO: 'bg-amber-100 text-amber-700',
-  STEP: 'bg-gray-100 text-gray-600',
+  SUITE: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400',
+  FEATURE: 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400',
+  SCENARIO: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400',
+  STEP: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
 };
 
 function ChevronIcon({ expanded }: { expanded: boolean }) {
   return (
     <svg
-      className={`w-3.5 h-3.5 text-gray-400 transition-transform ${expanded ? 'rotate-90' : ''}`}
+      className={`w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-transform ${expanded ? 'rotate-90' : ''}`}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -40,7 +40,7 @@ function PaperclipBadge({
 }) {
   return (
     <button
-      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 text-[10px] shrink-0 hover:bg-gray-200"
+      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-[10px] shrink-0 hover:bg-gray-200 dark:hover:bg-gray-600"
       onClick={onClick}
     >
       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -65,7 +65,7 @@ function StepRow({
 
   return (
     <div
-      className={`flex items-center gap-2 py-1 px-2 text-xs text-gray-600 hover:bg-gray-50 rounded ${
+      className={`flex items-center gap-2 py-1 px-2 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded ${
         onStepClick ? 'cursor-pointer' : ''
       }`}
       onClick={() => onStepClick?.(step)}
@@ -89,7 +89,7 @@ function StepRow({
         />
       )}
       {step.duration != null && (
-        <span className="text-gray-400 ml-auto">{formatDuration(step.duration)}</span>
+        <span className="text-gray-400 dark:text-gray-500 ml-auto">{formatDuration(step.duration)}</span>
       )}
     </div>
   );
@@ -114,10 +114,10 @@ export default function TreeNode({ node, depth = 0, onStepClick, onAttachmentCli
   );
 
   return (
-    <div className={depth > 0 ? 'ml-4 border-l border-gray-100' : ''}>
+    <div className={depth > 0 ? 'ml-4 border-l border-gray-100 dark:border-gray-800' : ''}>
       {/* Node header */}
       <div
-        className={`flex items-center gap-2 py-1.5 px-2 rounded hover:bg-gray-50 ${
+        className={`flex items-center gap-2 py-1.5 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 ${
           isExpandable ? 'cursor-pointer' : ''
         }`}
         onClick={() => isExpandable && setExpanded(!expanded)}
@@ -142,14 +142,14 @@ export default function TreeNode({ node, depth = 0, onStepClick, onAttachmentCli
 
         {/* Stats (for nodes with children) */}
         {node.statistics && hasChildren && (
-          <span className="text-[10px] text-gray-400 shrink-0 ml-1">
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0 ml-1">
             {node.statistics.passedNodes}P / {node.statistics.failedNodes}F / {node.statistics.skippedNodes}S
           </span>
         )}
 
         {/* Flaky badge */}
         {node.flaky && (
-          <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-yellow-100 text-yellow-700 shrink-0">
+          <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 shrink-0">
             Flaky
           </span>
         )}
@@ -167,7 +167,7 @@ export default function TreeNode({ node, depth = 0, onStepClick, onAttachmentCli
 
         {/* Duration */}
         {node.duration != null && (
-          <span className="text-xs text-gray-400 ml-auto shrink-0">
+          <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto shrink-0">
             {formatDuration(node.duration)}
           </span>
         )}
@@ -189,7 +189,7 @@ export default function TreeNode({ node, depth = 0, onStepClick, onAttachmentCli
 
           {/* Steps (inline under scenario/step nodes) */}
           {hasSteps && (
-            <div className={`${depth > 0 ? 'ml-4 border-l border-gray-100' : ''} pl-2`}>
+            <div className={`${depth > 0 ? 'ml-4 border-l border-gray-100 dark:border-gray-800' : ''} pl-2`}>
               {node.steps
                 .sort((a, b) => (a.stepOrder ?? 0) - (b.stepOrder ?? 0))
                 .map((step) => (

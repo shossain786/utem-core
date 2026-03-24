@@ -27,24 +27,24 @@ export default function QualityGateBadge({ gate }: Props) {
       </button>
 
       {open && !passed && (
-        <div className="absolute left-0 top-full mt-1 z-50 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="text-xs font-semibold text-gray-700 mb-2">Violations</p>
+        <div className="absolute left-0 top-full mt-1 z-50 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3">
+          <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Violations</p>
           <ul className="space-y-1.5">
             {gate.violations.map((v, i) => (
-              <li key={i} className="text-xs text-gray-600">
-                <span className="font-medium text-red-600">{v.rule}</span>
+              <li key={i} className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="font-medium text-red-600 dark:text-red-400">{v.rule}</span>
                 {' — '}
                 {v.message}
               </li>
             ))}
           </ul>
-          <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-400 space-y-0.5">
-            <div>Fail rate: <span className="text-gray-600">{gate.metrics.failRate.toFixed(1)}%</span></div>
+          <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400 dark:text-gray-500 space-y-0.5">
+            <div>Fail rate: <span className="text-gray-600 dark:text-gray-300">{gate.metrics.failRate.toFixed(1)}%</span></div>
             {gate.metrics.flakyTestCount > 0 && (
-              <div>Flaky tests: <span className="text-gray-600">{gate.metrics.flakyTestCount}</span></div>
+              <div>Flaky tests: <span className="text-gray-600 dark:text-gray-300">{gate.metrics.flakyTestCount}</span></div>
             )}
             {gate.metrics.newFailures > 0 && (
-              <div>New failures: <span className="text-gray-600">{gate.metrics.newFailures}</span></div>
+              <div>New failures: <span className="text-gray-600 dark:text-gray-300">{gate.metrics.newFailures}</span></div>
             )}
           </div>
         </div>

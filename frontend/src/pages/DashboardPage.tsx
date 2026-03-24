@@ -19,8 +19,8 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <div className="flex items-center gap-3 text-xs text-gray-500">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
+        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
           {statsUpdatedAt > 0 && (
             <span>Refreshed {formatRelativeTime(new Date(statsUpdatedAt).toISOString())}</span>
           )}
@@ -75,27 +75,27 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Runs */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-700">Recent Runs</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Recent Runs</h2>
           <Link to="/runs" className="text-xs text-blue-600 hover:text-blue-800">
             View all
           </Link>
         </div>
 
         {runsLoading ? (
-          <div className="p-6 text-center text-sm text-gray-500">Loading...</div>
+          <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">Loading...</div>
         ) : !runsPage || runsPage.empty ? (
           <div className="p-6 text-center">
-            <p className="text-sm text-gray-500 mb-1">No test runs yet</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">No test runs yet</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               Send events to the API to see test runs appear here.
             </p>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+              <tr className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
                 <th className="px-4 py-2 font-medium">Status</th>
                 <th className="px-4 py-2 font-medium">Name</th>
                 <th className="px-4 py-2 font-medium">Tests</th>
@@ -106,7 +106,7 @@ export default function DashboardPage() {
             </thead>
             <tbody>
               {runsPage.content.map((run) => (
-                <tr key={run.id} className="border-b border-gray-50 hover:bg-gray-50">
+                <tr key={run.id} className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-4 py-2.5">
                     <span
                       className={`inline-flex items-center gap-1.5 text-xs font-medium ${RUN_STATUS_TEXT_COLORS[run.status]}`}
@@ -115,11 +115,11 @@ export default function DashboardPage() {
                       {run.status}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 font-medium text-gray-900">{run.name}</td>
-                  <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>
-                  <td className="px-4 py-2.5 text-gray-600">{formatPassRate(run.passRate)}</td>
-                  <td className="px-4 py-2.5 text-gray-600">{formatDuration(run.duration)}</td>
-                  <td className="px-4 py-2.5 text-gray-500">{formatRelativeTime(run.startTime)}</td>
+                  <td className="px-4 py-2.5 font-medium text-gray-900 dark:text-gray-100">{run.name}</td>
+                  <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{run.totalTests ?? '--'}</td>
+                  <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{formatPassRate(run.passRate)}</td>
+                  <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{formatDuration(run.duration)}</td>
+                  <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">{formatRelativeTime(run.startTime)}</td>
                 </tr>
               ))}
             </tbody>
@@ -140,8 +140,8 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
-      <p className="text-sm text-gray-500 mb-1">{label}</p>
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{label}</p>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
     </div>
   );

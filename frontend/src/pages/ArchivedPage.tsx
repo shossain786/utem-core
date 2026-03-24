@@ -37,14 +37,14 @@ export default function ArchivedPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Archive</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Archive</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             Archived runs are excluded from analytics and trends.
           </p>
         </div>
         {selectedIds.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">{selectedIds.length} selected</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{selectedIds.length} selected</span>
             <button
               type="button"
               onClick={handleUnarchive}
@@ -57,15 +57,15 @@ export default function ArchivedPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         {isLoading ? (
-          <div className="p-6 text-center text-sm text-gray-500">Loading...</div>
+          <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">Loading...</div>
         ) : isError ? (
           <div className="p-6 text-center text-sm text-red-500">Failed to load archived runs.</div>
         ) : !runsPage || runsPage.empty ? (
           <div className="p-6 text-center">
-            <p className="text-sm text-gray-500 mb-1">No archived runs</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">No archived runs</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               Select runs on the Test Runs page and click Archive, or drag a row onto the Archive item in the sidebar.
             </p>
           </div>
@@ -73,7 +73,7 @@ export default function ArchivedPage() {
           <>
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+                <tr className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
                   <th className="px-3 py-2 w-8" scope="col">
                     <input
                       type="checkbox"
@@ -97,7 +97,7 @@ export default function ArchivedPage() {
                   return (
                     <tr
                       key={run.id}
-                      className={`border-b border-gray-50 hover:bg-gray-50 ${isSelected ? 'bg-green-50' : ''}`}
+                      className={`border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 ${isSelected ? 'bg-green-50 dark:bg-green-900/20' : ''}`}
                     >
                       <td className="px-3 py-2.5">
                         <input
@@ -125,15 +125,15 @@ export default function ArchivedPage() {
                       <td className="px-4 py-2.5">
                         <Link
                           to={`/runs/${run.id}`}
-                          className="font-medium text-gray-900 hover:text-blue-600"
+                          className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600"
                         >
                           {run.name}
                         </Link>
                       </td>
-                      <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>
-                      <td className="px-4 py-2.5 text-gray-600">{formatPassRate(run.passRate)}</td>
-                      <td className="px-4 py-2.5 text-gray-600">{formatDuration(run.duration)}</td>
-                      <td className="px-4 py-2.5 text-gray-500">{formatRelativeTime(run.startTime)}</td>
+                      <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{run.totalTests ?? '--'}</td>
+                      <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{formatPassRate(run.passRate)}</td>
+                      <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{formatDuration(run.duration)}</td>
+                      <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">{formatRelativeTime(run.startTime)}</td>
                     </tr>
                   );
                 })}
@@ -141,8 +141,8 @@ export default function ArchivedPage() {
             </table>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-              <p className="text-xs text-gray-500">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {runsPage.totalElements} run{runsPage.totalElements !== 1 ? 's' : ''} archived
               </p>
               <div className="flex items-center gap-2">
@@ -150,18 +150,18 @@ export default function ArchivedPage() {
                   type="button"
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={runsPage.first}
-                  className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   Page {runsPage.number + 1} of {runsPage.totalPages}
                 </span>
                 <button
                   type="button"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={runsPage.last}
-                  className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>

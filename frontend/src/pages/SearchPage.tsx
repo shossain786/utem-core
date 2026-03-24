@@ -30,21 +30,21 @@ function ResultSection({
   if (count === 0) return null;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 w-full px-4 py-3 text-left hover:bg-gray-50"
+        className="flex items-center gap-2 w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700"
       >
         <svg
-          className={`w-3.5 h-3.5 text-gray-400 transition-transform ${expanded ? 'rotate-90' : ''}`}
+          className={`w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-transform ${expanded ? 'rotate-90' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-        <h2 className="text-sm font-semibold text-gray-700">{title}</h2>
-        <span className="text-xs text-gray-400">({count})</span>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{title}</h2>
+        <span className="text-xs text-gray-400 dark:text-gray-500">({count})</span>
       </button>
-      {expanded && <div className="border-t border-gray-100">{children}</div>}
+      {expanded && <div className="border-t border-gray-100 dark:border-gray-800">{children}</div>}
     </div>
   );
 }
@@ -65,7 +65,7 @@ function RunsResults({ runs }: { runs: TestRunSummary[] }) {
       </thead>
       <tbody>
         {runs.map((run) => (
-          <tr key={run.id} className="border-b border-gray-50 hover:bg-gray-50">
+          <tr key={run.id} className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
             <td className="px-4 py-2.5">
               <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${RUN_STATUS_TEXT_COLORS[run.status]}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${RUN_STATUS_COLORS[run.status]}`} />
@@ -73,13 +73,13 @@ function RunsResults({ runs }: { runs: TestRunSummary[] }) {
               </span>
             </td>
             <td className="px-4 py-2.5">
-              <Link to={`/runs/${run.id}`} className="font-medium text-gray-900 hover:text-blue-600">
+              <Link to={`/runs/${run.id}`} className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600">
                 {run.name}
               </Link>
             </td>
-            <td className="px-4 py-2.5 text-gray-600">{run.totalTests ?? '--'}</td>
-            <td className="px-4 py-2.5 text-gray-600">{formatPassRate(run.passRate)}</td>
-            <td className="px-4 py-2.5 text-gray-500">{formatRelativeTime(run.startTime)}</td>
+            <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{run.totalTests ?? '--'}</td>
+            <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{formatPassRate(run.passRate)}</td>
+            <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">{formatRelativeTime(run.startTime)}</td>
           </tr>
         ))}
       </tbody>
@@ -110,7 +110,7 @@ function NodesResults({ nodes }: { nodes: TestNodeSummary[] }) {
       </thead>
       <tbody>
         {nodes.map((node) => (
-          <tr key={node.id} className="border-b border-gray-50 hover:bg-gray-50">
+          <tr key={node.id} className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
             <td className="px-4 py-2.5">
               <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${NODE_STATUS_TEXT_COLORS[node.status]}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${NODE_STATUS_COLORS[node.status]}`} />
@@ -122,17 +122,17 @@ function NodesResults({ nodes }: { nodes: TestNodeSummary[] }) {
                 {node.nodeType}
               </span>
             </td>
-            <td className="px-4 py-2.5 font-medium text-gray-900">{node.name}</td>
+            <td className="px-4 py-2.5 font-medium text-gray-900 dark:text-gray-100">{node.name}</td>
             <td className="px-4 py-2.5">
               {node.runId ? (
-                <Link to={`/runs/${node.runId}`} className="text-gray-600 hover:text-blue-600 text-xs">
+                <Link to={`/runs/${node.runId}`} className="text-gray-600 dark:text-gray-400 hover:text-blue-600 text-xs">
                   {node.runName ?? node.runId}
                 </Link>
               ) : (
-                <span className="text-gray-400 text-xs">--</span>
+                <span className="text-gray-400 dark:text-gray-500 text-xs">--</span>
               )}
             </td>
-            <td className="px-4 py-2.5 text-gray-600">{formatDuration(node.duration)}</td>
+            <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{formatDuration(node.duration)}</td>
           </tr>
         ))}
       </tbody>
@@ -144,9 +144,9 @@ function NodesResults({ nodes }: { nodes: TestNodeSummary[] }) {
 
 function StepsResults({ steps }: { steps: TestStepSummary[] }) {
   return (
-    <div className="divide-y divide-gray-50">
+    <div className="divide-y divide-gray-50 dark:divide-gray-700">
       {steps.map((step) => (
-        <div key={step.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50">
+        <div key={step.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700">
           <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${STEP_STATUS_COLORS[step.status]}`} />
           <div className="min-w-0 flex-1">
             <p className={`text-sm font-medium ${STEP_STATUS_TEXT_COLORS[step.status]}`}>
@@ -177,17 +177,17 @@ const ATTACHMENT_TYPE_STYLES: Record<AttachmentType, string> = {
 
 function AttachmentsResults({ attachments }: { attachments: AttachmentSummary[] }) {
   return (
-    <div className="divide-y divide-gray-50">
+    <div className="divide-y divide-gray-50 dark:divide-gray-700">
       {attachments.map((att) => (
-        <div key={att.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50">
+        <div key={att.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700">
           <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${ATTACHMENT_TYPE_STYLES[att.type]}`}>
             {att.type}
           </span>
-          <span className="text-sm text-gray-900 truncate">{att.name}</span>
+          <span className="text-sm text-gray-900 dark:text-gray-100 truncate">{att.name}</span>
           {att.fileSize != null && (
-            <span className="text-xs text-gray-400 shrink-0">{formatFileSize(att.fileSize)}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{formatFileSize(att.fileSize)}</span>
           )}
-          <span className="text-xs text-gray-400 ml-auto shrink-0">{formatRelativeTime(att.timestamp)}</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto shrink-0">{formatRelativeTime(att.timestamp)}</span>
         </div>
       ))}
     </div>
@@ -213,7 +213,7 @@ export default function SearchPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Search</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Search</h1>
 
       {/* Search input */}
       <div className="relative mb-6">
@@ -228,7 +228,7 @@ export default function SearchPage() {
           placeholder="Search runs, nodes, steps, attachments..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           autoFocus
         />
       </div>
@@ -239,8 +239,8 @@ export default function SearchPage() {
           <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <p className="text-sm text-gray-500">Type at least 2 characters to search across all test data.</p>
-          <p className="text-xs text-gray-400 mt-1">Search by run name, node name, step name, or attachment name.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Type at least 2 characters to search across all test data.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Search by run name, node name, step name, or attachment name.</p>
         </div>
       ) : isLoading ? (
         <div className="text-center py-12">
@@ -252,12 +252,12 @@ export default function SearchPage() {
         </div>
       ) : !hasResults ? (
         <div className="text-center py-12">
-          <p className="text-sm text-gray-500">No results found for &ldquo;{debouncedQuery}&rdquo;</p>
-          <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">No results found for &ldquo;{debouncedQuery}&rdquo;</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Try a different search term.</p>
         </div>
       ) : (
         <div className="space-y-4">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             {results.totalResults} result{results.totalResults !== 1 ? 's' : ''} for &ldquo;{results.query}&rdquo;
           </p>
 
