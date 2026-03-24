@@ -64,3 +64,4 @@ Your test run appears live in the dashboard.
 - [Enable authentication](./auth) — multi-user setup
 - [JUnit 5 reporter](../reporters/junit5) — detailed setup
 - [Cucumber reporter](../reporters/cucumber) — Cucumber integration
+- [Jest reporter](../reporters/jest) — JavaScript/TypeScript projects

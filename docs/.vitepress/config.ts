@@ -42,6 +42,7 @@ export default defineConfig({
         items: [
           { text: 'JUnit 5', link: '/reporters/junit5' },
           { text: 'Cucumber', link: '/reporters/cucumber' },
+          { text: 'Jest', link: '/reporters/jest' },
         ]
       },
       {
