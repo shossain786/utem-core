@@ -6,7 +6,7 @@
 - [x] Playwright reporter (`utem-reporter-playwright`) — npm ✅ v0.1.5
 - [x] Jest reporter (`utem-jest-reporter`) — npm ✅ v0.1.0
 - [x] Cypress reporter (`utem-cypress-reporter`) — npm ✅ v0.1.0
-- [ ] Robot Framework listener
+- [x] Robot Framework listener (`utem-robot-reporter`) — PyPI ✅ v0.1.0
 
 ## Notifications & Alerts
 - [x] Slack notifications — incoming webhook, Block Kit format ✅ v0.2.0

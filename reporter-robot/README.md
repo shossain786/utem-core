@@ -1,0 +1,140 @@
+# utem-robot-reporter
+
+Real-time [Robot Framework](https://robotframework.org/) listener for [UTEM Core](https://github.com/shossain786/utem-core). Streams test results to the UTEM dashboard as tests run — zero external dependencies, uses only the Python standard library.
+
+## Installation
+
+```bash
+pip install utem-robot-reporter
+```
+
+## Quick Start
+
+```bash
+robot --listener utem_robot_reporter.UtemListener tests/
+```
+
+Set the server URL via environment variable:
+
+```bash
+UTEM_SERVER_URL=http://myserver:8080/utem \
+robot --listener utem_robot_reporter.UtemListener tests/
+```
+
+Or pass directly as a listener argument:
+
+```bash
+robot --listener "utem_robot_reporter.UtemListener:http://myserver:8080/utem:my-api-key" tests/
+```
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `UTEM_SERVER_URL` | UTEM server base URL | `http://localhost:8080/utem` |
+| `UTEM_API_KEY` | Project API key | — |
+| `UTEM_RUN_NAME` | Custom run name | Suite name |
+| `UTEM_RUN_LABEL` | Tag (e.g. `regression`) | — |
+| `UTEM_JOB_NAME` | CI job name | — |
+| `UTEM_DISABLED` | Set `true` to disable | `false` |
+
+### utem.config.json
+
+Create `utem.config.json` in your project root:
+
+```json
+{
+  "serverUrl": "http://myserver:8080/utem",
+  "apiKey": "utem_your_api_key_here",
+  "runName": "My Test Suite",
+  "runLabel": "regression",
+  "jobName": "nightly",
+  "disabled": false
+}
+```
+
+**Priority:** Listener args → Environment variables → `utem.config.json` → defaults
+
+## Screenshot Support (Selenium)
+
+Register your WebDriver in a Suite Setup or a keyword called before tests run:
+
+```robotframework
+*** Settings ***
+Library    SeleniumLibrary
+Library    utem_robot_reporter
+
+Suite Setup    Open Browser And Register
+
+*** Keywords ***
+Open Browser And Register
+    Open Browser    https://example.com    chrome
+    Register Driver    ${BROWSER}
+```
+
+Or from Python:
+
+```python
+import utem_robot_reporter
+
+# In your setup keyword or custom library
+utem_robot_reporter.register_driver(driver)
+```
+
+Screenshots are automatically captured on test failure and attached in the UTEM dashboard.
+
+## CI Integration
+
+### GitHub Actions
+
+```yaml
+- name: Run Robot Framework tests
+  run: robot --listener utem_robot_reporter.UtemListener tests/
+  env:
+    UTEM_SERVER_URL: http://your-utem-server:8080/utem
+    UTEM_API_KEY: ${{ secrets.UTEM_API_KEY }}
+    UTEM_RUN_NAME: "Robot - ${{ github.ref_name }}"
+    UTEM_RUN_LABEL: regression
+```
+
+### Jenkins
+
+```groovy
+stage('Test') {
+    environment {
+        UTEM_SERVER_URL = 'http://your-utem-server:8080/utem'
+        UTEM_API_KEY    = credentials('utem-api-key')
+        UTEM_RUN_NAME   = "Robot - ${env.BRANCH_NAME}"
+    }
+    steps {
+        sh 'robot --listener utem_robot_reporter.UtemListener tests/'
+    }
+}
+```
+
+## Disabling the Reporter
+
+```bash
+UTEM_DISABLED=true robot tests/
+```
+
+## What Gets Reported
+
+| Robot Framework event | UTEM event |
+|---|---|
+| Suite start (root) | `TEST_RUN_STARTED` + `TEST_SUITE_STARTED` |
+| Suite start (nested) | `TEST_SUITE_STARTED` |
+| Test start | `TEST_CASE_STARTED` |
+| Test PASS | `TEST_PASSED` + `TEST_CASE_FINISHED` |
+| Test FAIL | `TEST_FAILED` + `TEST_CASE_FINISHED` |
+| Test SKIP / NOT RUN | `TEST_SKIPPED` + `TEST_CASE_FINISHED` |
+| Suite end | `TEST_SUITE_FINISHED` |
+| Suite end (root) | `TEST_RUN_FINISHED` |
+| Failure screenshot | `ATTACHMENT` + file upload |
+
+## Requirements
+
+- Python 3.8+
+- Robot Framework 4+

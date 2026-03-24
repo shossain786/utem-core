@@ -22,7 +22,7 @@ features:
     details: Live test results streamed via WebSocket. Watch tests pass and fail as they run.
   - icon: 🔌
     title: Zero Config Reporters
-    details: Drop-in reporters for JUnit 5, TestNG, Cucumber, Jest, Cypress, Playwright, and pytest. One dependency, no code changes required.
+    details: Drop-in reporters for JUnit 5, TestNG, Cucumber, Jest, Cypress, Playwright, pytest, and Robot Framework. One dependency, no code changes required.
   - icon: 📊
     title: Analytics & Trends
     details: Pass rate trends, flakiness detection, performance analysis, and failure clustering.
@@ -40,12 +40,12 @@ features:
 <!-- ── Stats bar ─────────────────────────────────────────────────── -->
 <div class="stats-bar">
   <div class="stat-item">
-    <span class="stat-number">7</span>
+    <span class="stat-number">8</span>
     <span class="stat-label">Reporters</span>
   </div>
   <div class="stat-divider"></div>
   <div class="stat-item">
-    <span class="stat-number">4</span>
+    <span class="stat-number">5</span>
     <span class="stat-label">Languages</span>
   </div>
   <div class="stat-divider"></div>
@@ -76,6 +76,7 @@ features:
     <a href="/utem-core/reporters/cypress" class="framework-badge js">Cypress</a>
     <a href="/utem-core/reporters/playwright" class="framework-badge js">Playwright</a>
     <a href="/utem-core/reporters/pytest" class="framework-badge python">pytest</a>
+    <a href="/utem-core/reporters/robot" class="framework-badge python">Robot Framework</a>
   </div>
 </div>
 
@@ -142,6 +143,7 @@ UTEM has first-class reporters for:
 - **[Cypress](/reporters/cypress)** — E2E testing, spec-level reporting, Node.js ≥ 18
 - **[Playwright](/reporters/playwright)** — E2E testing, screenshot forwarding, Node.js ≥ 18
 - **[pytest](/reporters/pytest)** — Python, auto-discovered, Python 3.8+
+- **[Robot Framework](/reporters/robot)** — Python, listener v3, RF 4+
 
 Support for NUnit, xUnit, and Vitest is on the roadmap.
 

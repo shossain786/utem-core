@@ -47,6 +47,7 @@ export default defineConfig({
           { text: 'Cypress', link: '/reporters/cypress' },
           { text: 'Playwright', link: '/reporters/playwright' },
           { text: 'pytest', link: '/reporters/pytest' },
+          { text: 'Robot Framework', link: '/reporters/robot' },
         ]
       },
       {
