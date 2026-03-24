@@ -22,7 +22,7 @@ features:
     details: Live test results streamed via WebSocket. Watch tests pass and fail as they run.
   - icon: 🔌
     title: Zero Config Reporters
-    details: Drop-in reporters for JUnit 5, Cucumber, and Jest. One dependency, no code changes required.
+    details: Drop-in reporters for JUnit 5, Cucumber, Jest, and Cypress. One dependency, no code changes required.
   - icon: 📊
     title: Analytics & Trends
     details: Pass rate trends, flakiness detection, performance analysis, and failure clustering.
@@ -62,6 +62,7 @@ UTEM has first-class reporters for:
 - **[JUnit 5](/reporters/junit5)** — Java, zero dependencies, Maven/Gradle
 - **[Cucumber](/reporters/cucumber)** — JVM (Java/Kotlin), step-level reporting + screenshots
 - **[Jest](/reporters/jest)** — JavaScript/TypeScript, zero dependencies, Node.js ≥ 18
+- **[Cypress](/reporters/cypress)** — E2E testing, spec-level reporting, Node.js ≥ 18
 
 Support for TestNG, Playwright, and pytest is on the roadmap.
 

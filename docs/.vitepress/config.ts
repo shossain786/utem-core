@@ -43,6 +43,7 @@ export default defineConfig({
           { text: 'JUnit 5', link: '/reporters/junit5' },
           { text: 'Cucumber', link: '/reporters/cucumber' },
           { text: 'Jest', link: '/reporters/jest' },
+          { text: 'Cypress', link: '/reporters/cypress' },
         ]
       },
       {

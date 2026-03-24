@@ -65,3 +65,4 @@ Your test run appears live in the dashboard.
 - [JUnit 5 reporter](../reporters/junit5) — detailed setup
 - [Cucumber reporter](../reporters/cucumber) — Cucumber integration
 - [Jest reporter](../reporters/jest) — JavaScript/TypeScript projects
+- [Cypress reporter](../reporters/cypress) — E2E testing

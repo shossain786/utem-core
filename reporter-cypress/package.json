@@ -1,0 +1,14 @@
+{
+  "name": "utem-cypress-reporter",
+  "version": "0.1.0",
+  "description": "Cypress plugin that streams test results to UTEM Core in real time",
+  "main": "index.js",
+  "license": "MIT",
+  "keywords": ["cypress", "reporter", "utem", "test-reporting"],
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "cypress": ">=10"
+  }
+}
