@@ -5,7 +5,7 @@
 - [x] TestNG reporter (`utem-reporter-testng`) — Maven Central ✅ v0.1.1
 - [x] Playwright reporter (`utem-reporter-playwright`) — npm ✅ v0.1.5
 - [x] Jest reporter (`utem-jest-reporter`) — npm ✅ v0.1.0
-- [ ] Cypress reporter
+- [x] Cypress reporter (`utem-cypress-reporter`) — npm ✅ v0.1.0
 - [ ] Robot Framework listener
 
 ## Notifications & Alerts
