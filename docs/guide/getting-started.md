@@ -64,5 +64,8 @@ Your test run appears live in the dashboard.
 - [Enable authentication](./auth) — multi-user setup
 - [JUnit 5 reporter](../reporters/junit5) — detailed setup
 - [Cucumber reporter](../reporters/cucumber) — Cucumber integration
+- [TestNG reporter](../reporters/testng) — Java TestNG projects
 - [Jest reporter](../reporters/jest) — JavaScript/TypeScript projects
-- [Cypress reporter](../reporters/cypress) — E2E testing
+- [Cypress reporter](../reporters/cypress) — Cypress E2E
+- [Playwright reporter](../reporters/playwright) — Playwright E2E
+- [pytest reporter](../reporters/pytest) — Python projects

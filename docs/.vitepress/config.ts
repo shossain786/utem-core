@@ -41,9 +41,12 @@ export default defineConfig({
         text: 'Reporters',
         items: [
           { text: 'JUnit 5', link: '/reporters/junit5' },
+          { text: 'TestNG', link: '/reporters/testng' },
           { text: 'Cucumber', link: '/reporters/cucumber' },
           { text: 'Jest', link: '/reporters/jest' },
           { text: 'Cypress', link: '/reporters/cypress' },
+          { text: 'Playwright', link: '/reporters/playwright' },
+          { text: 'pytest', link: '/reporters/pytest' },
         ]
       },
       {
