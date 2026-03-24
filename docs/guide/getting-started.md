@@ -19,7 +19,7 @@ Your tests  →  UTEM Reporter  →  UTEM Server  →  Dashboard
 ### 1. Start the server
 
 ```bash
-java -jar utem-core-0.9.1.jar
+java -jar utem-core-0.9.2.jar
 ```
 
 Open [http://localhost:8080](http://localhost:8080) — the dashboard is ready.
@@ -36,7 +36,7 @@ Add to your `pom.xml`:
 <dependency>
   <groupId>com.utem</groupId>
   <artifactId>utem-reporter-junit5</artifactId>
-  <version>0.9.1</version>
+  <version>0.9.2</version>
   <scope>test</scope>
 </dependency>
 ```

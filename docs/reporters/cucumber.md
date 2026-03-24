@@ -10,7 +10,7 @@ Same dependency as JUnit 5:
 <dependency>
   <groupId>com.utem</groupId>
   <artifactId>utem-reporter-junit5</artifactId>
-  <version>0.9.1</version>
+  <version>0.9.2</version>
   <scope>test</scope>
 </dependency>
 ```

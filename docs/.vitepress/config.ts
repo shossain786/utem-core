@@ -19,7 +19,7 @@ export default defineConfig({
       { text: 'API', link: '/api/rest' },
       { text: 'GitHub', link: 'https://github.com/shossain786/utem-core' },
       {
-        text: 'v0.9.1',
+        text: 'v0.9.2',
         items: [
           { text: 'Releases', link: 'https://github.com/shossain786/utem-core/releases' },
           { text: 'Docker Hub', link: 'https://hub.docker.com/r/sddmhossain/utem-core' },

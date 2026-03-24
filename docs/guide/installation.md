@@ -7,10 +7,10 @@
 
 ## Option 1: JAR (Recommended)
 
-Download `utem-core-0.9.1.jar` from [GitHub Releases](https://github.com/shossain786/utem-core/releases).
+Download `utem-core-0.9.2.jar` from [GitHub Releases](https://github.com/shossain786/utem-core/releases).
 
 ```bash
-java -jar utem-core-0.9.1.jar
+java -jar utem-core-0.9.2.jar
 ```
 
 The server starts on port 8080. Data is stored in `utem.db` in the current directory.
@@ -20,7 +20,7 @@ The server starts on port 8080. Data is stored in `utem.db` in the current direc
 For Windows users, download `start.bat` alongside the JAR:
 
 ```
-utem-core-0.9.1.jar
+utem-core-0.9.2.jar
 start.bat
 ```
 
@@ -46,7 +46,7 @@ To persist data across container restarts, the volume mounts `/app/data` where S
 version: '3.8'
 services:
   utem:
-    image: sddmhossain/utem-core:0.9.1
+    image: sddmhossain/utem-core:0.9.2
     ports:
       - "8080:8080"
     volumes:
@@ -66,7 +66,7 @@ volumes:
 git clone https://github.com/shossain786/utem-core.git
 cd utem-core
 mvn package -DskipTests
-java -jar target/utem-core-0.9.1.jar
+java -jar target/utem-core-0.9.2.jar
 ```
 
 ## Verify

@@ -117,7 +117,7 @@ export default function Sidebar() {
             </button>
           </div>
         ) : (
-          <span>v0.9.1 · UTEM</span>
+          <span>v0.9.2 · UTEM</span>
         )}
         <button
           type="button"

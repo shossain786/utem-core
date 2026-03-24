@@ -28,7 +28,7 @@ docker run -d \
 version: '3.8'
 services:
   utem:
-    image: sddmhossain/utem-core:0.9.1
+    image: sddmhossain/utem-core:0.9.2
     ports:
       - "8080:8080"
     volumes:
@@ -65,7 +65,7 @@ Mount your own `application.properties`:
 | Tag | Description |
 |---|---|
 | `latest` | Latest stable release |
-| `0.9.1` | Specific version |
+| `0.9.2` | Specific version |
 
 All tags: [Docker Hub](https://hub.docker.com/r/sddmhossain/utem-core/tags)
 

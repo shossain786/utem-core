@@ -90,7 +90,7 @@ features:
       <div class="step-content">
         <h3>Start the server</h3>
         <p>Run the JAR or Docker container. The dashboard is immediately available at <code>localhost:8080</code>.</p>
-        <div class="step-code">java -jar utem-core-0.9.1.jar</div>
+        <div class="step-code">java -jar utem-core-0.9.2.jar</div>
       </div>
     </div>
     <div class="step-arrow">→</div>
